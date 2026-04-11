@@ -57,7 +57,13 @@
 }
 
 @media (max-width: 768px) {
-  .profile-card {
+  .profile-card:not(.explorer-profile) {
+    display: none;
+  }
+}
+
+@media (min-width: 769px) {
+  .profile-card.explorer-profile {
     display: none;
   }
 }

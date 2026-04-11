@@ -50,6 +50,7 @@ a.internal.tag-link {
   background-color: var(--highlight);
   padding: 0.2rem 0.4rem;
   margin: 0 0.1rem;
+  font-size: 0.9rem;
 }
 `
 

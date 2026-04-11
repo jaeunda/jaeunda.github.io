@@ -7,6 +7,7 @@ import { classNames } from "../util/lang"
 import { i18n } from "../i18n"
 import { FileTrieNode } from "../util/fileTrie"
 import OverflowListFactory from "./OverflowList"
+import ProfileCard from "./ProfileCard"
 import { concatenateResources } from "../util/resources"
 
 type OrderEntries = "sort" | "filter" | "map"
@@ -59,8 +60,10 @@ let numExplorers = 0
 export default ((userOpts?: Partial<Options>) => {
   const opts: Options = { ...defaultOptions, ...userOpts }
   const { OverflowList, overflowListAfterDOMLoaded } = OverflowListFactory()
+const ProfileCardComponent = ProfileCard()
 
-  const Explorer: QuartzComponent = ({ cfg, displayClass }: QuartzComponentProps) => {
+  const Explorer: QuartzComponent = (props: QuartzComponentProps) => {
+    const { cfg, displayClass } = props
     const id = `explorer-${numExplorers++}`
 
     return (
@@ -120,6 +123,7 @@ export default ((userOpts?: Partial<Options>) => {
           </svg>
         </button>
         <div id={id} class="explorer-content" aria-expanded={false} role="group">
+          <ProfileCardComponent {...props} explorerProfile={true} />
           <OverflowList class="explorer-ul" />
         </div>
         <template id="template-file">
@@ -159,7 +163,7 @@ export default ((userOpts?: Partial<Options>) => {
     )
   }
 
-  Explorer.css = style
+  Explorer.css = concatenateResources(style, ProfileCardComponent.css)
   Explorer.afterDOMLoaded = concatenateResources(script, overflowListAfterDOMLoaded)
   return Explorer
 }) satisfies QuartzComponentConstructor
