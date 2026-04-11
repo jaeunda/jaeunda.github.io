@@ -6,6 +6,16 @@ import * as Plugin from "./quartz/plugins"
  *
  * See https://quartz.jzhao.xyz/configuration for more information.
  */
+export const socialLinks = [
+  {
+    name: "GitHub",
+    url: "https://github.com/jaeunda",   // ← 본인 URL로 교체
+    icon: "github",
+  },
+  // 나중에 추가할 것들 예시 (지금은 주석 처리)
+  // { name: "X", url: "https://x.com/...", icon: "x" },
+  // { name: "Email", url: "mailto:...", icon: "mail" },
+]
 const config: QuartzConfig = {
   configuration: {
     pageTitle: "jaeunda.log",

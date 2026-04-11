@@ -12,7 +12,7 @@
     border: 1px var(--lightgray) solid;
     border-radius: 4px;
     font-family: inherit;
-    font-size: inherit;
+    font-size: 0.9rem;
     height: 2rem;
     padding: 0 1rem 0 0;
     display: flex;
@@ -83,7 +83,7 @@
         padding: 0.5em 1em;
         font-family: var(--bodyFont);
         color: var(--dark);
-        font-size: 1.1em;
+        font-size: 0.9em;
         border: 1px solid var(--lightgray);
 
         &:focus {
@@ -188,7 +188,7 @@
 
             // normalize card props
             font-family: inherit;
-            font-size: 100%;
+            font-size: 95%;
             line-height: 1.15;
             margin: 0;
             text-transform: none;
