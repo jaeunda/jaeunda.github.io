@@ -1,3 +1,4 @@
+@use "./variables.scss" as *;
 @use "./base.scss";
 
 /* 전체 본문 */
@@ -20,6 +21,7 @@ h1, h2, h3, h4, h5, h6 {
 .page-title {
   font-weight: 600;
   font-size: 2rem;
+  margin-left: 0.15em;
   letter-spacing: -0.03em;
   color: var(--dark);
 }
@@ -52,4 +54,102 @@ code {
 footer {
   font-size: 0.8rem;
   color: var(--gray);
+}
+
+/* ============================================================
+   모바일 레이아웃 수정
+   ============================================================ */
+
+@media all and ($mobile) {
+  /* 1-1: 우측 사이드바 숨김 */
+  .sidebar.right {
+    display: none !important;
+  }
+
+  /* 1-2: 가로 오버플로우 방지 */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* 2-3: 읽기모드 버튼 숨김 */
+  .readermode {
+    display: none !important;
+  }
+
+  /* 2-1: 검색 아이콘 전용 모드 */
+  .search {
+    min-width: unset;
+
+    & > .search-button {
+      border: none;
+      padding: 0.5rem;
+      width: auto;
+      min-width: unset;
+
+      & > p {
+        display: none;
+      }
+
+      & > svg {
+        margin: 0;
+      }
+    }
+  }
+
+  /* A: 검색 아이콘 우측 정렬 + 컨테이너 여백 제거
+       gap은 inline style="gap: 1rem"으로 박혀 있어 !important 필요 */
+  .sidebar.left .flex-component {
+    margin-left: auto;
+    gap: 0 !important;
+    padding: 0 !important;
+    width: auto !important;
+    justify-content: flex-end !important;
+  }
+
+  /* 자식 wrapper들의 inline flex-grow도 !important로 덮어쓰기 */
+  .sidebar.left .flex-component > div {
+    flex-grow: 0 !important;
+    flex-shrink: 0 !important;
+    flex-basis: auto !important;
+  }
+
+  /* ReaderMode wrapper — 항상 숨김 (모바일에서 완전 미사용) */
+  .sidebar.left .flex-component > div:has(> .readermode) {
+    display: none !important;
+  }
+
+  /* Darkmode wrapper — display 유지하되 폭만 0으로 (display: none 시 fixed 자식도 숨겨지므로 사용 불가)
+     overflow: visible로 wrapper 밖의 fixed 버튼이 정상 렌더링되도록 허용 */
+  .sidebar.left .flex-component > div:has(> .darkmode) {
+    width: 0 !important;
+    flex-basis: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* B: 드로어 폭 100vw 강제 — position: absolute(sidebar 기준)를 fixed(viewport 기준)로 변경 */
+  .explorer-content {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100vw !important;
+  }
+
+  /* C: 다크모드 — 항상 fixed로 존재, 닫힘 시 화면 좌측 밖으로 숨김 (transform 슬라이드)
+     드로어 transition(200ms ease)과 동일 값으로 동기화 */
+  .sidebar.left .darkmode {
+    display: flex;
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 102;
+    transform: translateX(-100vw);
+    transition: transform 200ms ease;
+  }
+}
+
+/* C: 드로어 열림 — 다크모드 슬라이드 인 (트리거: html.mobile-no-scroll) */
+@media all and ($mobile) {
+  html.mobile-no-scroll .sidebar.left .darkmode {
+    transform: translateX(0);
+  }
 }
