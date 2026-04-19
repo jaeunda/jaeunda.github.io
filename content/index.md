@@ -1,6 +1,6 @@
 ---
-title: Welcome to Quartz
+title: jaeunda.log
 ---
 
-This is a blank Quartz installation.
-See the [documentation](https://quartz.jzhao.xyz) for how to get started.
+- Github: https://github.com/jaeunda
+- E-mail: jaeunda@gmail.com
