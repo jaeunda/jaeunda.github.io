@@ -166,7 +166,7 @@ Crab이 옆으로 걷는 것과 유사하여 Crabbing이라고 한다.
 
 T1에서 Split 또는 Merge가 발생하여 부모인 Internal node의 X-lock을 요청할 때, T2에서 search하며 Internal node가 S-lock을 보유하고 있다면 Deadlock이 발생할 수 있다.
 - T2: Internal node는 S-lock을 보유한 상태로 Leaf node의 S-lock을 기다리고, 
-- T1: Leaf node는 X-lock을 보유한 상태로 Leaf node의 X-lock을 기다리게 된다.
+- T1: Leaf node는 X-lock을 보유한 상태로 Internal node의 X-lock을 기다리게 된다.
 
 Index는 Top-down 순서로 데이터를 읽도록 설계된 구조이다. Split/Merge 때문에 역방향(Bottom-up)으로 lock을 추가 요청하게 되므로 Excessive Deadlock이 발생한다. 
 
