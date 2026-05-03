@@ -479,3 +479,84 @@ article {
     &:hover { color: var(--darkgray); }
   }
 }
+
+
+// ── 6. Tag / Folder List Page ────────────────────────────────
+
+.page-listing {
+  & > p {
+    font-size: 13px;
+    color: var(--gray);
+    margin-bottom: 28px;
+  }
+
+  ul.section-ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 0;
+  }
+
+  li.section-li {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--lightgray);
+    margin-bottom: 0;
+
+    &:last-child { border-bottom: none; }
+  }
+
+  li.section-li > .section {
+    grid-template-columns: fit-content(8em) 2fr 1.5fr;
+  }
+
+  .meta {
+    font-size: 12px;
+    font-family: var(--codeFont);
+    color: var(--gray);
+    opacity: 1;
+    margin: 0;
+  }
+
+  .desc h3 {
+    font-size: 15px;
+    font-weight: 500;
+    font-family: var(--bodyFont);
+    line-height: 1.35;
+    margin: 0;
+  }
+
+  .desc h3 a {
+    color: var(--darkgray);
+    text-decoration: none;
+    transition: color 0.12s;
+    &:hover { color: var(--tertiary); }
+  }
+
+  ul.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+}
+
+a.internal.tag-link {
+  font-size: 12px;
+  line-height: 1.5;
+  font-family: var(--codeFont);
+  background: var(--highlight);
+  color: var(--tertiary);
+  border: 1px solid var(--lightgray);
+  border-radius: 4px;
+  padding: 2px 9px;
+  margin: 0;
+  text-decoration: none;
+  transition: background 0.12s, color 0.12s;
+
+  &:hover {
+    background: rgba(154, 168, 136, 0.3);
+    color: var(--dark);
+  }
+}
