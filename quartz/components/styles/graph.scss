@@ -1,9 +1,28 @@
 @use "../../styles/variables.scss" as *;
 
 .graph {
-  & > h3 {
-    font-size: 1rem;
-    margin: 0;
+  & > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    list-style: none;
+    &::-webkit-details-marker { display: none; }
+
+    & > h3 {
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    & > .graph-fold-icon {
+      color: var(--gray);
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+  }
+
+  &[open] > summary > .graph-fold-icon {
+    transform: rotate(180deg);
   }
 
   & > .graph-outer {
