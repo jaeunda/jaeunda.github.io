@@ -581,6 +581,8 @@ document.addEventListener("nav", async (e: CustomEventMap["nav"]) => {
     cleanupLocalGraphs()
     const localGraphContainers = document.getElementsByClassName("graph-container")
     for (const container of localGraphContainers) {
+      const details = container.closest("details")
+      if (details && !details.open) continue
       localGraphCleanups.push(await renderGraph(container as HTMLElement, slug))
     }
   }
@@ -593,6 +595,15 @@ document.addEventListener("nav", async (e: CustomEventMap["nav"]) => {
   document.addEventListener("themechange", handleThemeChange)
   window.addCleanup(() => {
     document.removeEventListener("themechange", handleThemeChange)
+  })
+
+  const graphDetails = [...document.querySelectorAll("details.graph")] as HTMLDetailsElement[]
+  const handleGraphToggle = async () => {
+    await renderLocalGraph()
+  }
+  graphDetails.forEach((details) => {
+    details.addEventListener("toggle", handleGraphToggle)
+    window.addCleanup(() => details.removeEventListener("toggle", handleGraphToggle))
   })
 
   const containers = [...document.getElementsByClassName("global-graph-outer")] as HTMLElement[]
