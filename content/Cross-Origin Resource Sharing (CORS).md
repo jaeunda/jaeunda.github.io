@@ -41,11 +41,11 @@ Same-Origin Policy는 동일한 출처인 경우만 요청을 허용한다.
 
 | URL                                         | Outcome          | Reason                                             |
 | ------------------------------------------- | ---------------- | -------------------------------------------------- |
-| _http://store.aws.com/dir2/new.html_        | Same origin      | Only the path differs                              |
-| _http://store.aws.com/dir/inner/other.html_ | Same origin      | Only the path differs                              |
-| _https://store.aws.com/page.html_           | Different origin | Different **protocol**                             |
-| _http://store.aws.com:81/dir/page.html_     | Different origin | Different **port** (http:// is port 80 by default) |
-| _http://news.aws.com/dir/page.html_         | Different origin | Different **host**                                 |
+| `http://store.aws.com/dir2/new.html`        | Same origin      | Only the path differs                              |
+| `http://store.aws.com/dir/inner/other.html` | Same origin      | Only the path differs                              |
+| `https://store.aws.com/page.html`           | Different origin | Different **protocol**                             |
+| `http://store.aws.com:81/dir/page.html`     | Different origin | Different **port** (http:// is port 80 by default) |
+| `http://news.aws.com/dir/page.html`         | Different origin | Different **host**                                 |
 - `http`와 `https`는 다른 프로토콜이므로 다른 출처(origin)로 간주한다.
 - `http://store.aws.com`은 기본적으로 `80` 포트를 사용한다. `:81`은 포트 번호가 다르므로 다른 출처로 간주한다.
 - `news.aws.com`은 도메인(host)가 다르므로 다른 출처로 간주한다.
@@ -143,7 +143,8 @@ Access-Control-Allow-Headers: Content-Type
  
 `https://www.team-po.cloud`로 접속 자체는 가능하지만, 해당 Origin에서 발생하는 REST API 호출은 **CORS 허용 목록에 없기 때문에** Preflight 요청과 인증이 포함된 요청이 컨트롤러에 도달하기 전인 브라우저/보안 필터 단계에서 차단된다. 서버 API 자체는 정상이어도 프론트엔드에서는 로그인, 회원가입, 데이터 조회 같은 요청이 CORS 에러로 실패한다.
 
-![](img/Pasted-image-20260503231235.png)
+<img src="img/Pasted-image-20260503231235.png" width="400">
+
 ##### Changes
 `setAllowedOrigins` 리스트에 `https://www.team-po.cloud`를 추가하였다.
 ##### Why This Approach
