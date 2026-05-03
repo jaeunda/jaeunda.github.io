@@ -88,7 +88,7 @@ Content Type이 `application/json`인 경우도 complex request에 해당한다.
 
 #### How preflight requests work
 - Link: [AWS - What is a CORS preflight request?](https://aws.amazon.com/what-is/cross-origin-resource-sharing/#what-is-a-cors-preflight-request--17inh0i)
-![[Pasted image 20260503222455.png]]
+![](img/Pasted-image-20260503222455.png)
 1. 브라우저 $\to$ 서버
 	- 브라우저가 preflight request를 생성하고, 실제 요청 메시지를 보내기 전에 **접근 허용 여부 확인을 요청**한다.
 	- Preflight request에는 cross-origin 정보와 서버에 요청하고자 하는 작업에 대한 정보(Method, Header)가 포함된다.
@@ -143,7 +143,7 @@ Access-Control-Allow-Headers: Content-Type
  
 `https://www.team-po.cloud`로 접속 자체는 가능하지만, 해당 Origin에서 발생하는 REST API 호출은 **CORS 허용 목록에 없기 때문에** Preflight 요청과 인증이 포함된 요청이 컨트롤러에 도달하기 전인 브라우저/보안 필터 단계에서 차단된다. 서버 API 자체는 정상이어도 프론트엔드에서는 로그인, 회원가입, 데이터 조회 같은 요청이 CORS 에러로 실패한다.
 
-![[Pasted image 20260503231235.png]]
+![](img/Pasted-image-20260503231235.png)
 ##### Changes
 `setAllowedOrigins` 리스트에 `https://www.team-po.cloud`를 추가하였다.
 ##### Why This Approach
