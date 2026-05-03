@@ -11,7 +11,7 @@ Date: 2026-04-21
 
 > In SQL, a transaction **begins implicitly**
 
-SQL에서 Transaction은 DML(Data Manipulate Language) 문장이 나오면 암시작으로 시작된다.
+SQL에서 Transaction은 DML(Data Manipulate Language) 문장이 나오면 암시적으로 시작된다.
 
 > A transaction ends by:
 > - `COMMIT WORK`: commits current transaction and begins a new one
@@ -25,7 +25,7 @@ Transaction은 commit work 또는 rollback 문장으로 종료된다.
 
 > In almost all database systems, by default, every SQL statement also **commits implicitly** if it executes successfully (**auto commit**).
 
-SQL은 기본적으로 statement 하나를 transaction 하나로 간주한다. 따라서 DDL(Data Definition Language) 문장이 성공적으로 수행되면 따로 명시하지 않아도 자동으로 commit된다.
+SQL은 기본적으로 statement 하나를 transaction 하나로 간주한다. 따라서 DML(Data Manipulation Language) 문장이 성공적으로 수행되면 따로 명시하지 않아도 자동으로 commit된다.
 
 하지만 auto commit으로 인해 Atomicity가 깨지는 경우가 생길 수 있다. 이러한 경우 여러 statement가 하나의 단위가 되어 Transaction을 구성해야 한다. 이때는 명시적으로 auto commit을 끄고 직접 Transaction을 관리해야 한다.
 - SQL transaction statements: `SET TRANSACTION`, `COMMIT`, `ROLLBACK`, `SAVEPOINT`, `ROLLBACK TO SAVEPOINT`

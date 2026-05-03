@@ -33,8 +33,10 @@ Transaction이 임의 노드에 대하여 명시적으로(explicitly) 록을 잡
 |---|---|---|---|
 |Fine (lower in tree)|작음 (tuple)|높음|높음|
 |Coarse (higher in tree)|큼 (table/DB)|낮음|낮음|
-- 소수의 table만 접근하는 Transaction 다른 Transaction과의 충돌을 최소화하는 Fine granularity 유리하다.
+
+- 소수의 tuple만 접근하는 Transaction은 다른 Transaction과의 충돌을 최소화하는 Fine granularity가 유리하다.
 - 대량의 데이터에 접근하는 Transaction은 lock 횟수를 최소화하는 Coarse granularity가 유리하다.
+
 ### 2.2.2. Intention Lock Modes
 
 Intention Lock은 MGL(Multiple Granularity Locking)에서 상위노드만 확인해도 하위 노드의 lock 상태를 파악할 수 있도록 미래의 lock 계획을 상위 노드에 미리 표시하는 메커니즘이다. 
