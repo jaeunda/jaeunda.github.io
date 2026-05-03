@@ -153,3 +153,320 @@ footer {
     transform: translateX(0);
   }
 }
+
+// ============================================================
+// Typography & Sidebar Improvement v2 — 2026-05-04
+// ============================================================
+
+
+// ── 1. 본문 타이포그래피 ──────────────────────────────────────
+
+article {
+  font-size: 14px;
+  line-height: 1.70;
+  font-family: var(--bodyFont);
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  max-width: 660px;
+
+  p {
+    margin-bottom: 1.4em;
+    text-wrap: pretty;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.5px;
+  }
+
+  h2 {
+    font-family: var(--bodyFont);
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.28;
+    letter-spacing: -0.3px;
+    margin-top: 3em;
+    margin-bottom: 0.45em;
+    padding-bottom: 0.4em;
+    border-bottom: 1px solid var(--lightgray);
+  }
+  h2:first-child { margin-top: 0; }
+
+  h3 {
+    font-family: var(--bodyFont);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.35;
+    margin-top: 2.4em;
+    margin-bottom: 0.45em;
+  }
+
+  h4 {
+    font-family: var(--bodyFont);
+    font-size: 14.5px;
+    font-weight: 700;
+    line-height: 1.38;
+    margin-top: 1.8em;
+    margin-bottom: 0.4em;
+    color: var(--darkgray);
+  }
+
+  h5 {
+    font-family: var(--bodyFont);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-top: 1.8em;
+    margin-bottom: 0.4em;
+    color: var(--darkgray);
+  }
+
+  h6 {
+    font-family: var(--bodyFont);
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-top: 1.8em;
+    margin-bottom: 0.4em;
+    color: var(--darkgray);
+  }
+
+  ul, ol {
+    padding-left: 1.5em;
+    margin-bottom: 1.4em;
+  }
+
+  li {
+    line-height: 1.70;
+    margin-bottom: 0.45em;
+  }
+
+  li > ul,
+  li > ol {
+    margin-top: 0.35em;
+    margin-bottom: 0;
+  }
+
+  li > ul > li,
+  li > ol > li {
+    color: var(--darkgray);
+    font-size: 0.97em;
+  }
+
+  p code, li code, td code {
+    font-family: var(--codeFont);
+    font-size: 0.845em;
+    background: rgba(154, 168, 136, 0.14);
+    border: 1px solid var(--lightgray);
+    border-radius: 4px;
+    padding: 0.12em 0.38em;
+    color: var(--darkgray);
+  }
+
+  pre {
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 1.4em;
+    border: 1px solid var(--lightgray);
+
+    code {
+      font-family: var(--codeFont);
+      font-size: 12.5px;
+      line-height: 1.62;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.4em;
+    font-size: 0.92em;
+  }
+
+  th {
+    background: var(--highlight);
+    font-weight: 600;
+    padding: 9px 14px;
+    text-align: left;
+    border-bottom: 2px solid var(--lightgray);
+    font-size: 0.88em;
+  }
+
+  td {
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--lightgray);
+    font-variant-numeric: tabular-nums;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--highlight); }
+
+  blockquote {
+    border-left: 2.5px solid var(--lightgray);
+    padding: 2px 0 2px 16px;
+    margin: 0 0 1.4em;
+    background: none;
+
+    p {
+      color: var(--darkgray);
+      margin-bottom: 0;
+    }
+  }
+
+  a {
+    color: var(--tertiary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+    &:hover { color: var(--dark); }
+  }
+
+  mark {
+    background: var(--textHighlight);
+    color: inherit;
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+}
+
+
+// ── 2. 사이드바 Explorer ─────────────────────────────────────
+
+#explorer {
+  .fold-header button,
+  summary {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--gray);
+    opacity: 0.7;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  li a,
+  li > span,
+  li > .folder-button {
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.45;
+    color: var(--gray);
+    padding: 3px 6px;
+    border-radius: 4px;
+    text-decoration: none;
+    word-break: keep-all;
+    transition: color 0.12s;
+    cursor: pointer;
+
+    &:hover { color: var(--darkgray); }
+  }
+
+  li.active > a,
+  li.active > span,
+  li[data-active="true"] > a {
+    color: var(--tertiary);
+    font-weight: 500;
+  }
+}
+
+
+// ── 3. Table of Contents (우측 사이드바) ─────────────────────
+
+#toc {
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  li {
+    font-size: 11.5px;
+    font-weight: 400;
+    line-height: 1.45;
+    color: var(--gray);
+    padding: 3px 6px;
+    border-radius: 4px;
+    word-break: keep-all;
+    transition: color 0.12s;
+    cursor: pointer;
+
+    &:hover { color: var(--darkgray); }
+
+    &.depth-1 { padding-left: 6px; }
+    &.depth-2 { padding-left: 14px; }
+    &.depth-3 {
+      padding-left: 22px;
+      font-size: 11px;
+      color: var(--lightgray);
+    }
+
+    &.in-view {
+      color: var(--tertiary);
+      font-weight: 500;
+    }
+  }
+}
+
+.toc {
+  a {
+    font-size: 11.5px;
+    font-weight: 400;
+    line-height: 1.45;
+    color: var(--gray);
+    text-decoration: none;
+    display: block;
+    padding: 3px 6px;
+    border-radius: 4px;
+    transition: color 0.12s;
+    word-break: keep-all;
+    &:hover { color: var(--darkgray); }
+  }
+  a.in-view {
+    color: var(--tertiary);
+    font-weight: 500;
+  }
+}
+
+
+// ── 4. Backlinks ─────────────────────────────────────────────
+
+.backlinks {
+  & > h3 {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--tertiary);
+  }
+
+  li a {
+    font-size: 11.5px;
+    font-weight: 400;
+    line-height: 1.45;
+    color: var(--gray);
+    text-decoration: none;
+    display: block;
+    padding: 3px 6px;
+    border-radius: 4px;
+    transition: color 0.12s;
+    word-break: keep-all;
+    &:hover { color: var(--darkgray); }
+  }
+}
