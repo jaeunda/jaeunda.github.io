@@ -164,9 +164,9 @@ Crab이 옆으로 걷는 것과 유사하여 Crabbing이라고 한다.
 
 ###### Excessive Deadlock 발생 가능성
 
-Split/Merge가 발생하여 부모인 Internal node의 X-lock을 요청할 때 Internal node가 S-lock을 보유하고 있었다면 Deadlock이 발생할 수 있다.
-- Internal node는 S-lock을 보유한 상태로 Leaf node의 S-lock을 기다리고, 
-- Leaf node는 X-lock을 보유한 상태로 Leaf node의 X-lock을 기다리게 된다.
+T1에서 Split 또는 Merge가 발생하여 부모인 Internal node의 X-lock을 요청할 때, T2에서 search하며 Internal node가 S-lock을 보유하고 있다면 Deadlock이 발생할 수 있다.
+- T2: Internal node는 S-lock을 보유한 상태로 Leaf node의 S-lock을 기다리고, 
+- T1: Leaf node는 X-lock을 보유한 상태로 Leaf node의 X-lock을 기다리게 된다.
 
 Index는 Top-down 순서로 데이터를 읽도록 설계된 구조이다. Split/Merge 때문에 역방향(Bottom-up)으로 lock을 추가 요청하게 되므로 Excessive Deadlock이 발생한다. 
 
@@ -182,5 +182,10 @@ Internal node를 읽는 순간 다른 Transaction이 그 값을 바꿔 정확하
 Crabbing 방식과 달리 **자식의 lock을 획득하기 전**에 부모의 lock을 해제한다. 부모 lock을 해제하고 자식이 lock을 획득하는 사이 다른 Transaction이 Internal node의 값을 바꿀 수 있다. 하지만 Internal node의 값은 상관 없고 올바른 Leaf node에 도착하기만 하면 된다.
 
 이때 node에 대한 split/merge가 필요하면 lock을 해제하고 구조 연산을 수행한다. 이때 운영체제의 semaphore로 구현한 **latch**를 활용하여 배타적인 수행을 보장한다.
+- 부모 lock을 먼저 해제하고 자식 lock을 획득한다.
+- 그 사이 다른 transaction이 split/merge를 수행할 수 있다. (structural modification)
+- 이때 짧은 시간 동안 노드를 배타적으로 점유해야 하므로 transaction lock 대신 latch를 사용한다.
+- latch를 걸어 해당 노드를 잠시 잠그고, split/merge가 끝나면 즉시 해제한다.
+	- Semaphore가 한 시점에 하나의 thread만 critical section에 진입하도록 보장한다.
 
 참고: C. Mohan and F. Levine, "ARIES/IM: An Efficient and High-Concurrency Index Management Method Using Write-Ahead Logging", ACM SIGMOD 1992.
