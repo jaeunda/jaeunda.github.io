@@ -18,7 +18,7 @@ const config: QuartzConfig = {
     locale: "en-US",
     baseUrl: "https://jaeunda.github.io",
     ignorePatterns: ["private", "templates", ".obsidian"],
-    defaultDateType: "modified",
+    defaultDateType: "published",
     theme: {
       fontOrigin: "googleFonts",
       cdnCaching: true,
