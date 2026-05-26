@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design system"
+  short_description: "Applies jaeunda.log visual rules consistently."
+  default_prompt: "Use $design-system to update this blog UI while preserving the existing visual system."
