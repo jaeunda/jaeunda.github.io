@@ -2,10 +2,9 @@
 tags:
   - topic/database
   - project/database-system
-Date: 2026-04-19
+Date: 2026-04-17
 ---
-# 2. Concurrency Control
-## 2.1. Lock-based Protocols
+## 2.1. Concurrency Control: Lock-based Protocols
 
 ### 2.1.1. Lock-based Protocols
 
