@@ -94,7 +94,7 @@ SIX는 해당 노드 전체에 대하여 읽기 연산을 하고, 그 중 일부
 -  MGL에서 노드에 lock을 걸기 위해서는 반드시 부모 노드를 먼저 적절한 mode로 잠가야 한다.
 	- 어떤 노드에 **S 또는 IS** 록을 걸려면 → 부모가 **IS 또는 IX** 모드여야 함
 	- 어떤 노드에 **X, SIX, IX** 록을 걸려면 → 부모가 **IX 또는 SIX** 모드여야 함
-	- [Graph-based Protocol - 자식 노드에 접근하려면 반드시 부모 노드에 lock을 획득해야 한다.](02-1-Lock-based-Protocol)
+	- [Graph-based Protocol - 자식 노드에 접근하려면 반드시 부모 노드에 lock을 획득해야 한다.](Lock based Protocol)
 
 - Lock 획득은 root $\to$ leaf 방향, 해제는 leaf $\to$ root 방향으로 이루어진다.
 - 2PL을 준수해야 하므로 unlock을 시작하면 새로운 lock을 획득할 수 없고, 

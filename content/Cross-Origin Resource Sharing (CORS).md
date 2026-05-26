@@ -6,7 +6,6 @@ tags:
   - topic/HTTP
   - project/team-po
 ---
-# CORS: Cross-Origin Resource Sharing
 ## What is Cross-Origin Resource Sharing?
 
 > Cross-origin resource sharing (CORS) is a mechanism for integrating applications.
