@@ -2,10 +2,9 @@
 tags:
   - topic/database
   - project/database-system
-Date: 2026-04-19
+Date: 2026-04-18
 ---
-# 2. Concurrency Control
-## 2.2. Multiple Granularity Locking
+## 2.2. Concurrency Control: Multiple Granularity Locking
 
 ### 2.2.1. Multiple Granularity Locking
 

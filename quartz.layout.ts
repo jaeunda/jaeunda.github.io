@@ -17,8 +17,10 @@ export const sharedPageComponents: SharedLayout = {
 // components for pages that display a single page (e.g. a single note)
 export const defaultContentPageLayout: PageLayout = {
   beforeBody: [
-    Component.TagCloud({ limit: 8 }),
-    Component.RecentNotesWithPreview({ limit: 20, showTags: true, showReadTime: true }),
+    Component.ConditionalRender({
+      component: Component.TagCloud({ limit: 8 }),
+      condition: (page) => page.fileData.slug !== "index",
+    }),
     Component.ConditionalRender({
       component: Component.Breadcrumbs(),
       condition: (page) => page.fileData.slug !== "index",
@@ -36,6 +38,7 @@ export const defaultContentPageLayout: PageLayout = {
       condition: (page) => page.fileData.slug !== "index",
     }),
   ],
+  afterBody: [Component.RecentNotesWithPreview({ limit: 20, showTags: true, showReadTime: true })],
   left: [
     Component.PageTitle(),
     Component.MobileOnly(Component.Spacer()),

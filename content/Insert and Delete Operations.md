@@ -2,10 +2,9 @@
 tags:
   - topic/database
   - project/database-system
-Date: 2026-04-21
+Date: 2026-04-20
 ---
-# 2. Concurrency Control
-## 2.4. Insert and Delete Operations
+## 2.4. Concurrency Control: Insert and Delete Operations
 
 ### 2.4.1. Insert and Delete Operations
 

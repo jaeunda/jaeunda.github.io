@@ -2,10 +2,9 @@
 tags:
   - topic/database
   - project/database-system
-Date: 2026-04-20
+Date: 2026-04-19
 ---
-# 2. Concurrency Control
-## 2.3. Deadlock
+## 2.3. Concurrency Control: Deadlock
 
 ### 2.3.1. Deadlock Example
 

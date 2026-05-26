@@ -4,8 +4,7 @@ tags:
   - project/database-system
 Date: 2026-04-21
 ---
-# 2. Concurrency Control
-## 2.5. Transaction Isolation in SQL
+## 2.5. Concurrency Control: Transaction Isolation in SQL
 
 ### 2.5.1. Transactions in SQL
 

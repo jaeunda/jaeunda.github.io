@@ -19,7 +19,7 @@ const defaultOptions = (cfg: GlobalConfiguration): Options => ({
   limit: 5,
   showTags: true,
   showReadTime: true,
-  filter: () => true,
+  filter: (page) => page.slug !== "index",
   sort: byDateAndAlphabetical(cfg),
 })
 
@@ -40,12 +40,11 @@ export default ((userOpts?: Partial<Options>) => {
         <div class="section-header">
           <div class="section-title">
             Recent
-            <span class="section-title-count" data-recent-count>{pages.length}</span>
+            <span class="section-title-count" data-recent-count>
+              {pages.length}
+            </span>
           </div>
-          <a
-            href={resolveRelative(fileData.slug!, "tags/" as FullSlug)}
-            class="section-action"
-          >
+          <a href={resolveRelative(fileData.slug!, "tags/" as FullSlug)} class="section-action">
             archive →
           </a>
         </div>
@@ -54,20 +53,19 @@ export default ((userOpts?: Partial<Options>) => {
           <span class="active-filter-label">Filter</span>
           <span class="active-filter-chip">
             <span class="active-filter-tag" data-active-filter-tag></span>
-            <button class="active-filter-clear" data-active-filter-clear aria-label="필터 해제">×</button>
+            <button class="active-filter-clear" data-active-filter-clear aria-label="필터 해제">
+              ×
+            </button>
           </span>
         </div>
 
         <div class="recent-posts" data-recent-list>
           {pages.map((page) => {
-            const title =
-              page.frontmatter?.title ?? i18n(cfg.locale).propertyDefaults.title
+            const title = page.frontmatter?.title ?? i18n(cfg.locale).propertyDefaults.title
             const date = getDate(cfg, page)
             const day = date ? String(date.getDate()).padStart(2, "0") : ""
             const monthYear = date
-              ? date
-                  .toLocaleDateString("en-US", { month: "short", year: "numeric" })
-                  .toUpperCase()
+              ? date.toLocaleDateString("en-US", { month: "short", year: "numeric" }).toUpperCase()
               : ""
             const preview = page.description ?? ""
             const tags: string[] = page.frontmatter?.tags ?? []
@@ -89,10 +87,7 @@ export default ((userOpts?: Partial<Options>) => {
                   <span class="month-year">{monthYear}</span>
                 </div>
                 <div class="post-content-col">
-                  <a
-                    href={resolveRelative(fileData.slug!, page.slug!)}
-                    class="post-title"
-                  >
+                  <a href={resolveRelative(fileData.slug!, page.slug!)} class="post-title">
                     {title}
                   </a>
                   {preview && <p class="post-preview">{preview}</p>}
@@ -106,9 +101,7 @@ export default ((userOpts?: Partial<Options>) => {
                           #{tag}
                         </a>
                       ))}
-                    {opts.showReadTime && readTime && (
-                      <span class="post-readtime">{readTime}</span>
-                    )}
+                    {opts.showReadTime && readTime && <span class="post-readtime">{readTime}</span>}
                   </div>
                 </div>
               </article>
