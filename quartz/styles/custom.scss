@@ -587,7 +587,7 @@ a.internal.tag-link {
     font-family: var(--codeFont);
     font-size: 11px;
     font-weight: 400;
-    color: var(--lightgray);
+    color: var(--gray);
   }
   .section-action {
     font-size: 12px;
@@ -655,6 +655,7 @@ a.internal.tag-link {
     border-radius: 5px;
     text-decoration: none;
     transition: all 0.12s;
+    max-width: 100%;
 
     &:hover {
       background: rgba(154, 168, 136, 0.3);
@@ -744,7 +745,7 @@ a.internal.tag-link {
     display: block;
     text-transform: uppercase;
     font-size: 10px;
-    color: var(--lightgray);
+    color: var(--gray);
     letter-spacing: 0.08em;
   }
 }
@@ -806,8 +807,87 @@ a.internal.tag-link {
 .post-readtime {
   font-size: 11px;
   font-family: var(--codeFont);
-  color: var(--lightgray);
+  color: var(--gray);
   margin-left: auto;
+}
+
+@media all and (min-width: 801px) and (max-width: 1100px) {
+  .post-card {
+    grid-template-columns: 64px 1fr;
+    gap: 20px;
+  }
+}
+
+@media all and ($mobile) {
+  .top-tags {
+    margin-bottom: 40px;
+
+    .top-tags-list {
+      gap: 8px;
+    }
+
+    .top-tag {
+      padding: 7px 10px;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  .recent-posts-section {
+    margin-bottom: 28px;
+  }
+
+  .post-card {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 26px 0;
+
+    &:hover {
+      padding-left: 0;
+    }
+  }
+
+  .post-date-col {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding-top: 0;
+    line-height: 1;
+
+    .day {
+      display: inline;
+      font-size: 15px;
+      margin-bottom: 0;
+    }
+
+    .month-year {
+      display: inline;
+      font-size: 10px;
+    }
+  }
+
+  .post-title {
+    font-size: 20px;
+    line-height: 1.28;
+    margin-bottom: 10px;
+  }
+
+  .post-preview {
+    font-size: 13.5px;
+    line-height: 1.62;
+    margin-bottom: 14px;
+  }
+
+  .post-meta-row {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .post-readtime {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 2px;
+  }
 }
 
 :root[saved-theme="dark"] {
@@ -885,5 +965,57 @@ a.internal.tag-link {
     font-size: 13.5px;
     color: var(--gray);
     margin-bottom: 0;
+  }
+}
+
+
+// ============================================================
+// Mobile Drawer Layout + Content Padding — 2026-05-27
+// ============================================================
+
+// ── 모바일 드로어: 본문 밀어내기 ───────────────────────────────
+// Quartz는 #quartz-body.lock-scroll로 본문을 밀도록 설계했으나
+// explorer.inline.ts는 실제로는 html.mobile-no-scroll만 toggle함.
+// html.mobile-no-scroll을 트리거로 동일 효과를 구현.
+@media all and ($mobile) {
+  .page > #quartz-body > :not(.sidebar.left:has(.explorer)) {
+    transition: transform 300ms ease-in-out;
+  }
+}
+
+html.mobile-no-scroll {
+  @media all and ($mobile) {
+    .page > #quartz-body > :not(.sidebar.left:has(.explorer)) {
+      transform: translateX(100dvw);
+    }
+  }
+}
+
+// ── 콘텐츠 좌우 패딩 ─────────────────────────────────────────
+// box-sizing: border-box 없이 padding 추가 시 100% + padding 만큼
+// 오버플로우해 우측 사이드바와 겹침 → border-box로 총 폭 고정
+.center {
+  box-sizing: border-box;
+  padding-left: 48px;
+  padding-right: 48px;
+}
+
+@media all and (max-width: 1100px) {
+  .center {
+    box-sizing: border-box;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+@media all and ($mobile) {
+  .center {
+    box-sizing: border-box;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  article {
+    max-width: 100%;
   }
 }
