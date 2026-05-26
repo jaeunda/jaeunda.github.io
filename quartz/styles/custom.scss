@@ -672,10 +672,11 @@ a.internal.tag-link {
     }
     &:hover .top-tag-count { color: var(--tertiary); }
 
-    &.featured {
+    &.active {
       background: var(--tertiary);
       color: var(--light);
       border-color: var(--tertiary);
+      cursor: pointer;
 
       .top-tag-count {
         background: rgba(0, 0, 0, 0.15);
@@ -810,7 +811,79 @@ a.internal.tag-link {
 }
 
 :root[saved-theme="dark"] {
-  .top-tag.featured {
+  .top-tag.active {
     color: var(--dark);
+  }
+}
+
+// ── Home Tag Filter Interaction ────────────────────────────
+
+.active-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  &[hidden] { display: none; }
+
+  .active-filter-label {
+    font-family: var(--codeFont);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray);
+  }
+
+  .active-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 4px 4px 10px;
+    background: var(--highlight);
+    border: 1px solid var(--lightgray);
+    border-radius: 20px;
+  }
+
+  .active-filter-tag {
+    font-family: var(--codeFont);
+    font-size: 12px;
+    color: var(--tertiary);
+    font-weight: 500;
+  }
+  .active-filter-clear {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: var(--gray);
+    cursor: pointer;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    transition: background 0.12s, color 0.12s;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.08);
+      color: var(--dark);
+    }
+  }
+}
+
+.post-card.is-hidden {
+  display: none;
+}
+
+.recent-empty {
+  padding: 40px 0;
+  text-align: center;
+
+  p {
+    font-size: 13.5px;
+    color: var(--gray);
+    margin-bottom: 0;
   }
 }

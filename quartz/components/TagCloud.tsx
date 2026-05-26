@@ -1,5 +1,7 @@
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
 import { FullSlug, resolveRelative } from "../util/path"
+// @ts-ignore
+import homeFilterScript from "./scripts/homeFilter.inline"
 
 interface Options {
   limit: number
@@ -28,7 +30,7 @@ export default ((opts?: Partial<Options>) => {
     if (topTags.length === 0) return null
 
     return (
-      <section class={`top-tags ${displayClass ?? ""}`}>
+      <section class={`top-tags ${displayClass ?? ""}`} data-home-tagcloud>
         <div class="section-header">
           <div class="section-title">
             Topics
@@ -42,10 +44,11 @@ export default ((opts?: Partial<Options>) => {
           </a>
         </div>
         <div class="top-tags-list">
-          {topTags.map(([tag, count], i) => (
+          {topTags.map(([tag, count]) => (
             <a
               href={resolveRelative(fileData.slug!, `tags/${tag}` as FullSlug)}
-              class={`top-tag ${i === 0 ? "featured" : ""}`}
+              class="top-tag"
+              data-tag={tag}
             >
               #{tag}
               <span class="top-tag-count">{count}</span>
@@ -56,5 +59,6 @@ export default ((opts?: Partial<Options>) => {
     )
   }
 
+  TagCloud.afterDOMLoaded = homeFilterScript
   return TagCloud
 }) satisfies QuartzComponentConstructor
