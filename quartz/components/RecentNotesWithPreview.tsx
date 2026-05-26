@@ -36,11 +36,11 @@ export default ((userOpts?: Partial<Options>) => {
     const pages = allFiles.filter(opts.filter).sort(opts.sort).slice(0, opts.limit)
 
     return (
-      <section class={`recent-posts-section ${displayClass ?? ""}`}>
+      <section class={`recent-posts-section ${displayClass ?? ""}`} data-home-recent>
         <div class="section-header">
           <div class="section-title">
             Recent
-            <span class="section-title-count">{pages.length}</span>
+            <span class="section-title-count" data-recent-count>{pages.length}</span>
           </div>
           <a
             href={resolveRelative(fileData.slug!, "tags/" as FullSlug)}
@@ -49,7 +49,16 @@ export default ((userOpts?: Partial<Options>) => {
             archive →
           </a>
         </div>
-        <div class="recent-posts">
+
+        <div class="active-filter" data-active-filter hidden>
+          <span class="active-filter-label">Filter</span>
+          <span class="active-filter-chip">
+            <span class="active-filter-tag" data-active-filter-tag></span>
+            <button class="active-filter-clear" data-active-filter-clear aria-label="필터 해제">×</button>
+          </span>
+        </div>
+
+        <div class="recent-posts" data-recent-list>
           {pages.map((page) => {
             const title =
               page.frontmatter?.title ?? i18n(cfg.locale).propertyDefaults.title
@@ -69,7 +78,7 @@ export default ((userOpts?: Partial<Options>) => {
               : ""
 
             return (
-              <article class="post-card">
+              <article class="post-card" data-tags={tags.join(",")}>
                 <a
                   href={resolveRelative(fileData.slug!, page.slug!)}
                   class="post-card-link"
@@ -105,6 +114,10 @@ export default ((userOpts?: Partial<Options>) => {
               </article>
             )
           })}
+        </div>
+
+        <div class="recent-empty" data-recent-empty hidden>
+          <p>해당 태그의 글이 없습니다.</p>
         </div>
       </section>
     )

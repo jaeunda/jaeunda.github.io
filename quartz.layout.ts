@@ -18,7 +18,7 @@ export const sharedPageComponents: SharedLayout = {
 export const defaultContentPageLayout: PageLayout = {
   beforeBody: [
     Component.TagCloud({ limit: 8 }),
-    Component.RecentNotesWithPreview({ limit: 5, showTags: true, showReadTime: true }),
+    Component.RecentNotesWithPreview({ limit: 20, showTags: true, showReadTime: true }),
     Component.ConditionalRender({
       component: Component.Breadcrumbs(),
       condition: (page) => page.fileData.slug !== "index",
