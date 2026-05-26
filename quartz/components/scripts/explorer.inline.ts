@@ -19,6 +19,28 @@ type FolderState = {
   collapsed: boolean
 }
 
+function prettifyExplorerLabel(label: string): string {
+  return label.replace(/-/g, " ").replace(/\s+/g, " ").trim()
+}
+
+function setExplorerLabel(element: HTMLElement, label: string) {
+  const match = label.match(/^(\d+(?:-\d+)*)-(.+)$/)
+  const prefix = document.createElement("span")
+  const body = document.createElement("span")
+
+  if (match) {
+    prefix.className = "label-prefix"
+    prefix.textContent = match[1]
+    body.className = "label-body"
+    body.textContent = prettifyExplorerLabel(match[2])
+    element.replaceChildren(prefix, body)
+  } else {
+    body.className = "label-body"
+    body.textContent = prettifyExplorerLabel(label)
+    element.replaceChildren(body)
+  }
+}
+
 let currentExplorerState: Array<FolderState>
 function toggleExplorer(this: HTMLElement) {
   const nearestExplorer = this.closest(".explorer") as HTMLElement
@@ -86,7 +108,7 @@ function createFileNode(currentSlug: FullSlug, node: FileTrieNode): HTMLLIElemen
   const a = li.querySelector("a") as HTMLAnchorElement
   a.href = resolveRelative(currentSlug, node.slug)
   a.dataset.for = node.slug
-  a.textContent = node.displayName
+  setExplorerLabel(a, node.displayName)
 
   if (currentSlug === node.slug) {
     a.classList.add("active")
@@ -122,11 +144,11 @@ function createFolderNode(
     a.href = resolveRelative(currentSlug, folderPath)
     a.dataset.for = folderPath
     a.className = "folder-title"
-    a.textContent = node.displayName
+    setExplorerLabel(a, node.displayName)
     button.replaceWith(a)
   } else {
     const span = titleContainer.querySelector(".folder-title") as HTMLElement
-    span.textContent = node.displayName
+    setExplorerLabel(span, node.displayName)
   }
 
   // if the saved state is collapsed or the default state is collapsed

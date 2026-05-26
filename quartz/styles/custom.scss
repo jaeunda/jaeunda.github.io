@@ -11,7 +11,12 @@ body {
 }
 
 /* 헤딩 */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: var(--dark);
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -33,9 +38,24 @@ a {
   text-underline-offset: 3px;
 }
 
+:focus-visible {
+  outline: 2px solid var(--tertiary);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.article-title {
+  font-family: var(--headerFont);
+  font-size: clamp(28px, 3vw, 36px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0;
+  color: var(--dark);
+}
+
 /* selection */
 ::selection {
-  background-color: rgba(154, 168, 136, 0.20);
+  background-color: rgba(154, 168, 136, 0.2);
   color: var(--dark);
 }
 
@@ -158,54 +178,61 @@ footer {
 // Typography & Sidebar Improvement v2 — 2026-05-04
 // ============================================================
 
-
 // ── 1. 본문 타이포그래피 ──────────────────────────────────────
 
 article {
-  font-size: 14px;
-  line-height: 1.70;
+  font-size: 15px;
+  line-height: 1.78;
   font-family: var(--bodyFont);
+  color: var(--darkgray);
+  letter-spacing: -0.005em;
   word-break: keep-all;
-  overflow-wrap: break-word;
-  max-width: 660px;
+  overflow-wrap: anywhere;
+  max-width: 680px;
+  font-variant-numeric: proportional-nums;
 
   p {
-    margin-bottom: 1.4em;
+    margin-bottom: 1.5em;
     text-wrap: pretty;
   }
 
   h1 {
-    font-size: 22px;
+    font-family: var(--headerFont);
+    font-size: 1.55em;
     font-weight: 700;
     line-height: 1.25;
-    letter-spacing: -0.5px;
+    letter-spacing: 0;
+    margin-top: 0;
   }
 
   h2 {
-    font-family: var(--bodyFont);
-    font-size: 20px;
+    font-family: var(--headerFont);
+    font-size: 1.47em;
     font-weight: 600;
     line-height: 1.28;
-    letter-spacing: -0.3px;
+    letter-spacing: 0;
     margin-top: 3em;
     margin-bottom: 0.45em;
     padding-bottom: 0.4em;
-    border-bottom: 1px solid var(--lightgray);
+    border-bottom: 1px solid color-mix(in oklab, var(--lightgray) 55%, transparent);
   }
-  h2:first-child { margin-top: 0; }
+  h2:first-child {
+    margin-top: 0;
+  }
 
   h3 {
-    font-family: var(--bodyFont);
-    font-size: 17px;
+    font-family: var(--headerFont);
+    font-size: 1.2em;
     font-weight: 600;
     line-height: 1.35;
     margin-top: 2.4em;
     margin-bottom: 0.45em;
+    letter-spacing: 0;
   }
 
   h4 {
     font-family: var(--bodyFont);
-    font-size: 14.5px;
+    font-size: 1em;
     font-weight: 700;
     line-height: 1.38;
     margin-top: 1.8em;
@@ -215,7 +242,7 @@ article {
 
   h5 {
     font-family: var(--bodyFont);
-    font-size: 14px;
+    font-size: 0.93em;
     font-weight: 700;
     line-height: 1.4;
     margin-top: 1.8em;
@@ -224,23 +251,37 @@ article {
   }
 
   h6 {
-    font-family: var(--bodyFont);
-    font-size: 13.5px;
-    font-weight: 700;
+    font-family: var(--codeFont);
+    font-size: 0.87em;
+    font-weight: 600;
     line-height: 1.4;
     margin-top: 1.8em;
     margin-bottom: 0.4em;
     color: var(--darkgray);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
-  ul, ol {
-    padding-left: 1.5em;
-    margin-bottom: 1.4em;
+  h2 + blockquote,
+  h2 + p,
+  h2 + ul,
+  h2 + ol {
+    margin-top: 1.2em;
+  }
+
+  ul,
+  ol {
+    padding-left: 1.25em;
+    margin-bottom: 1.5em;
+  }
+
+  li::marker {
+    color: var(--gray);
   }
 
   li {
-    line-height: 1.70;
-    margin-bottom: 0.45em;
+    line-height: 1.78;
+    margin-bottom: 0.35em;
   }
 
   li > ul,
@@ -255,20 +296,25 @@ article {
     font-size: 0.97em;
   }
 
-  p code, li code, td code {
+  p code,
+  li code,
+  td code {
     font-family: var(--codeFont);
-    font-size: 0.845em;
+    font-size: 0.86em;
     background: rgba(154, 168, 136, 0.14);
     border: 1px solid var(--lightgray);
     border-radius: 4px;
-    padding: 0.12em 0.38em;
+    padding: 0.1em 0.36em;
     color: var(--darkgray);
+    vertical-align: 0.02em;
+    word-break: normal;
+    overflow-wrap: anywhere;
   }
 
   pre {
     border-radius: 8px;
     padding: 16px 20px;
-    margin-bottom: 1.4em;
+    margin-bottom: 1.5em;
     border: 1px solid var(--lightgray);
 
     code {
@@ -284,7 +330,7 @@ article {
   table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 1.4em;
+    margin-bottom: 1.5em;
     font-size: 0.92em;
   }
 
@@ -303,14 +349,20 @@ article {
     font-variant-numeric: tabular-nums;
   }
 
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: var(--highlight); }
+  tr:last-child td {
+    border-bottom: none;
+  }
+  tr:hover td {
+    background: var(--highlight);
+  }
 
   blockquote {
     border-left: 2.5px solid var(--lightgray);
-    padding: 2px 0 2px 16px;
-    margin: 0 0 1.4em;
+    padding: 2px 0 2px 1em;
+    margin: 0 0 1.5em;
     background: none;
+    color: var(--darkgray);
+    font-style: normal;
 
     p {
       color: var(--darkgray);
@@ -318,12 +370,31 @@ article {
     }
   }
 
+  strong {
+    font-weight: 600;
+    color: var(--dark);
+  }
+
+  em {
+    font-style: normal;
+    background: var(--highlight);
+    padding: 0 0.15em;
+    border-radius: 2px;
+  }
+
   a {
     color: var(--tertiary);
     text-decoration: underline;
-    text-underline-offset: 2px;
+    text-decoration-color: color-mix(in oklab, var(--tertiary) 35%, transparent);
+    text-underline-offset: 3px;
     text-decoration-thickness: 1px;
-    &:hover { color: var(--dark); }
+    transition:
+      color 0.12s,
+      text-decoration-color 0.15s ease;
+    &:hover {
+      color: var(--dark);
+      text-decoration-color: var(--tertiary);
+    }
   }
 
   mark {
@@ -333,7 +404,6 @@ article {
     padding: 0 2px;
   }
 }
-
 
 // ── 2. 사이드바 Explorer ─────────────────────────────────────
 
@@ -372,7 +442,9 @@ article {
     transition: color 0.12s;
     cursor: pointer;
 
-    &:hover { color: var(--darkgray); }
+    &:hover {
+      color: var(--darkgray);
+    }
   }
 
   li.active > a,
@@ -382,7 +454,6 @@ article {
     font-weight: 500;
   }
 }
-
 
 // ── 3. Table of Contents (우측 사이드바) ─────────────────────
 
@@ -407,10 +478,16 @@ article {
     transition: color 0.12s;
     cursor: pointer;
 
-    &:hover { color: var(--darkgray); }
+    &:hover {
+      color: var(--darkgray);
+    }
 
-    &.depth-1 { padding-left: 6px; }
-    &.depth-2 { padding-left: 14px; }
+    &.depth-1 {
+      padding-left: 6px;
+    }
+    &.depth-2 {
+      padding-left: 14px;
+    }
     &.depth-3 {
       padding-left: 22px;
       font-size: 11px;
@@ -436,14 +513,15 @@ article {
     border-radius: 4px;
     transition: color 0.12s;
     word-break: keep-all;
-    &:hover { color: var(--darkgray); }
+    &:hover {
+      color: var(--darkgray);
+    }
   }
   a.in-view {
     color: var(--tertiary);
     font-weight: 500;
   }
 }
-
 
 // ── 4. Popover ───────────────────────────────────────────────
 
@@ -452,7 +530,6 @@ article {
   max-height: 16rem;
   font-size: 0.82em;
 }
-
 
 // ── 5. Backlinks ─────────────────────────────────────────────
 
@@ -476,10 +553,11 @@ article {
     border-radius: 4px;
     transition: color 0.12s;
     word-break: keep-all;
-    &:hover { color: var(--darkgray); }
+    &:hover {
+      color: var(--darkgray);
+    }
   }
 }
-
 
 // ── 6. Tag / Folder List Page ────────────────────────────────
 
@@ -501,7 +579,9 @@ article {
     border-bottom: 1px solid var(--lightgray);
     margin-bottom: 0;
 
-    &:last-child { border-bottom: none; }
+    &:last-child {
+      border-bottom: none;
+    }
   }
 
   li.section-li > .section {
@@ -528,7 +608,9 @@ article {
     color: var(--darkgray);
     text-decoration: none;
     transition: color 0.12s;
-    &:hover { color: var(--tertiary); }
+    &:hover {
+      color: var(--tertiary);
+    }
   }
 
   ul.tags {
@@ -539,7 +621,6 @@ article {
     padding: 0;
     margin: 0;
   }
-
 }
 
 a.internal.tag-link {
@@ -553,14 +634,15 @@ a.internal.tag-link {
   padding: 2px 9px;
   margin: 0;
   text-decoration: none;
-  transition: background 0.12s, color 0.12s;
+  transition:
+    background 0.12s,
+    color 0.12s;
 
   &:hover {
     background: rgba(154, 168, 136, 0.3);
     color: var(--dark);
   }
 }
-
 
 // ============================================================
 // Home Page Redesign — 2026-05-26
@@ -594,7 +676,9 @@ a.internal.tag-link {
     color: var(--gray);
     text-decoration: none;
     font-family: var(--codeFont);
-    &:hover { color: var(--tertiary); }
+    &:hover {
+      color: var(--tertiary);
+    }
   }
 }
 
@@ -671,7 +755,9 @@ a.internal.tag-link {
       border-radius: 3px;
       font-weight: 500;
     }
-    &:hover .top-tag-count { color: var(--tertiary); }
+    &:hover .top-tag-count {
+      color: var(--tertiary);
+    }
 
     &.active {
       background: var(--tertiary);
@@ -692,7 +778,9 @@ a.internal.tag-link {
 }
 
 // ── Recent Posts ──────────────────────────────────────────
-.recent-posts-section { margin-bottom: 32px; }
+.recent-posts-section {
+  margin-bottom: 32px;
+}
 .recent-posts {
   display: flex;
   flex-direction: column;
@@ -708,10 +796,14 @@ a.internal.tag-link {
   transition: padding-left 0.18s ease;
   cursor: pointer;
 
-  &:last-child { border-bottom: none; }
+  &:last-child {
+    border-bottom: none;
+  }
   &:hover {
     padding-left: 8px;
-    .post-title { color: var(--tertiary); }
+    .post-title {
+      color: var(--tertiary);
+    }
   }
 
   .post-card-link {
@@ -750,7 +842,9 @@ a.internal.tag-link {
   }
 }
 
-.post-content-col { min-width: 0; }
+.post-content-col {
+  min-width: 0;
+}
 
 .post-title {
   font-family: var(--headerFont);
@@ -894,6 +988,153 @@ a.internal.tag-link {
   .top-tag.active {
     color: var(--dark);
   }
+
+  article {
+    color: #b8bdb6;
+
+    blockquote,
+    blockquote p,
+    h4,
+    h5,
+    h6,
+    p code,
+    li code,
+    td code {
+      color: #b8bdb6;
+    }
+  }
+}
+
+// ============================================================
+// Article Readability + Sidebar Type Vocabulary — 2026-05-27
+// ============================================================
+
+.section-label,
+.section-header .section-title,
+.explorer-toggle h2,
+.toc-header h3,
+.graph > h3,
+.backlinks > h3 {
+  font-family: var(--headerFont);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--dark);
+  line-height: 1.2;
+  text-transform: none;
+}
+
+.section-header .section-title-count,
+.explorer-count,
+.toc-count {
+  font-family: var(--codeFont);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--gray);
+  margin-left: 6px;
+}
+
+.explorer-content ul li > a,
+.folder-container div > a,
+.folder-container div > button,
+.folder-container div > button span {
+  font-family: var(--bodyFont);
+}
+
+.explorer-content ul li > a,
+.folder-container div > a,
+.folder-container div > button {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  line-height: 1.45;
+  text-decoration: none;
+}
+
+.explorer-content .label-prefix {
+  font-family: var(--codeFont);
+  font-size: 10.5px;
+  color: var(--gray);
+  letter-spacing: 0.02em;
+  flex: 0 0 auto;
+}
+
+.explorer-content .label-body {
+  font-family: var(--bodyFont);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--darkgray);
+}
+
+.explorer-content ul li > a:hover .label-body,
+.folder-container div > a:hover .label-body,
+.folder-container div > button:hover .label-body {
+  color: var(--dark);
+}
+
+.explorer-content ul li > a.active .label-prefix,
+.explorer-content ul li > a.active .label-body,
+.folder-container.active .label-prefix,
+.folder-container.active .label-body {
+  color: var(--tertiary);
+  font-weight: 500;
+}
+
+.toc {
+  position: sticky;
+  top: 24px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+
+  a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 3px 6px;
+    line-height: 1.45;
+    color: var(--darkgray);
+    opacity: 1;
+  }
+
+  .toc-prefix {
+    font-family: var(--codeFont);
+    font-size: 10.5px;
+    color: var(--gray);
+    font-variant-numeric: tabular-nums;
+    flex: 0 0 auto;
+    min-width: 2.6em;
+  }
+
+  .toc-body {
+    font-family: var(--bodyFont);
+    font-size: 11.5px;
+    font-weight: 400;
+    color: var(--darkgray);
+  }
+
+  a.in-view .toc-prefix,
+  a.in-view .toc-body {
+    color: var(--tertiary);
+    font-weight: 500;
+  }
+
+  .depth-3 .toc-body {
+    color: var(--gray);
+    font-size: 11px;
+  }
+}
+
+.breadcrumb-container {
+  font-family: var(--codeFont);
+  font-size: 11.5px;
+  color: var(--gray);
+  letter-spacing: 0;
+
+  a {
+    color: var(--tertiary);
+  }
 }
 
 // ── Home Tag Filter Interaction ────────────────────────────
@@ -904,7 +1145,9 @@ a.internal.tag-link {
   gap: 8px;
   margin-bottom: 16px;
 
-  &[hidden] { display: none; }
+  &[hidden] {
+    display: none;
+  }
 
   .active-filter-label {
     font-family: var(--codeFont);
@@ -944,7 +1187,9 @@ a.internal.tag-link {
     justify-content: center;
     font-size: 16px;
     line-height: 1;
-    transition: background 0.12s, color 0.12s;
+    transition:
+      background 0.12s,
+      color 0.12s;
 
     &:hover {
       background: rgba(0, 0, 0, 0.08);
@@ -967,7 +1212,6 @@ a.internal.tag-link {
     margin-bottom: 0;
   }
 }
-
 
 // ============================================================
 // Mobile Drawer Layout + Content Padding — 2026-05-27
@@ -1011,11 +1255,75 @@ html.mobile-no-scroll {
 @media all and ($mobile) {
   .center {
     box-sizing: border-box;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: max(20px, env(safe-area-inset-left));
+    padding-right: max(20px, env(safe-area-inset-right));
   }
 
   article {
+    font-size: 15px;
+    line-height: 1.75;
     max-width: 100%;
+
+    h1 {
+      font-size: 1.5em;
+    }
+    h2 {
+      font-size: 1.25em;
+      margin-top: 2.4em;
+    }
+    h3 {
+      font-size: 1.06em;
+      margin-top: 2em;
+    }
+
+    pre {
+      margin-left: -20px;
+      margin-right: -20px;
+      border-radius: 0;
+      border-left: 0;
+      border-right: 0;
+      padding: 14px 20px;
+
+      code {
+        font-size: 12px;
+        line-height: 1.6;
+      }
+    }
+  }
+
+  .explorer-content .label-prefix {
+    min-width: 2.6em;
+  }
+
+  .toc {
+    position: static;
+    max-height: none;
+  }
+}
+
+// ── Home page intro (index.md article) ──────────────────
+[data-slug="index"] .center > article {
+  font-family: var(--codeFont);
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--gray);
+  max-width: 540px;
+  margin-bottom: 32px;
+
+  p {
+    color: var(--gray);
+    margin-bottom: 0.4em;
+  }
+
+  a {
+    color: var(--tertiary);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--tertiary) 35%, transparent);
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+    transition: color 0.12s;
+    &:hover {
+      color: var(--dark);
+    }
   }
 }

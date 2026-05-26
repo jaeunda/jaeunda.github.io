@@ -261,7 +261,7 @@ Lock Manager는 **In-memory Hash Table** 형태의 Lock Table을 유지한다. D
 	- (T1, T23): (lock-S, lock-X) | (lock-X, lock-S) | (lock-X, lock-X)
 - Data Item I44: T8(granted)
 
-### 2.1.7. [Deadlock](02-3-Deadlocks)
+### 2.1.7. [Deadlock](Deadlocks)
 
 Deadlock은 두 개 이상의 Transaction이 서로 상대방이 보유한 lock이 해제되기를 기다리며 무한히 대기하는 상태이다.
 

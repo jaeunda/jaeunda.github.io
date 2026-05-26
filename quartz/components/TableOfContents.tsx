@@ -17,6 +17,21 @@ const defaultOptions: Options = {
   layout: "modern",
 }
 
+function formatTocLabel(text: string) {
+  const match = text.match(/^(\d+(?:\.\d+)*\.?)\s+(.+)$/)
+
+  if (!match) {
+    return <span class="toc-body">{text}</span>
+  }
+
+  return (
+    <>
+      <span class="toc-prefix">{match[1]}</span>
+      <span class="toc-body">{match[2]}</span>
+    </>
+  )
+}
+
 let numTocs = 0
 export default ((opts?: Partial<Options>) => {
   const layout = opts?.layout ?? defaultOptions.layout
@@ -62,7 +77,7 @@ export default ((opts?: Partial<Options>) => {
           {fileData.toc.map((tocEntry) => (
             <li key={tocEntry.slug} class={`depth-${tocEntry.depth}`}>
               <a href={`#${tocEntry.slug}`} data-for={tocEntry.slug}>
-                {tocEntry.text}
+                {formatTocLabel(tocEntry.text)}
               </a>
             </li>
           ))}
@@ -87,7 +102,7 @@ export default ((opts?: Partial<Options>) => {
           {fileData.toc.map((tocEntry) => (
             <li key={tocEntry.slug} class={`depth-${tocEntry.depth}`}>
               <a href={`#${tocEntry.slug}`} data-for={tocEntry.slug}>
-                {tocEntry.text}
+                {formatTocLabel(tocEntry.text)}
               </a>
             </li>
           ))}

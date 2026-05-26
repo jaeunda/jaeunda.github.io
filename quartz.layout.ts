@@ -18,10 +18,6 @@ export const sharedPageComponents: SharedLayout = {
 export const defaultContentPageLayout: PageLayout = {
   beforeBody: [
     Component.ConditionalRender({
-      component: Component.TagCloud({ limit: 8 }),
-      condition: (page) => page.fileData.slug !== "index",
-    }),
-    Component.ConditionalRender({
       component: Component.Breadcrumbs(),
       condition: (page) => page.fileData.slug !== "index",
     }),
@@ -38,7 +34,10 @@ export const defaultContentPageLayout: PageLayout = {
       condition: (page) => page.fileData.slug !== "index",
     }),
   ],
-  afterBody: [Component.RecentNotesWithPreview({ limit: 20, showTags: true, showReadTime: true })],
+  afterBody: [
+    Component.TagCloud({ limit: 8 }),
+    Component.RecentNotesWithPreview({ limit: 20, showTags: true, showReadTime: true }),
+  ],
   left: [
     Component.PageTitle(),
     Component.MobileOnly(Component.Spacer()),
