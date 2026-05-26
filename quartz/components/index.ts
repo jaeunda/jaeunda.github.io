@@ -23,6 +23,9 @@ import Breadcrumbs from "./Breadcrumbs"
 import Comments from "./Comments"
 import Flex from "./Flex"
 import ConditionalRender from "./ConditionalRender"
+import Hero from "./Hero"
+import TagCloud from "./TagCloud"
+import RecentNotesWithPreview from "./RecentNotesWithPreview"
 
 export {
   ArticleTitle,
@@ -50,5 +53,8 @@ export {
   Comments,
   Flex,
   ConditionalRender,
+  Hero,
+  TagCloud,
+  RecentNotesWithPreview,
 }
 export { default as ProfileCard } from "./ProfileCard"
