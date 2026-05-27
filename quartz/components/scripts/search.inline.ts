@@ -69,15 +69,15 @@ let index = new FlexSearch.Document<Item>({
     index: [
       {
         field: "title",
-        tokenize: "forward",
+        tokenize: "full",
       },
       {
         field: "content",
-        tokenize: "forward",
+        tokenize: "full",
       },
       {
         field: "tags",
-        tokenize: "forward",
+        tokenize: "full",
       },
     ],
   },
@@ -85,7 +85,7 @@ let index = new FlexSearch.Document<Item>({
 
 const p = new DOMParser()
 const fetchContentCache: Map<FullSlug, Element[]> = new Map()
-const contextWindowWords = 30
+const contextWindowWords = 12
 const numSearchResults = 8
 const numTagResults = 5
 
@@ -102,7 +102,7 @@ const tokenizeTerm = (term: string) => {
 }
 
 function highlight(searchTerm: string, text: string, trim?: boolean) {
-  const tokenizedTerms = tokenizeTerm(searchTerm)
+  const tokenizedTerms = tokenizeTerm(searchTerm).filter((term) => [...term].length > 1)
   let tokenizedText = text.split(/\s+/).filter((t) => t !== "")
 
   let startIndex = 0
@@ -148,7 +148,7 @@ function highlight(searchTerm: string, text: string, trim?: boolean) {
 
 function highlightHTML(searchTerm: string, el: HTMLElement) {
   const p = new DOMParser()
-  const tokenizedTerms = tokenizeTerm(searchTerm)
+  const tokenizedTerms = tokenizeTerm(searchTerm).filter((term) => [...term].length > 1)
   const html = p.parseFromString(el.innerHTML, "text/html")
 
   const createHighlightSpan = (text: string) => {
@@ -235,7 +235,7 @@ async function setupSearch(searchElement: Element, currentSlug: FullSlug, data: 
 
   function showSearch(searchTypeNew: SearchType) {
     searchType = searchTypeNew
-    if (sidebar) sidebar.style.zIndex = "1"
+    if (sidebar) sidebar.style.zIndex = "10000"
     container.classList.add("active")
     searchBar.focus()
   }
@@ -295,14 +295,13 @@ async function setupSearch(searchElement: Element, currentSlug: FullSlug, data: 
       // The results should already been focused, so we need to find the next one.
       // The activeElement is the search bar, so we need to find the first result and focus it.
       if (document.activeElement === searchBar || currentHover !== null) {
-        const firstResult = currentHover
-          ? currentHover
+        const nextResult = currentHover
+          ? (currentHover.nextElementSibling as HTMLInputElement | null)
           : (document.getElementsByClassName("result-card")[0] as HTMLInputElement | null)
-        const secondResult = firstResult?.nextElementSibling as HTMLInputElement | null
-        firstResult?.classList.remove("focus")
-        secondResult?.focus()
-        if (secondResult) currentHover = secondResult
-        await displayPreview(secondResult)
+        currentHover?.classList.remove("focus")
+        nextResult?.focus()
+        if (nextResult) currentHover = nextResult
+        await displayPreview(nextResult)
       }
     }
   }
@@ -347,7 +346,7 @@ async function setupSearch(searchElement: Element, currentSlug: FullSlug, data: 
     itemTile.innerHTML = `
       <h3 class="card-title">${title}</h3>
       ${htmlTags}
-      <p class="card-description">${content}</p>
+      ${content ? `<p class="card-description">${content}</p>` : ``}
     `
     itemTile.addEventListener("click", (event) => {
       if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
@@ -374,6 +373,8 @@ async function setupSearch(searchElement: Element, currentSlug: FullSlug, data: 
   }
 
   async function displayResults(finalResults: Item[]) {
+    currentHover?.classList.remove("focus")
+    currentHover = null
     removeAllChildren(results)
     if (finalResults.length === 0) {
       results.innerHTML = `<a class="result-card no-match">
@@ -387,12 +388,8 @@ async function setupSearch(searchElement: Element, currentSlug: FullSlug, data: 
     if (finalResults.length === 0 && preview) {
       // no results, clear previous preview
       removeAllChildren(preview)
-    } else {
-      // focus on first result, then also dispatch preview immediately
-      const firstChild = results.firstElementChild as HTMLElement
-      firstChild.classList.add("focus")
-      currentHover = firstChild as HTMLInputElement
-      await displayPreview(firstChild)
+    } else if (enablePreview) {
+      await displayPreview(results.firstElementChild as HTMLElement)
     }
   }
 

@@ -46,13 +46,12 @@
     position: fixed;
     contain: layout;
     z-index: 999;
-    left: 0;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
+    inset: 0;
+    width: 100dvw;
+    height: 100dvh;
     overflow-y: auto;
     display: none;
-    backdrop-filter: blur(4px);
+    background: var(--light);
 
     &.active {
       display: inline-block;
@@ -97,17 +96,19 @@
         border: 1px solid var(--lightgray);
         flex: 0 0 100%;
         box-sizing: border-box;
+        max-height: min(58vh, 34rem);
+        overflow: hidden;
 
         &.display-results {
           display: flex;
         }
 
-        &[data-preview] > .results-container {
+        &[data-preview="true"] > .results-container {
           flex: 0 0 min(30%, 450px);
         }
 
         @media all and not ($mobile) {
-          &[data-preview] {
+          &[data-preview="true"] {
             & .result-card > p.preview {
               display: none;
             }
@@ -128,7 +129,7 @@
         }
 
         & > div {
-          height: calc(75vh - 12vh);
+          max-height: min(58vh, 34rem);
           border-radius: 5px;
         }
 
@@ -139,7 +140,7 @@
             display: none !important;
           }
 
-          &[data-preview] > .results-container {
+          &[data-preview="true"] > .results-container {
             width: 100%;
             height: auto;
             flex: 0 0 100%;
@@ -174,11 +175,12 @@
         }
 
         & > .results-container {
+          width: 100%;
           overflow-y: auto;
 
           & .result-card {
             overflow: hidden;
-            padding: 1em;
+            padding: 0.85rem 1rem;
             cursor: pointer;
             transition: background 0.2s ease;
             border-bottom: 1px solid var(--lightgray);
@@ -188,8 +190,8 @@
 
             // normalize card props
             font-family: inherit;
-            font-size: 95%;
-            line-height: 1.15;
+            font-size: 0.92rem;
+            line-height: 1.35;
             margin: 0;
             text-transform: none;
             text-align: left;
@@ -204,12 +206,11 @@
 
             & > h3 {
               margin: 0;
-            }
-
-            @media all and not ($mobile) {
-              & > p.card-description {
-                display: none;
-              }
+              color: var(--dark);
+              font-family: var(--bodyFont);
+              font-size: 0.98rem;
+              font-weight: 600;
+              line-height: 1.35;
             }
 
             & > ul.tags {
@@ -232,7 +233,15 @@
             }
 
             & > p {
+              color: var(--gray);
+              display: -webkit-box;
+              font-size: 0.8rem;
+              line-height: 1.5;
+              margin-top: 0.35rem;
               margin-bottom: 0;
+              -webkit-box-orient: vertical;
+              -webkit-line-clamp: 1;
+              overflow: hidden;
             }
           }
         }

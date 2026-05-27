@@ -158,6 +158,20 @@ Breadcrumb:
 
 - IBM Plex Mono 11.5px `var(--gray)`; links use `var(--tertiary)`.
 
+Search:
+
+- Full-screen search uses an opaque `var(--light)` overlay so page content does
+  not show through behind the modal.
+- Default search results use a compact list: body-font title, one-line muted
+  snippet, and no article preview pane. Tag chips are shown only for tag-search
+  result context.
+- Search highlights are suppressed for one-character terms to keep broad
+  queries visually calm.
+- Search results do not receive an automatic selected-row background; keyboard
+  navigation applies focus only after the user moves through results.
+- English search uses full-token matching so internal substrings such as `ss`
+  in `cross` can be found.
+
 Post metadata:
 
 - `.content-meta`: IBM Plex Mono 0.82rem, line-height 1.35, muted
@@ -257,9 +271,13 @@ and `article { max-width: 100%; }`.
 
 Tables:
 
+- Article `.table-container` stays within the article width, removes Quartz's
+  default table margin, and only scrolls when content truly cannot wrap.
 - Full width, collapsed borders, `font-size: 0.92em`, margin-bottom 1.5em.
 - `th`: highlight background, 600, padding 9px 14px, bottom border 2px.
 - `td`: padding 8px 14px, bottom border 1px, tabular nums.
+- Inline code in table cells may wrap so URL-like values fit inside the page
+  before horizontal scrolling is needed.
 - Row hover: highlight background.
 
 Code:
@@ -313,3 +331,12 @@ For visual changes, check as applicable:
 - Tuned post pages toward an Obsidian-like note rhythm: tighter 1.72 article
   line-height, no h2 divider, muted date/read-time metadata, and tags grouped
   closer to the metadata line.
+- Simplified search into an opaque full-screen overlay with compact title and
+  one-line snippet results, removing the default article preview pane.
+- Suppressed one-character search highlights so broad queries do not flood the
+  compact result list with accent marks.
+- Removed automatic first-result focus styling and switched search indexing to
+  full-token matching for clearer substring search behavior.
+- Kept article tables inside the article width by removing default table
+  container margins/min-widths and allowing inline table code to wrap before
+  horizontal scrolling is needed.
