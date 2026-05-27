@@ -6,7 +6,7 @@ const TagList: QuartzComponent = ({ fileData, displayClass }: QuartzComponentPro
   const tags = fileData.frontmatter?.tags
   if (tags && tags.length > 0) {
     return (
-      <ul class={classNames(displayClass, "tags")}>
+      <ul class={classNames(displayClass, "tags", "content-tags")}>
         {tags.map((tag) => {
           const linkDest = resolveRelative(fileData.slug!, `tags/${tag}` as FullSlug)
           return (
@@ -34,6 +34,11 @@ TagList.css = `
   flex-wrap: wrap;
 }
 
+.content-tags {
+  gap: 0.35rem;
+  margin: 0 0 1.8rem;
+}
+
 .section-li > .section > .tags {
   justify-content: flex-end;
 }
@@ -51,6 +56,14 @@ a.internal.tag-link {
   padding: 0.2rem 0.4rem;
   margin: 0 0.1rem;
   font-size: 0.9rem;
+}
+
+.content-tags a.internal.tag-link {
+  border-radius: 5px;
+  padding: 0.18rem 0.48rem;
+  font-family: var(--codeFont);
+  font-size: 0.78rem;
+  color: var(--tertiary);
 }
 `
 

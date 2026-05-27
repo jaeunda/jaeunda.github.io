@@ -51,6 +51,33 @@ a {
   line-height: 1.2;
   letter-spacing: 0;
   color: var(--dark);
+  margin-bottom: 0.72rem;
+}
+
+.content-meta {
+  margin-top: 0;
+  margin-bottom: 0.65rem;
+  font-family: var(--codeFont);
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: color-mix(in oklab, var(--gray) 82%, var(--light));
+}
+
+.content-meta + .content-tags {
+  margin-top: 0;
+  margin-bottom: 1.8rem;
+}
+
+.center > .content-tags {
+  gap: 0.35rem;
+
+  a.internal.tag-link {
+    border-radius: 5px;
+    padding: 0.18rem 0.48rem;
+    font-family: var(--codeFont);
+    font-size: 0.78rem;
+    color: var(--tertiary);
+  }
 }
 
 /* selection */
@@ -182,7 +209,7 @@ footer {
 
 article {
   font-size: 15px;
-  line-height: 1.78;
+  line-height: 1.72;
   font-family: var(--bodyFont);
   color: var(--darkgray);
   letter-spacing: -0.005em;
@@ -192,7 +219,8 @@ article {
   font-variant-numeric: proportional-nums;
 
   p {
-    margin-bottom: 1.5em;
+    margin-top: 0;
+    margin-bottom: 1.35em;
     text-wrap: pretty;
   }
 
@@ -211,10 +239,10 @@ article {
     font-weight: 600;
     line-height: 1.28;
     letter-spacing: 0;
-    margin-top: 3em;
-    margin-bottom: 0.45em;
-    padding-bottom: 0.4em;
-    border-bottom: 1px solid color-mix(in oklab, var(--lightgray) 55%, transparent);
+    margin-top: 2.7em;
+    margin-bottom: 0.75em;
+    padding-bottom: 0;
+    border-bottom: 0;
   }
   h2:first-child {
     margin-top: 0;
@@ -225,8 +253,8 @@ article {
     font-size: 1.2em;
     font-weight: 600;
     line-height: 1.35;
-    margin-top: 2.4em;
-    margin-bottom: 0.45em;
+    margin-top: 2.2em;
+    margin-bottom: 0.65em;
     letter-spacing: 0;
   }
 
@@ -266,7 +294,7 @@ article {
   h2 + p,
   h2 + ul,
   h2 + ol {
-    margin-top: 1.2em;
+    margin-top: 0.9em;
   }
 
   ul,
@@ -280,7 +308,7 @@ article {
   }
 
   li {
-    line-height: 1.78;
+    line-height: 1.72;
     margin-bottom: 0.35em;
   }
 
@@ -357,9 +385,9 @@ article {
   }
 
   blockquote {
-    border-left: 2.5px solid var(--lightgray);
-    padding: 2px 0 2px 1em;
-    margin: 0 0 1.5em;
+    border-left: 3px solid color-mix(in oklab, var(--secondary) 42%, var(--lightgray));
+    padding: 0.1em 0 0.1em 1em;
+    margin: 0.2em 0 1.35em;
     background: none;
     color: var(--darkgray);
     font-style: normal;
@@ -1261,7 +1289,7 @@ html.mobile-no-scroll {
 
   article {
     font-size: 15px;
-    line-height: 1.75;
+    line-height: 1.72;
     max-width: 100%;
 
     h1 {
