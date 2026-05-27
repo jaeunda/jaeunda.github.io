@@ -85,21 +85,21 @@ font-weight 400, letter-spacing -0.01em.
 
 ### Article Scale
 
-| Element          | Current Style                                                                                                                                    |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `.article-title` | Fraunces `clamp(28px, 3vw, 36px)`, 700, line-height 1.2                                                                                          |
-| `article`        | 15px desktop / 16px mobile, line-height 1.78 desktop / 1.75 mobile, max-width 680px, `word-break: keep-all`, `overflow-wrap: anywhere`           |
-| `p`              | margin-bottom 1.5em, `text-wrap: pretty`                                                                                                         |
-| `h1`             | Fraunces 1.55em desktop / 1.5em mobile, 700, line-height 1.25                                                                                    |
-| `h2`             | Fraunces 1.47em desktop / 1.25em mobile, 600, line-height 1.28, margin-top 3em desktop / 2.4em mobile, bottom border toned down with `color-mix` |
-| `h3`             | Fraunces 1.2em desktop / 1.06em mobile, 600, line-height 1.35, margin-top 2.4em desktop / 2em mobile                                             |
-| `h4`             | Body font 1em, 700, line-height 1.38, margin-top 1.8em, color `darkgray`                                                                         |
-| `h5`             | Body font 0.93em, 700                                                                                                                            |
-| `h6`             | IBM Plex Mono 0.87em, 600, uppercase, letter-spacing 0.08em                                                                                      |
-| `li`             | line-height 1.78, margin-bottom 0.35em                                                                                                           |
-| inline `code`    | 0.86em, IBM Plex Mono, tint background, 1px border, radius 4px                                                                                   |
-| `pre code`       | 12.5px, line-height 1.62                                                                                                                         |
-| `blockquote`     | 2.5px `lightgray` left border, no background, no italic                                                                                          |
+| Element          | Current Style                                                                                                             |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `.article-title` | Fraunces `clamp(28px, 3vw, 36px)`, 700, line-height 1.2                                                                   |
+| `article`        | 15px desktop / 15px mobile, line-height 1.72, max-width 680px, `word-break: keep-all`, `overflow-wrap: anywhere`          |
+| `p`              | margin-top 0, margin-bottom 1.35em, `text-wrap: pretty`                                                                   |
+| `h1`             | Fraunces 1.55em desktop / 1.5em mobile, 700, line-height 1.25                                                             |
+| `h2`             | Fraunces 1.47em desktop / 1.25em mobile, 600, line-height 1.28, margin-top 2.7em desktop / 2.4em mobile, no bottom border |
+| `h3`             | Fraunces 1.2em desktop / 1.06em mobile, 600, line-height 1.35, margin-top 2.2em desktop / 2em mobile                      |
+| `h4`             | Body font 1em, 700, line-height 1.38, margin-top 1.8em, color `darkgray`                                                  |
+| `h5`             | Body font 0.93em, 700                                                                                                     |
+| `h6`             | IBM Plex Mono 0.87em, 600, uppercase, letter-spacing 0.08em                                                               |
+| `li`             | line-height 1.72, margin-bottom 0.35em                                                                                    |
+| inline `code`    | 0.86em, IBM Plex Mono, tint background, 1px border, radius 4px                                                            |
+| `pre code`       | 12.5px, line-height 1.62                                                                                                  |
+| `blockquote`     | 3px muted secondary/lightgray left border, no background, no italic                                                       |
 
 Article h1-h3 use the display font but remain subordinate to `.article-title`.
 Article `strong` uses 600 weight plus `dark`; article `em` uses a subtle
@@ -158,6 +158,13 @@ Breadcrumb:
 
 - IBM Plex Mono 11.5px `var(--gray)`; links use `var(--tertiary)`.
 
+Post metadata:
+
+- `.content-meta`: IBM Plex Mono 0.82rem, line-height 1.35, muted
+  `color-mix(in oklab, var(--gray) 82%, var(--light))`, margin-bottom 0.65rem.
+- Content-page tags sit close to the date/read-time line: 0.78rem IBM Plex
+  Mono, tertiary text on highlight background, radius 5px, margin-bottom 1.8rem.
+
 ## Home Page
 
 Current `defaultContentPageLayout.beforeBody` renders on every content page, but
@@ -171,7 +178,8 @@ the custom home components return `null` unless `fileData.slug === "index"`:
 the hero, preserve its `fileData.slug === "index"` guard and place it before
 `TagCloud`.
 
-`content/index.md` is empty. Home content is component-driven.
+`content/index.md` contains a short profile/contact intro. Home listing content
+is otherwise component-driven.
 
 ### Section Header
 
@@ -300,3 +308,8 @@ For visual changes, check as applicable:
   in-view states coloring both prefix and readable label body.
 - Changed article emphasis for Korean readability: `strong` is 600 weight with
   darker text, and `em` is a subtle highlight instead of italic.
+- Added a muted profile interest keyword line using `var(--gray)` so identity
+  metadata stays present without competing with the name and school line.
+- Tuned post pages toward an Obsidian-like note rhythm: tighter 1.72 article
+  line-height, no h2 divider, muted date/read-time metadata, and tags grouped
+  closer to the metadata line.

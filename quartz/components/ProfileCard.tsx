@@ -11,17 +11,26 @@ const icons: Record<string, string> = {
   email: emailIcon,
 }
 
-const ProfileCard: QuartzComponent = (props: QuartzComponentProps & { explorerProfile?: boolean }) => {
+const ProfileCard: QuartzComponent = (
+  props: QuartzComponentProps & { explorerProfile?: boolean },
+) => {
   return (
     <div class={classNames("profile-card", props.explorerProfile && "explorer-profile")}>
       <div class="profile-avatar">
         <img src="https://github.com/jaeunda.png" alt="profile" />
       </div>
       <div class="profile-name">Daeun Jang</div>
-      <div class="profile-bio">Soongsil Univ.</div>
+      <div class="profile-interest">OS · Networks · Databases · Embedded SW · Infrastructure</div>
       <div class="profile-socials">
         {socialLinks.map(({ name, url, icon }) => (
-          <a href={url} target="_blank" rel="noopener noreferrer" aria-label={name} title={name} dangerouslySetInnerHTML={{ __html: icons[icon] ?? name }} />
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={name}
+            title={name}
+            dangerouslySetInnerHTML={{ __html: icons[icon] ?? name }}
+          />
         ))}
       </div>
     </div>

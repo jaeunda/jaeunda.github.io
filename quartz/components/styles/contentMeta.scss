@@ -1,6 +1,10 @@
 .content-meta {
   margin-top: 0;
-  color: var(--darkgray);
+  margin-bottom: 0.65rem;
+  font-family: var(--codeFont);
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: color-mix(in oklab, var(--gray) 82%, var(--light));
 
   &[show-comma="true"] {
     > *:not(:last-child) {
