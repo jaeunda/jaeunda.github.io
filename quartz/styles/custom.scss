@@ -695,6 +695,97 @@ a.internal.tag-link {
   }
 }
 
+.tag-index-filter {
+  margin: 8px 0 34px;
+
+  .section-header {
+    margin-bottom: 12px;
+  }
+
+  .tag-index-filter-groups {
+    display: grid;
+    gap: 16px;
+  }
+
+  .tag-index-filter-group {
+    display: grid;
+    grid-template-columns: 6.5rem 1fr;
+    gap: 14px;
+    align-items: start;
+  }
+
+  .tag-index-filter-prefix {
+    font-family: var(--codeFont);
+    font-size: 11.5px;
+    color: var(--gray);
+    line-height: 1.7;
+  }
+
+  .top-tags-list {
+    gap: 7px;
+  }
+
+  .top-tag {
+    padding: 5px 9px;
+    font-size: 11.5px;
+    line-height: 1.35;
+  }
+}
+
+.tag-index-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 2.2em;
+  margin-bottom: 0.7em;
+
+  a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    color: var(--dark);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--tertiary);
+    }
+  }
+
+  .tag-index-heading-prefix {
+    font-family: var(--codeFont);
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--gray);
+  }
+
+  .tag-index-heading-label {
+    font-family: var(--headerFont);
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: inherit;
+  }
+
+  .tag-index-heading-count {
+    font-family: var(--codeFont);
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--gray);
+  }
+}
+
+.tag-index-sections [hidden] {
+  display: none;
+}
+
+@media all and ($mobile) {
+  .tag-index-filter {
+    .tag-index-filter-group {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+  }
+}
+
 // ============================================================
 // Home Page Redesign — 2026-05-26
 // ============================================================
@@ -825,6 +916,35 @@ a.internal.tag-link {
         border-color: var(--dark);
       }
     }
+  }
+}
+
+.sidebar-topics {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  margin-bottom: 0;
+
+  .section-header {
+    margin-bottom: 12px;
+  }
+
+  .section-header .section-title {
+    font-size: 18px;
+  }
+
+  .top-tags-list {
+    gap: 7px;
+    max-height: min(32vh, 16rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 4px;
+  }
+
+  .top-tag {
+    padding: 5px 9px;
+    font-size: 11.5px;
+    line-height: 1.35;
   }
 }
 

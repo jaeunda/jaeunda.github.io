@@ -137,6 +137,23 @@ Shared type roles:
 - Identifier / Meta: IBM Plex Mono 400-500 for tags, dates, read time, counts,
   breadcrumb, code, filename prefixes, and TOC number prefixes.
 
+Sidebar topics:
+
+- Desktop and tablet left sidebar replaces Explorer with
+  `TagCloud({ limit: 8, showOnAllPages: true, variant: "sidebar" })`.
+- Sidebar topics reuse `.top-tag` chips with slightly tighter padding and no
+  section bottom margin.
+- The sidebar topic list keeps its natural chip height until it reaches
+  `min(32vh, 16rem)`, then scrolls internally so it does not become a tall empty
+  block.
+- Topics include only tags prefixed with `topic/`, but display them without the
+  prefix, such as `#database`; tag links and home filtering keep the full tag
+  value.
+- On the index page, sidebar topic clicks keep the home filtering behavior. On
+  non-index pages, topic clicks navigate to the relevant tag page.
+- The all-tags action opens the complete leaf tag index, including non-topic
+  tags while omitting grouping prefixes such as `topic` and `project`.
+
 Explorer:
 
 - Section label: Fraunces 18px, 600, `var(--dark)`.
@@ -184,9 +201,13 @@ Post metadata:
 Current `defaultContentPageLayout.beforeBody` renders on every content page, but
 the custom home components return `null` unless `fileData.slug === "index"`:
 
-1. `TagCloud({ limit: 8 })`
+1. `MobileOnly(TagCloud({ limit: 8 }))`
 2. `RecentNotesWithPreview({ limit: 20, showTags: true, showReadTime: true })`
 3. Breadcrumbs, ArticleTitle, ContentMeta, TagList for non-index pages
+
+Desktop and tablet layouts show Topics in the left sidebar where Explorer used
+to be. Mobile keeps the index Topics above recent posts because the left sidebar
+collapses into the top bar.
 
 `Hero.tsx` exists but is not currently mounted in `quartz.layout.ts`. If adding
 the hero, preserve its `fileData.slug === "index"` guard and place it before
@@ -249,6 +270,22 @@ Preserve default navigation for modifier or middle clicks:
 - `.desc h3`: 15px, weight 500, body font, line-height 1.35.
 - Tag links: 12px IBM Plex Mono, highlight background, tertiary text,
   lightgray border, radius 4px, padding 2px 9px.
+
+Tag index:
+
+- The all-tags page shows a compact `.tag-index-filter` chip list above the tag
+  sections.
+- Tag index chips are grouped by prefix such as `project` and `topic`; within a
+  group, chip labels omit the prefix while retaining full tag links and filter
+  values. Tags are ordered by descending post count, then alphabetically.
+- Prefix labels use 11.5px IBM Plex Mono, matching chip text scale while staying
+  muted with `var(--gray)`.
+- Tag section headings are distinct from chip styling: prefix uses code/meta
+  text, the tag label uses the display font, and the post count appears as a
+  small code-font number beside the heading.
+- Tag index chips filter visible tag sections in place while preserving
+  modifier-click navigation to individual tag pages.
+- The selected tag is mirrored in the URL as `?tag=...`.
 
 ## Mobile Drawer And Padding
 
@@ -340,3 +377,24 @@ For visual changes, check as applicable:
 - Kept article tables inside the article width by removing default table
   container margins/min-widths and allowing inline table code to wrap before
   horizontal scrolling is needed.
+
+### 2026-05-29
+
+- Replaced the left sidebar Explorer placement with sidebar Topics, preserving
+  home tag filtering on index while letting non-index sidebar topics navigate to
+  tag pages.
+- Limited Topics to `topic/` tags, stripped that prefix from chip labels, kept
+  `all tags` as the full tag index, and made sidebar Topics scroll within the
+  available sidebar height.
+- Reduced sidebar Topics from a full-height flex filler to a natural-height list
+  with a capped internal scroll area for better visual consistency.
+- Removed grouping-only prefix entries such as `topic` and `project` from the
+  all-tags index, leaving their concrete child tags visible.
+- Added a top chip filter to the all-tags index so selecting a tag shows only
+  that tag's post section while keeping direct tag-page links available.
+- Grouped all-tags filter chips by tag prefix, removed the redundant total-tags
+  line, and moved per-tag item counts into the section headings.
+- Sorted tag index chips and sections by descending post count, with alphabetical
+  fallback for ties.
+- Increased Tag Index prefix labels to align with chip text scale and improve
+  scanability.

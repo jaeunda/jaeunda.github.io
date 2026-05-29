@@ -35,7 +35,7 @@ export const defaultContentPageLayout: PageLayout = {
     }),
   ],
   afterBody: [
-    Component.TagCloud({ limit: 8 }),
+    Component.MobileOnly(Component.TagCloud({ limit: 8 })),
     Component.RecentNotesWithPreview({ limit: 20, showTags: true, showReadTime: true }),
   ],
   left: [
@@ -52,7 +52,9 @@ export const defaultContentPageLayout: PageLayout = {
       ],
     }),
     Component.DesktopOnly(Component.ProfileCard()),
-    Component.Explorer(),
+    Component.DesktopOnly(
+      Component.TagCloud({ limit: 8, showOnAllPages: true, variant: "sidebar" }),
+    ),
   ],
   right: [
     Component.Graph(),
@@ -78,7 +80,9 @@ export const defaultListPageLayout: PageLayout = {
       ],
     }),
     Component.DesktopOnly(Component.ProfileCard()),
-    Component.Explorer(),
+    Component.DesktopOnly(
+      Component.TagCloud({ limit: 8, showOnAllPages: true, variant: "sidebar" }),
+    ),
   ],
   right: [],
 }

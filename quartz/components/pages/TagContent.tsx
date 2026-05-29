@@ -8,6 +8,8 @@ import { htmlToJsx } from "../../util/jsx"
 import { i18n } from "../../i18n"
 import { ComponentChildren } from "preact"
 import { concatenateResources } from "../../util/resources"
+// @ts-ignore
+import tagIndexFilterScript from "../scripts/tagIndexFilter.inline"
 
 interface TagContentOptions {
   sort?: SortFn
@@ -16,6 +18,11 @@ interface TagContentOptions {
 
 const defaultOptions: TagContentOptions = {
   numPages: 10,
+}
+
+function splitTag(tag: string) {
+  const [prefix, ...rest] = tag.split("/")
+  return rest.length === 0 ? { prefix: "other", label: tag } : { prefix, label: rest.join("/") }
 }
 
 export default ((opts?: Partial<TagContentOptions>) => {
@@ -43,23 +50,67 @@ export default ((opts?: Partial<TagContentOptions>) => {
     const cssClasses: string[] = fileData.frontmatter?.cssclasses ?? []
     const classes = cssClasses.join(" ")
     if (tag === "/") {
-      const tags = [
+      const allTags = [
         ...new Set(
           allFiles.flatMap((data) => data.frontmatter?.tags ?? []).flatMap(getAllSegmentPrefixes),
         ),
       ].sort((a, b) => a.localeCompare(b))
+      const tags = allTags.filter((tag) => !allTags.some((other) => other.startsWith(`${tag}/`)))
       const tagItemMap: Map<string, QuartzPluginData[]> = new Map()
       for (const tag of tags) {
         tagItemMap.set(tag, allPagesWithTag(tag))
       }
+      const tagsByPostCount = tags.toSorted((a, b) => {
+        const countDiff = tagItemMap.get(b)!.length - tagItemMap.get(a)!.length
+        return countDiff === 0 ? a.localeCompare(b) : countDiff
+      })
+      const tagGroups = tagsByPostCount.reduce<Array<{ prefix: string; tags: string[] }>>(
+        (groups, tag) => {
+          const { prefix } = splitTag(tag)
+          const existing = groups.find((group) => group.prefix === prefix)
+          if (existing) existing.tags.push(tag)
+          else groups.push({ prefix, tags: [tag] })
+          return groups
+        },
+        [],
+      )
       return (
         <div class="popover-hint">
           <article class={classes}>
             <p>{content}</p>
           </article>
-          <p>{i18n(cfg.locale).pages.tagContent.totalTags({ count: tags.length })}</p>
-          <div>
-            {tags.map((tag) => {
+          <section class="tag-index-filter top-tags" data-tag-index-filter>
+            <div class="section-header">
+              <div class="section-title">
+                Tags
+                <span class="section-title-count">{tags.length}</span>
+              </div>
+            </div>
+            <div class="tag-index-filter-groups">
+              {tagGroups.map(({ prefix, tags }) => (
+                <div class="tag-index-filter-group">
+                  <div class="tag-index-filter-prefix">{prefix}</div>
+                  <div class="top-tags-list">
+                    {tags.map((tag) => {
+                      const pages = tagItemMap.get(tag)!
+                      const { label } = splitTag(tag)
+                      const tagListingPage = `/tags/${tag}` as FullSlug
+                      const href = resolveRelative(fileData.slug!, tagListingPage)
+
+                      return (
+                        <a href={href} class="top-tag" data-tag-index-chip data-tag={tag}>
+                          #{label}
+                          <span class="top-tag-count">{pages.length}</span>
+                        </a>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+          <div class="tag-index-sections">
+            {tagsByPostCount.map((tag) => {
               const pages = tagItemMap.get(tag)!
               const listProps = {
                 ...props,
@@ -76,30 +127,20 @@ export default ((opts?: Partial<TagContentOptions>) => {
 
               const tagListingPage = `/tags/${tag}` as FullSlug
               const href = resolveRelative(fileData.slug!, tagListingPage)
+              const { prefix, label } = splitTag(tag)
 
               return (
-                <div>
-                  <h2>
-                    <a class="internal tag-link" href={href}>
-                      {tag}
+                <div data-tag-index-section data-tag={tag}>
+                  <h2 class="tag-index-heading">
+                    <a href={href}>
+                      <span class="tag-index-heading-prefix">{prefix}</span>
+                      <span class="tag-index-heading-label">{label}</span>
                     </a>
+                    <span class="tag-index-heading-count">{pages.length}</span>
                   </h2>
                   {content && <p>{content}</p>}
                   <div class="page-listing">
-                    <p>
-                      {i18n(cfg.locale).pages.tagContent.itemsUnderTag({ count: pages.length })}
-                      {pages.length > options.numPages && (
-                        <>
-                          {" "}
-                          <span>
-                            {i18n(cfg.locale).pages.tagContent.showingFirst({
-                              count: options.numPages,
-                            })}
-                          </span>
-                        </>
-                      )}
-                    </p>
-                    <PageList limit={options.numPages} {...listProps} sort={options?.sort} />
+                    <PageList {...listProps} sort={options?.sort} />
                   </div>
                 </div>
               )
@@ -129,5 +170,6 @@ export default ((opts?: Partial<TagContentOptions>) => {
   }
 
   TagContent.css = concatenateResources(style, PageList.css)
+  TagContent.afterDOMLoaded = tagIndexFilterScript
   return TagContent
 }) satisfies QuartzComponentConstructor
