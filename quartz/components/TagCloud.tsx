@@ -24,7 +24,10 @@ export default ((opts?: Partial<Options>) => {
     displayClass,
   }: QuartzComponentProps) => {
     const isIndex = fileData.slug === "index"
+    const isSidebar = options.variant === "sidebar"
+    const isTagIndex = fileData.slug === "tags/index"
     if (!isIndex && !options.showOnAllPages) return null
+    if (isSidebar && isTagIndex) return null
 
     const tagCounts = new Map<string, number>()
     for (const file of allFiles) {
@@ -41,7 +44,7 @@ export default ((opts?: Partial<Options>) => {
 
     return (
       <section
-        class={`top-tags ${options.variant === "sidebar" ? "sidebar-topics" : ""} ${displayClass ?? ""}`}
+        class={`top-tags ${isSidebar ? "sidebar-topics" : ""} ${displayClass ?? ""}`}
         data-home-tagcloud={isIndex ? "" : undefined}
       >
         <div class="section-header">
@@ -63,7 +66,7 @@ export default ((opts?: Partial<Options>) => {
                 class="top-tag"
                 data-tag={isIndex ? tag : undefined}
               >
-                #{label}
+                <span class="top-tag-label">#{label}</span>
                 <span class="top-tag-count">{count}</span>
               </a>
             )

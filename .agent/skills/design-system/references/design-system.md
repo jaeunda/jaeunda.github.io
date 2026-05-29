@@ -149,6 +149,8 @@ Sidebar topics:
 - Topics include only tags prefixed with `topic/`, but display them without the
   prefix, such as `#database`; tag links and home filtering keep the full tag
   value.
+- Sidebar topics are hidden on the all-tags Tag Index page because the main page
+  already contains the full tag navigation.
 - On the index page, sidebar topic clicks keep the home filtering behavior. On
   non-index pages, topic clicks navigate to the relevant tag page.
 - The all-tags action opens the complete leaf tag index, including non-topic
@@ -216,6 +218,16 @@ the hero, preserve its `fileData.slug === "index"` guard and place it before
 `content/index.md` contains a short profile/contact intro. Home listing content
 is otherwise component-driven.
 
+Profile card:
+
+- `.profile-name` keeps the default body/display tone for a calmer identity
+  anchor, with 8px space from the avatar.
+- `.profile-interest` uses IBM Plex Mono at 0.72rem with `white-space: nowrap`
+  and a wider 15rem max-width so only intentional `<br />` breaks appear. It
+  sits 5px below the name.
+- `.profile-socials` sits 21px below the interest line so icons feel connected
+  but not cramped.
+
 ### Section Header
 
 - `.section-header`: flex, baseline aligned, `margin-bottom: 14px`.
@@ -232,6 +244,8 @@ is otherwise component-driven.
 - Count: 10.5px, `var(--gray)`, `var(--light)` background, radius 3px.
 - Active: `var(--tertiary)` background and border, `var(--light)` text; dark
   theme overrides active text to `var(--dark)`.
+- Sidebar `.sidebar-topics .top-tag` keeps the same hashtag chip language at a
+  slightly smaller scale for the left rail.
 
 ### Recent Post Cards
 
@@ -271,21 +285,35 @@ Preserve default navigation for modifier or middle clicks:
 - Tag links: 12px IBM Plex Mono, highlight background, tertiary text,
   lightgray border, radius 4px, padding 2px 9px.
 
-Tag index:
+Archive index:
 
-- The all-tags page shows a compact `.tag-index-filter` chip list above the tag
-  sections.
-- Tag index chips are grouped by prefix such as `project` and `topic`; within a
-  group, chip labels omit the prefix while retaining full tag links and filter
-  values. Tags are ordered by descending post count, then alphabetically.
-- Prefix labels use 11.5px IBM Plex Mono, matching chip text scale while staying
-  muted with `var(--gray)`.
-- Tag section headings are distinct from chip styling: prefix uses code/meta
-  text, the tag label uses the display font, and the post count appears as a
-  small code-font number beside the heading.
-- Tag index chips filter visible tag sections in place while preserving
-  modifier-click navigation to individual tag pages.
-- The selected tag is mirrored in the URL as `?tag=...`.
+- The all-tags/archive page title is `Archive`, emphasizing that the page is
+  primarily the Recent archive destination.
+- The page title includes the concrete post count as a small
+  `.article-title-count`.
+- The archive result area renders all posts by default with the exact same
+  `.post-card`, `.post-date-col`, `.post-title`, `.post-preview`,
+  `.post-meta-row`, `.post-tag`, and `.post-readtime` structure used by home
+  Recent.
+- The all-tags page title includes a small bordered `←` back affordance linking
+  to home.
+- The all-tags page shows Topic and Project tabs before the compact
+  `.tag-index-filter` chip list; when no chip is selected, the archive result
+  area shows All Posts.
+- Tag index chips are scoped by the active tab rather than repeating `topic` or
+  `project` labels in the chip area; chip labels omit the prefix while retaining
+  full tag links and filter values. Tags are ordered by descending post count,
+  then alphabetically.
+- Tag section headings are distinct from chip styling: prefix/count use small
+  code/meta text, and the tag label uses the display font.
+- Tag index chips filter the result area in place while preserving
+  modifier-click navigation to individual tag pages. Selecting a chip hides All
+  Posts and shows only that tag's post list; clearing the chip restores All
+  Posts.
+- The selected tag is mirrored in the URL as `?tag=...`; the selected default
+  tab can be mirrored as `?group=project`.
+- Tag index post lists reuse the same Recent post-card structure and styling
+  without smaller overrides, including tags and read-time metadata.
 
 ## Mobile Drawer And Padding
 
@@ -398,3 +426,44 @@ For visual changes, check as applicable:
   fallback for ties.
 - Increased Tag Index prefix labels to align with chip text scale and improve
   scanability.
+- Combined the all-tags page title and count, added Topic/Project tabs for the
+  default Tag Index state, and switched Tag Index sections to compact
+  preview-only post lists without per-post tag chips.
+- Removed repeated `topic` / `project` group labels from the Tag Index chip area
+  because the active tabs already provide that grouping context.
+- Render inactive Tag Index chip groups and sections with `hidden` by default so
+  tab scoping works before client-side navigation scripts run.
+- Restored Tag Index section labels to the display font while keeping post
+  titles compact, display-font based, lower weight/color, and free of the
+  default internal-link highlight background.
+- Kept Tag Index chip groups tab-scoped even when a chip is selected, so
+  selecting a Topic chip does not reveal Project chips.
+- Disabled Quartz hover popovers site-wide because note previews made link
+  hover behavior feel visually noisy.
+- Added a small back arrow above the Tag Index title so users can return home
+  after entering the full tag index.
+- Restored sidebar Topics to hashtag-style topic chips and hid the sidebar
+  Topics component on the Tag Index page to avoid duplicated tag navigation.
+- Aligned Tag Index post rows with the Recent post layout language while keeping
+  them more compact and metadata-light for index scanning.
+- Increased Tag Index post title contrast and tightened row spacing after the
+  first Recent-like pass felt too airy for an index page.
+- Switched Tag Index post rows onto the same `.post-card`, `.post-date-col`,
+  `.post-title`, and `.post-preview` structure as Recent, then scaled the Tag
+  Index variant down.
+- Softened the Tag Index post title color and weight so the list keeps the
+  Recent structure without competing with tag section headings.
+- Applied mono typography only to the profile interest line, preserving the name
+  styling and preventing accidental wraps inside each profile-interest line.
+- Tuned profile-card vertical rhythm: avatar-to-name, name-to-interest, and
+  interest-to-social spacing are explicit instead of relying on one uniform gap.
+- Increased the profile interest-to-social spacing so the icons read as actions
+  rather than a continuation of the interest text.
+- Expanded the profile interest-to-social spacing to 21px after the 14px version
+  still felt too close to the intro line.
+- Renamed the all-tags/archive destination from `Posts & Tags` to `Archive` and
+  changed the title count from tag count to post count because the page is the
+  archive target from Recent.
+- Restored Topic/Project tag tabs as the archive filter control: All Posts shows
+  when no chip is selected, and a selected tag replaces it with that tag's post
+  list.

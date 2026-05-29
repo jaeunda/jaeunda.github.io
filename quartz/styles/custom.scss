@@ -702,23 +702,47 @@ a.internal.tag-link {
     margin-bottom: 12px;
   }
 
+  .tag-index-tabs {
+    display: inline-flex;
+    gap: 4px;
+    padding: 3px;
+    margin-bottom: 16px;
+    border: 1px solid var(--lightgray);
+    border-radius: 6px;
+    background: var(--light);
+  }
+
+  .tag-index-tab {
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--gray);
+    cursor: pointer;
+    font-family: var(--codeFont);
+    font-size: 11.5px;
+    line-height: 1.2;
+    padding: 5px 11px;
+    transition:
+      background 0.12s,
+      color 0.12s;
+
+    &:hover {
+      color: var(--tertiary);
+    }
+
+    &.active {
+      background: var(--highlight);
+      color: var(--dark);
+    }
+  }
+
   .tag-index-filter-groups {
     display: grid;
-    gap: 16px;
+    gap: 10px;
   }
 
   .tag-index-filter-group {
-    display: grid;
-    grid-template-columns: 6.5rem 1fr;
-    gap: 14px;
-    align-items: start;
-  }
-
-  .tag-index-filter-prefix {
-    font-family: var(--codeFont);
-    font-size: 11.5px;
-    color: var(--gray);
-    line-height: 1.7;
+    display: block;
   }
 
   .top-tags-list {
@@ -735,14 +759,14 @@ a.internal.tag-link {
 .tag-index-heading {
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  margin-top: 2.2em;
-  margin-bottom: 0.7em;
+  gap: 7px;
+  margin-top: 2em;
+  margin-bottom: 0.55em;
 
   a {
     display: inline-flex;
     align-items: baseline;
-    gap: 8px;
+    gap: 7px;
     color: var(--dark);
     text-decoration: none;
 
@@ -774,14 +798,23 @@ a.internal.tag-link {
 }
 
 .tag-index-sections [hidden] {
-  display: none;
+  display: none !important;
+}
+
+.archive-posts-section[hidden] {
+  display: none !important;
+}
+
+.tag-index-filter [hidden] {
+  display: none !important;
 }
 
 @media all and ($mobile) {
   .tag-index-filter {
-    .tag-index-filter-group {
-      grid-template-columns: 1fr;
-      gap: 6px;
+    .tag-index-tabs {
+      display: flex;
+      width: fit-content;
+      max-width: 100%;
     }
   }
 }
@@ -945,6 +978,12 @@ a.internal.tag-link {
     padding: 5px 9px;
     font-size: 11.5px;
     line-height: 1.35;
+
+    .top-tag-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 }
 
