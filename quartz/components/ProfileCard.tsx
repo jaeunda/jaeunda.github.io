@@ -20,7 +20,11 @@ const ProfileCard: QuartzComponent = (
         <img src="https://github.com/jaeunda.png" alt="profile" />
       </div>
       <div class="profile-name">Daeun Jang</div>
-      <div class="profile-interest">OS · Networks · Databases · Embedded SW · Infrastructure</div>
+      <div class="profile-interest">
+        Systems & Infrastructure
+        <br />
+        OS · Databases · Distributed
+      </div>
       <div class="profile-socials">
         {socialLinks.map(({ name, url, icon }) => (
           <a

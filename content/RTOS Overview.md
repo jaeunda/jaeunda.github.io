@@ -1,10 +1,11 @@
 ---
 tags:
   - project/seminar
-  - topic/os
+  - topic/operating-systems
   - topic/rtos
 Date: 2025-11-11
 ---
+
 2025년 11월 11일 GDG 슈몰세미나 요약입니다.
 
 ![[rtos-overview_1.png]]
@@ -64,11 +65,13 @@ Date: 2025-11-11
 - 항공기 제어·브레이크·에어백 등 안전 필수 시스템에 사용된다.
 
 ![[rtos-overview_9.png]]
+
 - Hard RTOS는 실행 시간 예측을 위해 정적 메모리 할당 위주로 구성된다.
 - Strict Priority 기반으로 높은 우선순위 Task를 항상 우선 실행한다.
 - Priority Inheritance를 통해 우선순위 역전 문제를 완화한다.
 
 ##### 우선순위 역전(Priority Inversion) 문제
+
 - 낮은 우선순위 Task가 점유한 자원을 높은 우선순위 Task가 기다리는 현상이다.
 - 1997년 NASA Pathfinder 탐사선 문제로 유명해졌다.
 - 이후 RTOS에서는 Priority Inheritance가 핵심 기법으로 자리잡았다.
