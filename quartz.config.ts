@@ -11,7 +11,7 @@ const config: QuartzConfig = {
     pageTitle: "jaeunda.log",
     pageTitleSuffix: "",
     enableSPA: true,
-    enablePopovers: true,
+    enablePopovers: false,
     analytics: {
       provider: "plausible",
     },

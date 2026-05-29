@@ -23,7 +23,7 @@ const ProfileCard: QuartzComponent = (
       <div class="profile-interest">
         Systems & Infrastructure
         <br />
-        OS · Databases · Distributed
+        OS · Databases · Distributed Systems
       </div>
       <div class="profile-socials">
         {socialLinks.map(({ name, url, icon }) => (
