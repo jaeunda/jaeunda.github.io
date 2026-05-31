@@ -251,6 +251,14 @@ function addGlobalPageResources(ctx: BuildCtx, componentResources: ComponentReso
 
       document.head.appendChild(rybbitScript);
     `)
+  } else if (cfg.analytics?.provider === "cloudflare") {
+    componentResources.afterDOMLoaded.push(`
+      const cfScript = document.createElement('script');
+      cfScript.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+      cfScript.defer = true;
+      cfScript.setAttribute('data-cf-beacon', JSON.stringify({ token: '${cfg.analytics.token}' }));
+      document.head.appendChild(cfScript);
+    `)
   }
 
   if (cfg.enableSPA) {

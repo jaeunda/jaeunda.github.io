@@ -1,0 +1,34 @@
+.visitor-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 10px;
+  margin-top: 6px;
+  border-top: 1px solid var(--lightgray);
+
+  svg {
+    color: var(--gray);
+    flex-shrink: 0;
+    width: 13px;
+    height: 13px;
+  }
+
+  .visitor-count-text {
+    font-family: var(--codeFont);
+    font-size: 0.72rem;
+    color: var(--gray);
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+
+  .visitor-count-value {
+    color: var(--darkgray);
+  }
+}
+
+@media (max-width: 1200px) {
+  .visitor-count {
+    display: none;
+  }
+}

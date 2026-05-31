@@ -62,6 +62,11 @@ export const defaultContentPageLayout: PageLayout = {
     Component.Graph(),
     Component.DesktopOnly(Component.TableOfContents()),
     Component.Backlinks(),
+    Component.DesktopOnly(
+      Component.VisitorCount({
+        workerUrl: process.env.CF_VISITOR_WORKER_URL ?? "",
+      }),
+    ),
   ],
 }
 
