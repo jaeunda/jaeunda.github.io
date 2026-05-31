@@ -113,6 +113,12 @@ footer {
     display: none !important;
   }
 
+  /* 1-2: .desktop-only 강제 숨김 — custom.scss의 .sidebar-topics { display: flex }가
+     base.scss의 .desktop-only { display: none }보다 나중에 로드돼 덮어쓰는 버그 수정 */
+  .desktop-only {
+    display: none !important;
+  }
+
   /* 1-2: 가로 오버플로우 방지 */
   body {
     overflow-x: hidden;
@@ -1467,6 +1473,14 @@ html.mobile-no-scroll {
     box-sizing: border-box;
     padding-left: max(20px, env(safe-area-inset-left));
     padding-right: max(20px, env(safe-area-inset-right));
+  }
+
+  /* 네비게이션 바(.sidebar.left)와 본문(.center) 좌우 시작점을 동일하게 맞춤
+     base.scss의 #quartz-body { padding: 0 1rem } (16px)와
+     .center의 20px가 더해져 36px vs 16px 불일치 → sidebar도 20px로 통일 */
+  .sidebar.left {
+    padding-left: max(20px, env(safe-area-inset-left)) !important;
+    padding-right: max(20px, env(safe-area-inset-right)) !important;
   }
 
   article {

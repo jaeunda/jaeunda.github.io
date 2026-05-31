@@ -36,7 +36,7 @@ export const defaultContentPageLayout: PageLayout = {
   ],
   afterBody: [
     Component.MobileOnly(Component.TagCloud({ limit: 8 })),
-    Component.RecentNotesWithPreview({ limit: 20, showTags: true, showReadTime: true }),
+    Component.RecentNotesWithPreview({ limit: 5, showTags: true, showReadTime: true, mode: "featured" }),
   ],
   left: [
     Component.PageTitle(),
