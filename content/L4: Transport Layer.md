@@ -4,6 +4,7 @@ tags:
   - project/csocrates2
   - topic/linux-kernel
 Date: 2026-02-04
+featured: true
 ---
 ## 0. Host-to-Host vs. Process-to-Process
 > Whereas a **transport-layer protocol** provides logical communication between **processes** running on different hosts, a **network-layer protocol** provides logical communication between **hosts.**

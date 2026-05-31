@@ -4,6 +4,7 @@ tags:
   - topic/kubernetes
   - topic/network
 Date: 2026-03-01
+featured: true
 ---
 ## 쿠버네티스에서 패킷은 어떻게 흐르는가
 

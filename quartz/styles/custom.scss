@@ -1130,7 +1130,7 @@ a.internal.tag-link {
 
 @media all and ($mobile) {
   .top-tags {
-    margin-bottom: 40px;
+    margin-bottom: 0;
 
     .top-tags-list {
       gap: 8px;
@@ -1143,7 +1143,11 @@ a.internal.tag-link {
     }
   }
 
+  /* Topics → Featured 구분선: 프로필 섹션의 border-bottom과 대칭 */
   .recent-posts-section {
+    margin-top: 32px;
+    padding-top: 28px;
+    border-top: 1px solid var(--lightgray);
     margin-bottom: 28px;
   }
 
