@@ -4,10 +4,11 @@ tags:
   - project/csocrates2
   - topic/linux-kernel
 Date: 2026-02-04
+featured: true
+pinOrder: 2
 ---
-## 0. Host-to-Host vs. Process-to-Process
-> Whereas a **transport-layer protocol** provides logical communication between **processes** running on different hosts, a **network-layer protocol** provides logical communication between **hosts.**
-> - *Computer Networking, A Top Down Approach, 7th ed.*
+## Host-to-Host vs Process-to-Process
+ Whereas a **transport-layer protocol** provides logical communication between **processes** running on different hosts, a **network-layer protocol** provides logical communication between **hosts.** - *Computer Networking, A Top Down Approach, 7th ed.*
 #### L3(Network Layer)의 역할
 - **Host-to-Host**: 패킷을 목적지 **호스트**까지 전달하는 계층
 	- $\rightarrow$ "어디까지 보낼 것인가"

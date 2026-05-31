@@ -113,6 +113,12 @@ footer {
     display: none !important;
   }
 
+  /* 1-2: .desktop-only 강제 숨김 — custom.scss의 .sidebar-topics { display: flex }가
+     base.scss의 .desktop-only { display: none }보다 나중에 로드돼 덮어쓰는 버그 수정 */
+  .desktop-only {
+    display: none !important;
+  }
+
   /* 1-2: 가로 오버플로우 방지 */
   body {
     overflow-x: hidden;
@@ -427,7 +433,7 @@ article {
   }
 
   em {
-    font-style: normal;
+    font-style: italic;
     background: var(--highlight);
     padding: 0 0.15em;
     border-radius: 2px;
@@ -996,6 +1002,123 @@ a.internal.tag-link {
   flex-direction: column;
 }
 
+// ── Pinned Posts (2×n divider grid) ──────────────────────
+.pinned-posts-section {
+  margin-bottom: 32px;
+}
+
+.pinned-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+// Each row: two cards side-by-side, separated from next row by a border-bottom
+.pin-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 44px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--lightgray);
+
+  &:first-child {
+    padding-top: 0;
+  }
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.pin-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+
+  .pin-card-link {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .pin-card-date {
+    display: none; // shown only in mobile list mode
+  }
+
+  &:hover .pin-card-title {
+    color: var(--tertiary);
+  }
+}
+
+.pin-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pin-card-title {
+  font-family: var(--headerFont);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--dark);
+  line-height: 1.3;
+  letter-spacing: -0.1px;
+  word-break: keep-all;
+  transition: color 0.12s;
+  /* z-index 제거: div에 z-index:2를 주면 overlay(z-index:1) 위를 막아 클릭 불가 */
+}
+
+.pin-card-preview {
+  font-size: 12.5px;
+  line-height: 1.58;
+  color: var(--gray);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  word-break: keep-all;
+  flex: 1;
+}
+
+.pin-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: 2px;
+}
+
+.pin-card-tag {
+  font-size: 10px;
+  font-family: var(--codeFont);
+  color: var(--gray);
+  background: transparent;
+  border: 1px solid var(--lightgray);
+  border-radius: 3px;
+  padding: 1px 5px;
+  text-decoration: none;
+  transition: all 0.12s;
+  position: relative;
+  z-index: 2;
+
+  &:hover {
+    border-color: var(--secondary);
+    color: var(--tertiary);
+    background: var(--highlight);
+  }
+}
+
+.pin-card-readtime {
+  font-size: 10px;
+  font-family: var(--codeFont);
+  color: var(--gray);
+  margin-left: auto;
+}
+
 .post-card {
   position: relative;
   padding: 22px 0;
@@ -1124,7 +1247,7 @@ a.internal.tag-link {
 
 @media all and ($mobile) {
   .top-tags {
-    margin-bottom: 40px;
+    margin-bottom: 0;
 
     .top-tags-list {
       gap: 8px;
@@ -1137,8 +1260,75 @@ a.internal.tag-link {
     }
   }
 
-  .recent-posts-section {
+  /* Topics → 다음 섹션 구분선: 프로필 섹션의 border-bottom과 대칭 */
+  .recent-posts-section,
+  .pinned-posts-section {
+    margin-top: 32px;
+    padding-top: 28px;
+    border-top: 1px solid var(--lightgray);
     margin-bottom: 28px;
+  }
+
+  // Pinned: 모바일에서는 2-col grid → 단일 컬럼 목록으로 전환
+  .pin-row {
+    display: contents; // 행 래퍼를 해체해 pin-card가 직접 배치되게 함
+  }
+
+  .pin-card {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    column-gap: 20px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--lightgray);
+
+    .pin-card-date {
+      display: flex;
+      flex-direction: column;
+      font-family: var(--codeFont);
+      padding-top: 4px;
+
+      .day {
+        display: block;
+        font-size: 18px;
+        font-weight: 500;
+        color: var(--dark);
+        line-height: 1;
+        margin-bottom: 2px;
+        font-variant-numeric: tabular-nums;
+      }
+      .month-year {
+        display: block;
+        font-size: 10px;
+        color: var(--gray);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+    }
+
+    .pin-card-title {
+      font-size: 17px;
+      line-height: 1.28;
+      margin-bottom: 6px;
+    }
+
+    .pin-card-preview {
+      font-size: 13px;
+      line-height: 1.62;
+      -webkit-line-clamp: 2;
+      margin-bottom: 10px;
+    }
+
+    .pin-card-readtime {
+      font-size: 11px;
+      width: 100%;
+      margin-left: 0;
+      margin-top: 2px;
+    }
+  }
+
+  // 마지막 pin-card의 구분선 제거 (pin-row가 display: contents이므로 직접 타게팅)
+  .pinned-grid .pin-card:last-of-type {
+    border-bottom: none;
   }
 
   .post-card {
@@ -1467,6 +1657,14 @@ html.mobile-no-scroll {
     box-sizing: border-box;
     padding-left: max(20px, env(safe-area-inset-left));
     padding-right: max(20px, env(safe-area-inset-right));
+  }
+
+  /* 네비게이션 바(.sidebar.left)와 본문(.center) 좌우 시작점을 동일하게 맞춤
+     base.scss의 #quartz-body { padding: 0 1rem } (16px)와
+     .center의 20px가 더해져 36px vs 16px 불일치 → sidebar도 20px로 통일 */
+  .sidebar.left {
+    padding-left: max(20px, env(safe-area-inset-left)) !important;
+    padding-right: max(20px, env(safe-area-inset-right)) !important;
   }
 
   article {

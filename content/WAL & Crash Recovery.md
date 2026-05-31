@@ -3,6 +3,8 @@ tags:
   - topic/database
   - project/csocrates2
 Date: 2026-03-29
+featured: true
+pinOrder: 1
 ---
 1. 커밋했는데 서버가 꺼지면?
 2. 커밋 중에 죽으면, 절반만 쓰인 데이터는?

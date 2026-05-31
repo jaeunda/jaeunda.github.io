@@ -4,6 +4,8 @@ tags:
   - topic/operating-systems
   - topic/rtos
 Date: 2025-11-11
+featured: true
+pinOrder: 4
 ---
 
 2025년 11월 11일 GDG 슈몰세미나 요약입니다.

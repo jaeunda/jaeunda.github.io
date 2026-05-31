@@ -11,6 +11,7 @@ interface Options {
   limit: number
   showTags: boolean
   showReadTime: boolean
+  mode: "recent" | "featured"
   filter: (f: QuartzPluginData) => boolean
   sort: (f1: QuartzPluginData, f2: QuartzPluginData) => number
 }
@@ -19,6 +20,7 @@ const defaultOptions = (cfg: GlobalConfiguration): Options => ({
   limit: 5,
   showTags: true,
   showReadTime: true,
+  mode: "recent",
   filter: (page) => page.slug !== "index",
   sort: byDateAndAlphabetical(cfg),
 })
@@ -33,19 +35,21 @@ export default ((userOpts?: Partial<Options>) => {
     if (fileData.slug !== "index") return null
 
     const opts = { ...defaultOptions(cfg), ...userOpts }
-    const pages = allFiles.filter(opts.filter).sort(opts.sort).slice(0, opts.limit)
+    const sorted = allFiles.filter(opts.filter).sort(opts.sort)
+    const featured = opts.mode === "featured" ? sorted.filter((p) => p.frontmatter?.featured === true) : []
+    const pages = featured.length > 0 ? featured : sorted.slice(0, opts.limit)
 
     return (
       <section class={`recent-posts-section ${displayClass ?? ""}`} data-home-recent>
         <div class="section-header">
           <div class="section-title">
-            Recent
+            {opts.mode === "featured" ? "Featured" : "Recent"}
             <span class="section-title-count" data-recent-count>
               {pages.length}
             </span>
           </div>
           <a href={resolveRelative(fileData.slug!, "tags/" as FullSlug)} class="section-action">
-            archive →
+            {opts.mode === "featured" ? "all posts →" : "archive →"}
           </a>
         </div>
 
