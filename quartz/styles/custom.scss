@@ -433,7 +433,7 @@ article {
   }
 
   em {
-    font-style: normal;
+    font-style: italic;
     background: var(--highlight);
     padding: 0 0.15em;
     border-radius: 2px;
@@ -1067,8 +1067,7 @@ a.internal.tag-link {
   letter-spacing: -0.1px;
   word-break: keep-all;
   transition: color 0.12s;
-  position: relative;
-  z-index: 2;
+  /* z-index 제거: div에 z-index:2를 주면 overlay(z-index:1) 위를 막아 클릭 불가 */
 }
 
 .pin-card-preview {
