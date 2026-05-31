@@ -13,7 +13,8 @@ const config: QuartzConfig = {
     enableSPA: true,
     enablePopovers: false,
     analytics: {
-      provider: "plausible",
+      provider: "cloudflare",
+      token: process.env.CF_BEACON_TOKEN ?? "",
     },
     locale: "en-US",
     baseUrl: "https://jaeunda.github.io",
