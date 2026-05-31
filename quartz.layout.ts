@@ -36,7 +36,9 @@ export const defaultContentPageLayout: PageLayout = {
   ],
   afterBody: [
     Component.MobileOnly(Component.TagCloud({ limit: 8 })),
-    Component.RecentNotesWithPreview({ limit: 5, showTags: true, showReadTime: true, mode: "featured" }),
+    // EXPERIMENT: PinnedPosts (2×n grid). Rollback = swap back to RecentNotesWithPreview below.
+    // Component.RecentNotesWithPreview({ limit: 5, showTags: true, showReadTime: true, mode: "featured" }),
+    Component.PinnedPosts(),
   ],
   left: [
     Component.PageTitle(),

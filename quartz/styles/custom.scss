@@ -1002,6 +1002,113 @@ a.internal.tag-link {
   flex-direction: column;
 }
 
+// ── Pinned Posts (2×n grid) ───────────────────────────────
+.pinned-posts-section {
+  margin-bottom: 32px;
+}
+
+.pinned-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.pin-card {
+  position: relative;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.12s;
+
+  &:hover {
+    border-color: var(--secondary);
+
+    .pin-card-title {
+      color: var(--tertiary);
+    }
+  }
+
+  &.pin-card--full {
+    grid-column: span 2;
+  }
+
+  .pin-card-link {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: 8px;
+  }
+}
+
+.pin-card-title {
+  font-family: var(--headerFont);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--dark);
+  line-height: 1.3;
+  letter-spacing: -0.1px;
+  word-break: keep-all;
+  transition: color 0.12s;
+  position: relative;
+  z-index: 2;
+}
+
+.pin-card-preview {
+  font-size: 12px;
+  line-height: 1.58;
+  color: var(--gray);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  word-break: keep-all;
+  flex: 1;
+}
+
+.pin-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: 2px;
+}
+
+.pin-card-tag {
+  font-size: 10px;
+  font-family: var(--codeFont);
+  color: var(--gray);
+  background: transparent;
+  border: 1px solid var(--lightgray);
+  border-radius: 3px;
+  padding: 1px 5px;
+  text-decoration: none;
+  transition: all 0.12s;
+  position: relative;
+  z-index: 2;
+
+  &:hover {
+    border-color: var(--secondary);
+    color: var(--tertiary);
+    background: var(--highlight);
+  }
+}
+
+.pin-card-date {
+  font-size: 10px;
+  font-family: var(--codeFont);
+  color: var(--gray);
+  margin-left: auto;
+}
+
 .post-card {
   position: relative;
   padding: 22px 0;
@@ -1143,8 +1250,9 @@ a.internal.tag-link {
     }
   }
 
-  /* Topics → Featured 구분선: 프로필 섹션의 border-bottom과 대칭 */
-  .recent-posts-section {
+  /* Topics → 다음 섹션 구분선: 프로필 섹션의 border-bottom과 대칭 */
+  .recent-posts-section,
+  .pinned-posts-section {
     margin-top: 32px;
     padding-top: 28px;
     border-top: 1px solid var(--lightgray);

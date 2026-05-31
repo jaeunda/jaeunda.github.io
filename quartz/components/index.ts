@@ -26,6 +26,7 @@ import ConditionalRender from "./ConditionalRender"
 import Hero from "./Hero"
 import TagCloud from "./TagCloud"
 import RecentNotesWithPreview from "./RecentNotesWithPreview"
+import PinnedPosts from "./PinnedPosts"
 
 export {
   ArticleTitle,
@@ -56,5 +57,6 @@ export {
   Hero,
   TagCloud,
   RecentNotesWithPreview,
+  PinnedPosts,
 }
 export { default as ProfileCard } from "./ProfileCard"
