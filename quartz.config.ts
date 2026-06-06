@@ -17,7 +17,7 @@ const config: QuartzConfig = {
       token: process.env.CF_BEACON_TOKEN ?? "",
     },
     locale: "en-US",
-    baseUrl: "https://jaeunda.github.io",
+    baseUrl: "jaeunda.github.io",
     ignorePatterns: ["private", "templates", ".obsidian"],
     defaultDateType: "published",
     theme: {
