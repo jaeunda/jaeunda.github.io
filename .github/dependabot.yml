@@ -9,6 +9,10 @@ updates:
         applies-to: "version-updates"
         patterns:
           - "*"
+    ignore:
+      - dependency-name: "js-yaml"
+        update-types:
+          - "version-update:semver-major"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
