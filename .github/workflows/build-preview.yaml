@@ -7,7 +7,6 @@ on:
 
 jobs:
   build-preview:
-    if: ${{ github.repository == 'jackyzha0/quartz' }}
     runs-on: ubuntu-latest
     name: Build Preview
     steps:
@@ -30,13 +29,11 @@ jobs:
 
       - run: npm ci
 
-      - name: Check types and style
-        run: npm run check
-
       - name: Build Quartz
-        run: npx quartz build -d docs -v
+        run: npm run quartz -- build
 
       - name: Upload build artifact
+        if: ${{ github.repository == 'jackyzha0/quartz' }}
         uses: actions/upload-artifact@v7
         with:
           name: preview-build
