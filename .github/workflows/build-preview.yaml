@@ -33,6 +33,7 @@ jobs:
         run: npm run quartz -- build
 
       - name: Upload build artifact
+        if: ${{ github.repository == 'jackyzha0/quartz' }}
         uses: actions/upload-artifact@v7
         with:
           name: preview-build
