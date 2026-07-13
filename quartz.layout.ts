@@ -5,7 +5,12 @@ import * as Component from "./quartz/components"
 export const sharedPageComponents: SharedLayout = {
   head: Component.Head(),
   header: [],
-  afterBody: [],
+  afterBody: [
+    Component.MobileOnly(Component.TagCloud({ limit: 8 })),
+    // EXPERIMENT: PinnedPosts (2×n grid). Rollback = swap back to RecentNotesWithPreview below.
+    // Component.RecentNotesWithPreview({ limit: 5, showTags: true, showReadTime: true, mode: "featured" }),
+    Component.PinnedPosts(),
+  ],
   footer: Component.Footer({
     links: {
       GitHub: "https://github.com/jackyzha0/quartz",
@@ -33,12 +38,6 @@ export const defaultContentPageLayout: PageLayout = {
       component: Component.TagList(),
       condition: (page) => page.fileData.slug !== "index",
     }),
-  ],
-  afterBody: [
-    Component.MobileOnly(Component.TagCloud({ limit: 8 })),
-    // EXPERIMENT: PinnedPosts (2×n grid). Rollback = swap back to RecentNotesWithPreview below.
-    // Component.RecentNotesWithPreview({ limit: 5, showTags: true, showReadTime: true, mode: "featured" }),
-    Component.PinnedPosts(),
   ],
   left: [
     Component.PageTitle(),

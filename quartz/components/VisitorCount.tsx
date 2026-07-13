@@ -1,5 +1,6 @@
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
 import style from "./styles/visitorCount.inline.scss"
+// @ts-ignore
 import script from "./scripts/visitorCount.inline"
 
 interface VisitorCountOptions {

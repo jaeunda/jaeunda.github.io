@@ -13,23 +13,19 @@ interface Options {
   filter: (f: QuartzPluginData) => boolean
 }
 
-const defaultOptions = (cfg: GlobalConfiguration): Options => ({
+const defaultOptions: Options = {
   showTags: true,
   showReadTime: true,
   filter: (page) => page.slug !== "index",
-})
+}
 
 function pinnedSort(cfg: GlobalConfiguration) {
   const byDate = byDateAndAlphabetical(cfg)
   return (a: QuartzPluginData, b: QuartzPluginData): number => {
     const ao =
-      typeof a.frontmatter?.pinOrder === "number"
-        ? (a.frontmatter.pinOrder as number)
-        : undefined
+      typeof a.frontmatter?.pinOrder === "number" ? (a.frontmatter.pinOrder as number) : undefined
     const bo =
-      typeof b.frontmatter?.pinOrder === "number"
-        ? (b.frontmatter.pinOrder as number)
-        : undefined
+      typeof b.frontmatter?.pinOrder === "number" ? (b.frontmatter.pinOrder as number) : undefined
     if (ao !== undefined && bo !== undefined) return ao - bo
     if (ao !== undefined) return -1
     if (bo !== undefined) return 1
@@ -46,7 +42,7 @@ export default ((userOpts?: Partial<Options>) => {
   }: QuartzComponentProps) => {
     if (fileData.slug !== "index") return null
 
-    const opts = { ...defaultOptions(cfg), ...userOpts }
+    const opts = { ...defaultOptions, ...userOpts }
     const pins = allFiles
       .filter(opts.filter)
       .filter((p) => p.frontmatter?.featured === true)
@@ -76,8 +72,7 @@ export default ((userOpts?: Partial<Options>) => {
           {rows.map((row) => (
             <div class="pin-row">
               {row.map((page) => {
-                const title =
-                  page.frontmatter?.title ?? i18n(cfg.locale).propertyDefaults.title
+                const title = page.frontmatter?.title ?? i18n(cfg.locale).propertyDefaults.title
                 const date = getDate(cfg, page)
                 const day = date ? String(date.getDate()).padStart(2, "0") : ""
                 const monthYear = date

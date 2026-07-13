@@ -15,7 +15,13 @@ const ProfileCard: QuartzComponent = (
   props: QuartzComponentProps & { explorerProfile?: boolean },
 ) => {
   return (
-    <div class={classNames("profile-card", props.explorerProfile && "explorer-profile")}>
+    <div
+      class={classNames(
+        props.displayClass,
+        "profile-card",
+        ...(props.explorerProfile ? ["explorer-profile"] : []),
+      )}
+    >
       <div class="profile-avatar">
         <img src="https://github.com/jaeunda.png" alt="profile" />
       </div>
