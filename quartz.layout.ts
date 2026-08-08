@@ -58,14 +58,27 @@ export const defaultContentPageLayout: PageLayout = {
     ),
   ],
   right: [
-    Component.Graph(),
-    Component.DesktopOnly(Component.TableOfContents()),
-    Component.Backlinks(),
-    Component.DesktopOnly(
-      Component.VisitorCount({
-        workerUrl: process.env.CF_VISITOR_WORKER_URL ?? "",
-      }),
-    ),
+    // Turn 3 확정 시안: 홈 화면은 우측 컬럼(Graph/TOC/Backlinks/VisitorCount) 없이 2열 구성
+    Component.ConditionalRender({
+      component: Component.Graph(),
+      condition: (page) => page.fileData.slug !== "index",
+    }),
+    Component.ConditionalRender({
+      component: Component.DesktopOnly(Component.TableOfContents()),
+      condition: (page) => page.fileData.slug !== "index",
+    }),
+    Component.ConditionalRender({
+      component: Component.Backlinks(),
+      condition: (page) => page.fileData.slug !== "index",
+    }),
+    Component.ConditionalRender({
+      component: Component.DesktopOnly(
+        Component.VisitorCount({
+          workerUrl: process.env.CF_VISITOR_WORKER_URL ?? "",
+        }),
+      ),
+      condition: (page) => page.fileData.slug !== "index",
+    }),
   ],
 }
 

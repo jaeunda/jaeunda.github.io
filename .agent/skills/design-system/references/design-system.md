@@ -141,18 +141,17 @@ Sidebar topics:
 
 - Desktop and tablet left sidebar replaces Explorer with
   `TagCloud({ limit: 8, showOnAllPages: true, variant: "sidebar" })`.
-- Sidebar topics reuse `.top-tag` chips with slightly tighter padding and no
-  section bottom margin.
-- The sidebar topic list keeps its natural chip height until it reaches
-  `min(32vh, 16rem)`, then scrolls internally so it does not become a tall empty
-  block.
+- Sidebar topics render the top eight topics as compact outlined tag boxes,
+  ordered by descending post count with an alphabetical tie-breaker.
+- Sidebar topic boxes wrap naturally without an internal scroll area. Each box
+  shows the topic name and its post count.
 - Topics include only tags prefixed with `topic/`, but display them without the
   prefix, such as `#database`; tag links and home filtering keep the full tag
   value.
 - Sidebar topics are hidden on the all-tags Tag Index page because the main page
   already contains the full tag navigation.
-- On the index page, sidebar topic clicks keep the home filtering behavior. On
-  non-index pages, topic clicks navigate to the relevant tag page.
+- Sidebar and mobile topic clicks navigate to the relevant tag page on every
+  page, including the index.
 - The all-tags action opens the complete leaf tag index, including non-topic
   tags while omitting grouping prefixes such as `topic` and `project`.
 
@@ -215,18 +214,18 @@ collapses into the top bar.
 the hero, preserve its `fileData.slug === "index"` guard and place it before
 `TagCloud`.
 
-`content/index.md` contains a short profile/contact intro. Home listing content
-is otherwise component-driven.
+`content/index.md` contains only the short systems intro, set in 14px IBM Plex
+Mono. This places it below Pinned titles and above Pinned preview text on both
+desktop and mobile. PROFILE owns the contact links. Home listing content is
+otherwise component-driven.
 
 Profile card:
 
-- `.profile-name` keeps the default body/display tone for a calmer identity
-  anchor, with 8px space from the avatar.
-- `.profile-interest` uses IBM Plex Mono at 0.72rem with `white-space: nowrap`
-  and a wider 15rem max-width so only intentional `<br />` breaks appear. It
-  sits 5px below the name.
-- `.profile-socials` sits 21px below the interest line so icons feel connected
-  but not cramped.
+- `.profile-name` is the dark identity anchor below a small mono PROFILE label.
+- `.profile-interest` uses IBM Plex Mono for the two-line systems focus.
+- `.profile-links` lists GitHub, e-mail, and LinkedIn as restrained mono rows.
+  GitHub displays `github.com/jaeunda`; LinkedIn displays `Daeun Jang` without
+  exposing its URL as text.
 
 ### Section Header
 
@@ -244,8 +243,8 @@ Profile card:
 - Count: 10.5px, `var(--gray)`, `var(--light)` background, radius 3px.
 - Active: `var(--tertiary)` background and border, `var(--light)` text; dark
   theme overrides active text to `var(--dark)`.
-- Sidebar `.sidebar-topics .top-tag` keeps the same hashtag chip language at a
-  slightly smaller scale for the left rail.
+- Sidebar `.sidebar-topics .top-tag` is a compact mono outlined box with a
+  transparent background, topic name, and post count.
 
 ### Recent Post Cards
 
@@ -264,14 +263,18 @@ Profile card:
 - Read time: 11px IBM Plex Mono, `var(--gray)`, `margin-left: auto`; mobile
   full width.
 
+### Pinned Post Cards
+
+- Pinned title: Fraunces 15px desktop / 17px mobile; preview: 12.5px desktop /
+  13px mobile.
+- Desktop cards retain their individual outlined boxes, while the extra
+  horizontal divider between card rows is omitted.
+- Mobile Pinned cards also omit per-card horizontal dividers.
+
 ### Tag Filter Interaction
 
-`homeFilter.inline.ts` synchronizes a single selected tag across top chips,
-visible post cards, recent count, active-filter chip, empty state, and the URL
-`?tag=` param.
-
-Preserve default navigation for modifier or middle clicks:
-`metaKey`, `ctrlKey`, `shiftKey`, or `button === 1`.
+Home Topics are navigation links to their individual tag pages. In-place tag
+filtering remains scoped to the all-tags index.
 
 ## List Pages
 
@@ -467,3 +470,18 @@ For visual changes, check as applicable:
 - Restored Topic/Project tag tabs as the archive filter control: All Posts shows
   when no chip is selected, and a selected tag replaces it with that tag's post
   list.
+
+### 2026-08-08
+
+- Removed duplicate GitHub/e-mail details from the home intro and made PROFILE
+  the single contact surface, with explicit GitHub text and a LinkedIn row that
+  hides the raw URL.
+- Changed sidebar Topics into one full-width row per topic, kept count-first
+  ordering, and restored direct tag-page navigation now that the home listing no
+  longer provides the old Recent tag-filter target.
+- Restored sidebar Topics as eight count-sorted outlined tag boxes without an
+  internal scrollbar or filled background.
+- Removed the school/department line and applied its 15px IBM Plex Mono style to
+  the remaining home introduction.
+- Set the revised home introduction to 14px so it sits between Pinned titles and
+  previews, and removed the extra horizontal dividers between Pinned cards.

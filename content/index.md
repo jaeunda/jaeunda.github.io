@@ -2,9 +2,6 @@
 title: jaeunda.log
 ---
 
-**Computer Science & Engineering**, Soongsil Univ.<br />
-Interested in the low-level systems behind **reliable software** —<br />
-from **OS internals** to **databases** and **distributed infrastructure**.
-
-GitHub: https://github.com/jaeunda<br />
-E-mail: jaeunda@gmail.com
+Interested in **the systems behind reliable software.** <br />
+Building on Linux and database internals, with a growing focus on <br />
+runtime execution and hardware-aware performance.

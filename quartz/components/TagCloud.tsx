@@ -1,10 +1,5 @@
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
 import { FullSlug, resolveRelative } from "../util/path"
-import { concatenateResources } from "../util/resources"
-// @ts-ignore
-import homeFilterScript from "./scripts/homeFilter.inline"
-// @ts-ignore
-import tagIndexFilterScript from "./scripts/tagIndexFilter.inline"
 
 interface Options {
   limit: number
@@ -38,15 +33,14 @@ export default ((opts?: Partial<Options>) => {
       }
     }
 
-    const topTags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, options.limit)
+    const topTags = [...tagCounts.entries()]
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .slice(0, options.limit)
 
     if (topTags.length === 0) return null
 
     return (
-      <section
-        class={`top-tags ${isSidebar ? "sidebar-topics" : ""} ${displayClass ?? ""}`}
-        data-home-tagcloud={isIndex ? "" : undefined}
-      >
+      <section class={`top-tags ${isSidebar ? "sidebar-topics" : ""} ${displayClass ?? ""}`}>
         <div class="section-header">
           <div class="section-title">
             Topics
@@ -61,11 +55,7 @@ export default ((opts?: Partial<Options>) => {
             const label = tag.slice(topicPrefix.length)
 
             return (
-              <a
-                href={resolveRelative(fileData.slug!, `tags/${tag}` as FullSlug)}
-                class="top-tag"
-                data-tag={isIndex ? tag : undefined}
-              >
+              <a href={resolveRelative(fileData.slug!, `tags/${tag}` as FullSlug)} class="top-tag">
                 <span class="top-tag-label">#{label}</span>
                 <span class="top-tag-count">{count}</span>
               </a>
@@ -76,6 +66,5 @@ export default ((opts?: Partial<Options>) => {
     )
   }
 
-  TagCloud.afterDOMLoaded = concatenateResources(homeFilterScript, tagIndexFilterScript)
   return TagCloud
 }) satisfies QuartzComponentConstructor

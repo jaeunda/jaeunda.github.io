@@ -80,6 +80,9 @@ export default ((userOpts?: Partial<Options>) => {
                       .toLocaleDateString("en-US", { month: "short", year: "numeric" })
                       .toUpperCase()
                   : ""
+                const isoDate = date
+                  ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
+                  : ""
                 const preview = page.description ?? ""
                 const tags: string[] = (page.frontmatter?.tags ?? []).filter((t: string) =>
                   t.startsWith("topic/"),
@@ -103,6 +106,8 @@ export default ((userOpts?: Partial<Options>) => {
                       <span class="month-year">{monthYear}</span>
                     </div>
                     <div class="pin-card-body">
+                      {/* ISO date: shown atop the card on desktop only (Turn 3 확정 시안) */}
+                      <div class="pin-card-date-full">{isoDate}</div>
                       <div class="pin-card-title">{title}</div>
                       {preview && <p class="pin-card-preview">{preview}</p>}
                       <div class="pin-card-meta">

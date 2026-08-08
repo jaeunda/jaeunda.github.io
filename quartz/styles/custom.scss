@@ -845,6 +845,17 @@ a.internal.tag-link {
     display: flex;
     align-items: baseline;
     gap: 8px;
+
+    // Turn 3 확정 시안 — 블로그·포트폴리오 공용 섹션 마커
+    &::before {
+      content: "";
+      display: inline-block;
+      width: 2px;
+      height: 0.85em;
+      background: var(--dark);
+      align-self: center;
+      flex: 0 0 auto;
+    }
   }
   .section-title-count {
     font-family: var(--codeFont);
@@ -973,22 +984,67 @@ a.internal.tag-link {
   }
 
   .top-tags-list {
-    gap: 7px;
-    max-height: min(32vh, 16rem);
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    padding-right: 4px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
   }
 
+  // Sidebar Topics — 배경 없이 테두리만 사용하는 compact tag box
   .top-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
     padding: 5px 9px;
     font-size: 11.5px;
     line-height: 1.35;
+    color: var(--tertiary);
+    background: transparent;
+    border: 1px solid var(--lightgray);
+    border-radius: 5px;
+    width: auto;
 
     .top-tag-label {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+
+    .top-tag-count {
+      background: transparent;
+      padding: 0;
+      font-weight: 500;
+      color: var(--gray);
+    }
+
+    &:hover {
+      background: transparent;
+      color: var(--dark);
+      border-color: var(--secondary);
+
+      .top-tag-count {
+        color: var(--tertiary);
+        background: transparent;
+      }
+    }
+
+    &.active {
+      background: transparent;
+      color: var(--tertiary);
+      border-color: var(--tertiary);
+
+      .top-tag-count {
+        background: transparent;
+        color: var(--tertiary);
+      }
+
+      &:hover {
+        background: none;
+        color: var(--dark);
+      }
     }
   }
 }
@@ -1002,7 +1058,7 @@ a.internal.tag-link {
   flex-direction: column;
 }
 
-// ── Pinned Posts (2×n divider grid) ──────────────────────
+// ── Pinned Posts (2×n card grid) ─────────────────────────
 .pinned-posts-section {
   margin-bottom: 32px;
 }
@@ -1012,19 +1068,17 @@ a.internal.tag-link {
   flex-direction: column;
 }
 
-// Each row: two cards side-by-side, separated from next row by a border-bottom
+// Each row: two cards side-by-side without an additional row divider
 .pin-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   column-gap: 44px;
   padding: 20px 0;
-  border-bottom: 1px solid var(--lightgray);
 
   &:first-child {
     padding-top: 0;
   }
   &:last-child {
-    border-bottom: none;
     padding-bottom: 0;
   }
 }
@@ -1117,6 +1171,36 @@ a.internal.tag-link {
   font-family: var(--codeFont);
   color: var(--gray);
   margin-left: auto;
+}
+
+.pin-card-date-full {
+  display: none;
+}
+
+// ── Pinned cards: bordered box on desktop (Turn 3 확정 시안) ─
+@media all and (min-width: 801px) {
+  .pin-card {
+    padding: 20px;
+    border: 1px solid var(--lightgray);
+    border-radius: 4px;
+    min-height: 168px;
+    transition: border-color 0.12s;
+
+    &:hover {
+      border-color: var(--tertiary);
+    }
+  }
+
+  .pin-card-date-full {
+    display: block;
+    font-family: var(--codeFont);
+    font-size: 12px;
+    color: var(--gray);
+  }
+
+  .pin-card-preview {
+    -webkit-line-clamp: 2;
+  }
 }
 
 .post-card {
@@ -1279,7 +1363,7 @@ a.internal.tag-link {
     grid-template-columns: 60px 1fr;
     column-gap: 20px;
     padding: 22px 0;
-    border-bottom: 1px solid var(--lightgray);
+    border-bottom: none;
 
     .pin-card-date {
       display: flex;
@@ -1324,11 +1408,6 @@ a.internal.tag-link {
       margin-left: 0;
       margin-top: 2px;
     }
-  }
-
-  // 마지막 pin-card의 구분선 제거 (pin-row가 display: contents이므로 직접 타게팅)
-  .pinned-grid .pin-card:last-of-type {
-    border-bottom: none;
   }
 
   .post-card {
@@ -1709,18 +1788,24 @@ html.mobile-no-scroll {
   }
 }
 
-// ── Home page intro (index.md article) ──────────────────
+// ── Home page intro (index.md article) ───────────────────
+// 기존 학과·학교 문구의 mono 스타일을 단일 소개문에 적용
 [data-slug="index"] .center > article {
   font-family: var(--codeFont);
-  font-size: 12px;
-  line-height: 1.7;
+  font-size: 0.875rem; // 14px: Pinned title보다 작고 preview보다 큼
+  line-height: 1.75;
+  letter-spacing: 0;
   color: var(--gray);
-  max-width: 540px;
+  max-width: 620px;
   margin-bottom: 32px;
 
   p {
-    color: var(--gray);
-    margin-bottom: 0.4em;
+    margin-bottom: 0.6em;
+  }
+
+  strong {
+    font-weight: 600;
+    color: var(--dark);
   }
 
   a {
