@@ -5,8 +5,10 @@
 //
 // Dates travel as ISO strings and are revived in entry.tsx — JSON has no Date.
 import matter from "gray-matter"
+import Slugger from "github-slugger"
 import { globbySync } from "globby"
 import isAbsoluteUrl from "is-absolute-url"
+import { toString } from "mdast-util-to-string"
 import remarkGfm from "remark-gfm"
 import remarkParse from "remark-parse"
 import { unified } from "unified"
@@ -113,6 +115,26 @@ function resolveInternalLink(sourceSlug, rawTarget, allSlugs) {
   return simplifySlug(decodeURIComponent(stripSlashes(destination, true)))
 }
 
+// Mirrors quartz/plugins/transformers/toc.ts with its default maxDepth and
+// minEntries. Parsing the mdast first excludes fenced-code lookalikes.
+function buildToc(markdownTree) {
+  const slugger = new Slugger()
+  const entries = []
+  let highestDepth = 3
+
+  visit(markdownTree, "heading", (node) => {
+    if (node.depth > 3) return
+
+    const text = toString(node)
+    highestDepth = Math.min(highestDepth, node.depth)
+    entries.push({ depth: node.depth, text, slug: slugger.slug(text) })
+  })
+
+  return entries.length > 1
+    ? entries.map((entry) => ({ ...entry, depth: entry.depth - highestDepth }))
+    : []
+}
+
 function firstProse(body) {
   // Skip fenced code, headings and list markers to find a real sentence for
   // the card preview text (Quartz's Description plugin does the equivalent).
@@ -147,28 +169,15 @@ for (const file of contentFiles) {
   const title = data.title ?? basename(rel).replace(/\.md$/, "")
   const dateStr = data.Date ?? data.date ?? data.published ?? data.created
   const iso = dateStr ? new Date(dateStr).toISOString() : new Date().toISOString()
+  const markdownTree = markdownParser.parse(content)
 
-  // TocEntry[] as quartz/plugins/transformers/toc.ts defines it: depth is
-  // relative to the shallowest heading in the file.
-  const headings = [...content.matchAll(/^(#{1,6})\s+(.+)$/gm)]
-    .filter((m) => !/^```/.test(m[2]))
-    .map((m) => ({ level: m[1].length, text: m[2].replace(/[*_`]/g, "").trim() }))
-  const minLevel = headings.length ? Math.min(...headings.map((h) => h.level)) : 0
-  const toc = headings.map((h) => ({
-    depth: h.level - minLevel,
-    text: h.text,
-    slug: h.text
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-"),
-  }))
+  const toc = (data.enableToc ?? true) ? buildToc(markdownTree) : []
 
   // Wikilinks and parsed Markdown links, resolved with Quartz's "shortest"
   // strategy — Backlinks filters allFiles on `links?.includes(slug)`.
   // `![[x]]` is an image embed, not a page link — the negative lookbehind keeps
   // those out, otherwise every embedded screenshot looks like an outgoing link.
   const linkTargets = [...content.matchAll(/(?<!!)\[\[([^\]|#]+)/g)].map((m) => m[1].trim())
-  const markdownTree = markdownParser.parse(content)
   const definitions = new Map()
   visit(markdownTree, "definition", (node) => definitions.set(node.identifier, node.url))
   visit(markdownTree, "link", (node) => linkTargets.push(node.url))
