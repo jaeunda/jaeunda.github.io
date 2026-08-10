@@ -6,6 +6,11 @@
 // Dates travel as ISO strings and are revived in entry.tsx — JSON has no Date.
 import matter from "gray-matter"
 import { globbySync } from "globby"
+import isAbsoluteUrl from "is-absolute-url"
+import remarkGfm from "remark-gfm"
+import remarkParse from "remark-parse"
+import { unified } from "unified"
+import { visit } from "unist-util-visit"
 import { readFileSync, mkdirSync, writeFileSync } from "fs"
 import { basename, dirname } from "path"
 
@@ -29,6 +34,85 @@ function slugify(name) {
     .join("/")
 }
 
+function stripSlashes(value, onlyPrefix = false) {
+  const withoutPrefix = value.startsWith("/") ? value.slice(1) : value
+  return !onlyPrefix && withoutPrefix.endsWith("/") ? withoutPrefix.slice(0, -1) : withoutPrefix
+}
+
+function endsWithPath(value, suffix) {
+  return value === suffix || value.endsWith(`/${suffix}`)
+}
+
+function simplifySlug(value) {
+  const withoutIndex = endsWithPath(value, "index") ? value.slice(0, -5) : value
+  const simple = stripSlashes(withoutIndex, true)
+  return simple.length === 0 ? "/" : simple
+}
+
+function joinSegments(...segments) {
+  if (segments.length === 0) return ""
+
+  let joined = segments
+    .filter((segment) => segment !== "" && segment !== "/")
+    .map((segment) => stripSlashes(segment))
+    .join("/")
+
+  if (segments[0].startsWith("/")) joined = `/${joined}`
+  if (segments.at(-1).endsWith("/")) joined += "/"
+  return joined
+}
+
+function pathToRoot(slug) {
+  const root = slug
+    .split("/")
+    .filter(Boolean)
+    .slice(0, -1)
+    .map(() => "..")
+    .join("/")
+  return root || "."
+}
+
+function resolveRelative(current, target) {
+  return joinSegments(pathToRoot(current), simplifySlug(target))
+}
+
+function isFolderPath(value) {
+  return (
+    value.endsWith("/") ||
+    endsWithPath(value, "index") ||
+    endsWithPath(value, "index.md") ||
+    endsWithPath(value, "index.html")
+  )
+}
+
+// Mirrors the "shortest" CrawlLinks strategy configured in quartz.config.ts,
+// then applies the same canonicalization CrawlLinks uses for fileData.links.
+function resolveInternalLink(sourceSlug, rawTarget, allSlugs) {
+  if (isAbsoluteUrl(rawTarget, { httpOnly: false }) || rawTarget.startsWith("#")) return null
+
+  const decoded = decodeURI(rawTarget)
+  const fileLike = decoded.split("#", 1)[0]
+  const folderPath = isFolderPath(fileLike)
+  const segments = fileLike.split("/").filter(Boolean)
+  const prefix = segments.filter((segment) => /^\.{1,2}$/.test(segment)).join("/")
+  const filePath = segments.filter((segment) => !/^\.{1,2}$/.test(segment)).join("/")
+  const simpleTarget = simplifySlug(slugify(filePath))
+  const targetPath = joinSegments(stripSlashes(prefix), stripSlashes(simpleTarget))
+  const relativeTarget = targetPath.startsWith(".") ? targetPath : `./${targetPath || "."}`
+  const canonicalTarget = stripSlashes(relativeTarget.slice(1))
+  const matchingSlugs = allSlugs.filter((slug) => slug.split("/").at(-1) === canonicalTarget)
+  const transformed =
+    matchingSlugs.length === 1
+      ? resolveRelative(sourceSlug, matchingSlugs[0])
+      : joinSegments(pathToRoot(sourceSlug), canonicalTarget) + (folderPath ? "/" : "")
+
+  const current = simplifySlug(sourceSlug)
+  const url = new URL(transformed, `https://base.com/${stripSlashes(current, true)}`)
+  let destination = url.pathname
+  if (destination.endsWith("/")) destination += "index"
+  return simplifySlug(decodeURIComponent(stripSlashes(destination, true)))
+}
+
 function firstProse(body) {
   // Skip fenced code, headings and list markers to find a real sentence for
   // the card preview text (Quartz's Description plugin does the equivalent).
@@ -46,8 +130,12 @@ function firstProse(body) {
   return para.length > 150 ? para.slice(0, 150).trimEnd() + "…" : para
 }
 
+const markdownParser = unified().use(remarkParse).use(remarkGfm)
+const contentFiles = globbySync("content/**/*.md").sort()
+const allSlugs = contentFiles.map((file) => slugify(file.replace(/^content\//, "")))
+
 const pages = []
-for (const file of globbySync("content/**/*.md").sort()) {
+for (const file of contentFiles) {
   const raw = readFileSync(file, "utf8")
   const { data, content } = matter(raw)
   const rel = file.replace(/^content\//, "")
@@ -75,14 +163,26 @@ for (const file of globbySync("content/**/*.md").sort()) {
       .replace(/\s+/g, "-"),
   }))
 
-  // Wikilinks and relative markdown links, resolved to slugs — Backlinks
-  // filters allFiles on `links?.includes(slug)`.
+  // Wikilinks and parsed Markdown links, resolved with Quartz's "shortest"
+  // strategy — Backlinks filters allFiles on `links?.includes(slug)`.
   // `![[x]]` is an image embed, not a page link — the negative lookbehind keeps
   // those out, otherwise every embedded screenshot looks like an outgoing link.
+  const linkTargets = [...content.matchAll(/(?<!!)\[\[([^\]|#]+)/g)].map((m) => m[1].trim())
+  const markdownTree = markdownParser.parse(content)
+  const definitions = new Map()
+  visit(markdownTree, "definition", (node) => definitions.set(node.identifier, node.url))
+  visit(markdownTree, "link", (node) => linkTargets.push(node.url))
+  visit(markdownTree, "linkReference", (node) => {
+    const target = definitions.get(node.identifier)
+    if (target) linkTargets.push(target)
+  })
   const links = [
-    ...[...content.matchAll(/(?<!!)\[\[([^\]|#]+)/g)].map((m) => slugify(m[1].trim())),
-    ...[...content.matchAll(/(?<!!)\]\(\.?\/?([^)\s#]+\.md)/g)].map((m) => slugify(m[1].trim())),
-  ].filter((l) => !/\.(png|jpe?g|gif|svg|webp)$/i.test(l))
+    ...new Set(
+      linkTargets
+        .map((target) => resolveInternalLink(slug, target, allSlugs))
+        .filter((target) => target !== null),
+    ),
+  ]
 
   pages.push({
     slug,
