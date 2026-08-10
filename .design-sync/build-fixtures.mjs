@@ -69,7 +69,10 @@ for (const file of globbySync("content/**/*.md").sort()) {
   const toc = headings.map((h) => ({
     depth: h.level - minLevel,
     text: h.text,
-    slug: h.text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-"),
+    slug: h.text
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-"),
   }))
 
   // Wikilinks and relative markdown links, resolved to slugs — Backlinks
@@ -85,9 +88,17 @@ for (const file of globbySync("content/**/*.md").sort()) {
     slug,
     filePath: `content/${rel}`,
     relativePath: rel,
-    frontmatter: { title, tags: data.tags ?? [] },
+    frontmatter: {
+      title,
+      tags: data.tags ?? [],
+      featured: data.featured,
+      pinOrder: data.pinOrder,
+    },
     description: firstProse(content),
-    text: content.replace(/```[\s\S]*?```/g, " ").replace(/\s+/g, " ").trim(),
+    text: content
+      .replace(/```[\s\S]*?```/g, " ")
+      .replace(/\s+/g, " ")
+      .trim(),
     datesISO: { created: iso, modified: iso, published: iso },
     toc,
     links,
@@ -100,5 +111,9 @@ for (const p of pages) for (const t of p.frontmatter.tags) tagCounts[t] = (tagCo
 const out = { pages, tagCounts }
 writeFileSync(outFile, JSON.stringify(out, null, 2))
 console.log(`wrote ${outFile}: ${pages.length} pages, ${Object.keys(tagCounts).length} tags`)
-console.log(`tags: ${Object.entries(tagCounts).map(([t, n]) => `${t}(${n})`).join(", ")}`)
+console.log(
+  `tags: ${Object.entries(tagCounts)
+    .map(([t, n]) => `${t}(${n})`)
+    .join(", ")}`,
+)
 console.log(`titles: ${pages.map((p) => p.frontmatter.title).join(" | ")}`)
