@@ -1,5 +1,52 @@
+@use "sass:map";
+@use "sass:math";
 @use "./variables.scss" as *;
 @use "./base.scss";
+@use "./readability-experiment.scss" as readability;
+
+/* Global UI scale — keep one reversible control for desktop and mobile. */
+$site-scale: 0.95;
+$site-scale-inverse: math.div(1, $site-scale);
+$site-page-max-width: (map.get($breakpoints, desktop) + 300px) * $site-scale-inverse;
+$site-side-panel-width: $sidePanelWidth * $site-scale-inverse;
+$readability-experiment-enabled: true; // Roll back this reading pass by changing only this to false.
+
+:root {
+  --site-scale: #{$site-scale};
+  --site-viewport-width: #{$site-scale-inverse * 100}vw;
+  --site-viewport-height: #{$site-scale-inverse * 100}dvh;
+  --mobile-edge-gutter: 1.5rem;
+}
+
+html {
+  zoom: var(--site-scale);
+}
+
+body {
+  width: #{$site-scale-inverse * 100%};
+}
+
+/* Preserve the original desktop grid geometry while its contents render at 95%. */
+.page {
+  max-width: $site-page-max-width;
+
+  & > #quartz-body {
+    @media all and ($tablet) {
+      grid-template-columns: $site-side-panel-width auto;
+    }
+
+    @media all and ($desktop) {
+      grid-template-columns: $site-side-panel-width auto $site-side-panel-width;
+    }
+  }
+}
+
+@media all and not ($mobile) {
+  .page > #quartz-body > .sidebar.left {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
 
 /* 전체 본문 */
 body {
@@ -124,27 +171,32 @@ footer {
     overflow-x: hidden;
   }
 
-  /* 2-3: 읽기모드 버튼 숨김 */
-  .readermode {
-    display: none !important;
-  }
-
-  /* 2-1: 검색 아이콘 전용 모드 */
+  /* 모바일 드로어 검색 — 닫힘 상태에서는 화면 밖, 열리면 첫 번째 컨트롤 */
   .search {
     min-width: unset;
+    display: block;
+    position: fixed;
+    top: 4.75rem;
+    left: calc(0px - var(--site-viewport-width));
+    width: calc(var(--site-viewport-width) - 5.5rem);
+    z-index: 102;
+    transition: left 200ms ease;
 
     & > .search-button {
-      border: none;
-      padding: 0.5rem;
-      width: auto;
-      min-width: unset;
+      border-bottom: 1px solid var(--lightgray);
+      padding: 0 0 0.5rem;
+      width: 100%;
 
       & > p {
-        display: none;
+        display: inline;
+      }
+
+      & > .search-shortcut {
+        display: inline;
       }
 
       & > svg {
-        margin: 0;
+        display: none;
       }
     }
   }
@@ -166,44 +218,54 @@ footer {
     flex-basis: auto !important;
   }
 
-  /* ReaderMode wrapper — 항상 숨김 (모바일에서 완전 미사용) */
-  .sidebar.left .flex-component > div:has(> .readermode) {
-    display: none !important;
-  }
-
-  /* Darkmode wrapper — display 유지하되 폭만 0으로 (display: none 시 fixed 자식도 숨겨지므로 사용 불가)
-     overflow: visible로 wrapper 밖의 fixed 버튼이 정상 렌더링되도록 허용 */
+  /* Darkmode wrapper — 드로어의 두 번째 컨트롤을 wrapper 밖에 배치 */
   .sidebar.left .flex-component > div:has(> .darkmode) {
     width: 0 !important;
     flex-basis: 0 !important;
     overflow: visible !important;
   }
 
-  /* B: 드로어 폭 100vw 강제 — position: absolute(sidebar 기준)를 fixed(viewport 기준)로 변경 */
-  .explorer-content {
+  /* 드로어 폭 100vw + 닫기/검색 컨트롤 아래에서 프로필 시작 */
+  .sidebar.left .explorer-content {
     position: fixed !important;
     top: 0;
     left: 0;
-    width: 100vw !important;
+    width: var(--site-viewport-width) !important;
+    padding: 8.75rem var(--mobile-edge-gutter) 2rem;
   }
 
-  /* C: 다크모드 — 항상 fixed로 존재, 닫힘 시 화면 좌측 밖으로 숨김 (transform 슬라이드)
-     드로어 transition(200ms ease)과 동일 값으로 동기화 */
+  /* 다크모드 — 닫힘 상태에서는 화면 밖, 열리면 검색 행 오른쪽에 표시 */
   .sidebar.left .darkmode {
     display: flex;
     position: fixed;
-    top: 1rem;
-    right: 1rem;
+    top: 4.5rem;
+    left: calc(0px - var(--site-viewport-width));
+    right: auto;
+    width: 32px;
+    height: 32px;
     z-index: 102;
-    transform: translateX(-100vw);
-    transition: transform 200ms ease;
+    transition: left 200ms ease;
+
+    svg {
+      left: 6px;
+    }
   }
 }
 
-/* C: 드로어 열림 — 다크모드 슬라이드 인 (트리거: html.mobile-no-scroll) */
+/* 드로어 열림 — 검색과 다크모드 컨트롤 슬라이드 인 */
 @media all and ($mobile) {
+  html.mobile-no-scroll .sidebar.left .search,
   html.mobile-no-scroll .sidebar.left .darkmode {
-    transform: translateX(0);
+    left: var(--mobile-edge-gutter);
+  }
+
+  html.mobile-no-scroll .sidebar.left .darkmode {
+    left: calc(var(--site-viewport-width) - 3.5rem);
+  }
+
+  .sidebar.left:has(.search-container.active) .darkmode {
+    opacity: 0;
+    pointer-events: none;
   }
 }
 
@@ -762,24 +824,11 @@ a.internal.tag-link {
   }
 }
 
-.tag-index-heading {
+.tag-index-heading,
+.tag-page-title {
   display: flex;
   align-items: baseline;
   gap: 7px;
-  margin-top: 2em;
-  margin-bottom: 0.55em;
-
-  a {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 7px;
-    color: var(--dark);
-    text-decoration: none;
-
-    &:hover {
-      color: var(--tertiary);
-    }
-  }
 
   .tag-index-heading-prefix {
     font-family: var(--codeFont);
@@ -801,6 +850,34 @@ a.internal.tag-link {
     font-weight: 400;
     color: var(--gray);
   }
+}
+
+.tag-index-heading {
+  margin-top: 2em;
+  margin-bottom: 0.55em;
+
+  a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 7px;
+    color: var(--dark);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--tertiary);
+    }
+  }
+}
+
+.article-title.tag-page-title {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.35;
+  margin-bottom: 1.35rem;
+}
+
+.tag-posts-section {
+  margin-top: 0;
 }
 
 .tag-index-sections [hidden] {
@@ -975,6 +1052,14 @@ a.internal.tag-link {
   flex-direction: column;
   margin-bottom: 0;
 
+  &.mobile-only {
+    display: none;
+
+    @media all and ($mobile) {
+      display: flex;
+    }
+  }
+
   .section-header {
     margin-bottom: 12px;
   }
@@ -1066,21 +1151,14 @@ a.internal.tag-link {
 .pinned-grid {
   display: flex;
   flex-direction: column;
+  gap: 20px;
 }
 
 // Each row: two cards side-by-side without an additional row divider
 .pin-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  column-gap: 44px;
-  padding: 20px 0;
-
-  &:first-child {
-    padding-top: 0;
-  }
-  &:last-child {
-    padding-bottom: 0;
-  }
+  column-gap: 20px;
 }
 
 .pin-card {
@@ -1344,6 +1422,14 @@ a.internal.tag-link {
     }
   }
 
+  /* 모바일 홈 Topics도 데스크톱 사이드바와 같은 compact outlined chip 사용 */
+  [data-slug="index"] .sidebar-topics .top-tag {
+    padding: 5px 9px;
+    font-size: 11.5px;
+    line-height: 1.35;
+    overflow-wrap: normal;
+  }
+
   /* Topics → 다음 섹션 구분선: 프로필 섹션의 border-bottom과 대칭 */
   .recent-posts-section,
   .pinned-posts-section {
@@ -1354,6 +1440,10 @@ a.internal.tag-link {
   }
 
   // Pinned: 모바일에서는 2-col grid → 단일 컬럼 목록으로 전환
+  .pinned-grid {
+    gap: 0;
+  }
+
   .pin-row {
     display: contents; // 행 래퍼를 해체해 pin-card가 직접 배치되게 함
   }
@@ -1709,7 +1799,7 @@ a.internal.tag-link {
 html.mobile-no-scroll {
   @media all and ($mobile) {
     .page > #quartz-body > :not(.sidebar.left:has(.explorer)) {
-      transform: translateX(100dvw);
+      transform: translateX(var(--site-viewport-width));
     }
   }
 }
@@ -1732,8 +1822,15 @@ html.mobile-no-scroll {
 }
 
 @media all and ($mobile) {
+  .page > #quartz-body {
+    padding-left: var(--mobile-edge-gutter);
+    padding-right: var(--mobile-edge-gutter);
+  }
+
   .center {
     box-sizing: border-box;
+    min-width: 0 !important;
+    width: 100%;
     padding-left: max(20px, env(safe-area-inset-left));
     padding-right: max(20px, env(safe-area-inset-right));
   }
@@ -1820,3 +1917,14 @@ html.mobile-no-scroll {
     }
   }
 }
+
+@media all and ($mobile) {
+  [data-slug="index"] .center > article {
+    width: 100%;
+    max-width: 100%;
+    font-size: 12px;
+  }
+}
+
+// Isolated 2026-08-12 reading pass; controlled by the boolean near the scale tokens.
+@include readability.styles($readability-experiment-enabled);

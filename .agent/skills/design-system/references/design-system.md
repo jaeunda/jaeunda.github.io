@@ -19,8 +19,8 @@ disagree, code wins; update this file in the same patch.
 
 ## Design Principles
 
-1. Balance cohesion and breath: `article` line-height is 1.78 on desktop and
-   paragraph spacing is 1.5em.
+1. Balance cohesion and breath: long-form `article` line-height is 1.72 and
+   paragraph spacing is 1.25em.
 2. Use asymmetric heading spacing: heading top margins are much larger than
    bottom margins so headings attach to the content below.
 3. Keep the palette in a low-chroma green-gray family. Prefer existing tokens.
@@ -30,35 +30,42 @@ disagree, code wins; update this file in the same patch.
 
 ## Color Tokens
 
-Declared in `quartz.config.ts`.
+Tokens are declared in `quartz.config.ts`. The isolated readability switch adds
+only a separate code-and-quote reading surface; page background and body text
+continue to use the base theme tokens shown below.
 
 ### Light Mode
 
-| Token           | Value                      | Use                                |
-| --------------- | -------------------------- | ---------------------------------- |
-| `light`         | `#f6f7f5`                  | Page background                    |
-| `lightgray`     | `#dde0d3`                  | Borders and faint surfaces         |
-| `gray`          | `#7a7d72`                  | Metadata and secondary text        |
-| `darkgray`      | `#2b2e28`                  | Body text                          |
-| `dark`          | `#1a1d17`                  | Headings and strong emphasis       |
-| `secondary`     | `#9aa888`                  | UI accent and decorative underline |
-| `tertiary`      | `#6b7a5a`                  | Body links, active states          |
-| `highlight`     | `rgba(154, 168, 136, 0.2)` | Tints and table header backgrounds |
-| `textHighlight` | `#cdd8be`                  | Markdown mark highlight            |
+| Token           | Value                    | Use                                |
+| --------------- | ------------------------ | ---------------------------------- |
+| `light`         | `#fafaf8`                | Page background                    |
+| `lightgray`     | `#e3e4df`                | Borders and faint surfaces         |
+| `gray`          | `#5f6259`                | Metadata and secondary text        |
+| `darkgray`      | `#33362f`                | Body text                          |
+| `dark`          | `#1a1d17`                | Headings and strong emphasis       |
+| `secondary`     | `#4f5e3c`                | UI accent and decorative underline |
+| `tertiary`      | `#4f5e3c`                | Body links, active states          |
+| `highlight`     | `rgba(79, 94, 60, 0.12)` | Tints and table header backgrounds |
+| `textHighlight` | `#dde3d4`                | Markdown mark highlight            |
+
+The isolated reading pass adds `--reading-surface: #eceee5` for code and quote
+surfaces without repurposing the lighter border token.
 
 ### Dark Mode
 
 | Token           | Value                       | Use                          |
 | --------------- | --------------------------- | ---------------------------- |
-| `light`         | `#1c1e19`                   | Page background              |
-| `lightgray`     | `#2a2d26`                   | Borders and faint surfaces   |
-| `gray`          | `#7a7d72`                   | Metadata and secondary text  |
-| `darkgray`      | `#c4c9c2`                   | Body text                    |
+| `light`         | `#1a1c16`                   | Page background              |
+| `lightgray`     | `#2e3229`                   | Borders and faint surfaces   |
+| `gray`          | `#9b9f94`                   | Metadata and secondary text  |
+| `darkgray`      | `#c7ccc3`                   | Body text                    |
 | `dark`          | `#f0f2ee`                   | Headings and strong emphasis |
-| `secondary`     | `#b8c3a5`                   | UI accent                    |
-| `tertiary`      | `#9aa888`                   | Body links and active states |
-| `highlight`     | `rgba(154, 168, 136, 0.18)` | Tints                        |
-| `textHighlight` | `#3a4a30`                   | Markdown mark highlight      |
+| `secondary`     | `#a9ba8e`                   | UI accent                    |
+| `tertiary`      | `#a9ba8e`                   | Body links and active states |
+| `highlight`     | `rgba(169, 186, 142, 0.16)` | Tints                        |
+| `textHighlight` | `#2a3123`                   | Markdown mark highlight      |
+
+The dark reading surface is `#292d24`.
 
 ### Color Rules
 
@@ -88,8 +95,8 @@ font-weight 400, letter-spacing -0.01em.
 | Element          | Current Style                                                                                                             |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | `.article-title` | Fraunces `clamp(28px, 3vw, 36px)`, 700, line-height 1.2                                                                   |
-| `article`        | 15px desktop / 15px mobile, line-height 1.72, max-width 680px, `word-break: keep-all`, `overflow-wrap: anywhere`          |
-| `p`              | margin-top 0, margin-bottom 1.35em, `text-wrap: pretty`                                                                   |
+| `article`        | 16px desktop/mobile, line-height 1.72, max-width 68ch, letter-spacing -0.01em, `word-break: keep-all`                     |
+| `p`              | inherited 1.72 line-height, margin `0 0 1.25em`, `text-wrap: pretty`                                                      |
 | `h1`             | Fraunces 1.55em desktop / 1.5em mobile, 700, line-height 1.25                                                             |
 | `h2`             | Fraunces 1.47em desktop / 1.25em mobile, 600, line-height 1.28, margin-top 2.7em desktop / 2.4em mobile, no bottom border |
 | `h3`             | Fraunces 1.2em desktop / 1.06em mobile, 600, line-height 1.35, margin-top 2.2em desktop / 2em mobile                      |
@@ -97,15 +104,27 @@ font-weight 400, letter-spacing -0.01em.
 | `h5`             | Body font 0.93em, 700                                                                                                     |
 | `h6`             | IBM Plex Mono 0.87em, 600, uppercase, letter-spacing 0.08em                                                               |
 | `li`             | line-height 1.72, margin-bottom 0.35em                                                                                    |
-| inline `code`    | 0.86em, IBM Plex Mono, tint background, 1px border, radius 4px                                                            |
+| inline `code`    | 0.86em IBM Plex Mono, `reading-surface` background, no border                                                             |
 | `pre code`       | 12.5px, line-height 1.62                                                                                                  |
-| `blockquote`     | 3px muted secondary/lightgray left border, no background, no italic                                                       |
+| `blockquote`     | `reading-surface` background, no border, no italic                                                                        |
 
 Article h1-h3 use the display font but remain subordinate to `.article-title`.
 Article `strong` uses 600 weight plus `dark`; article `em` uses a subtle
 `highlight` background instead of italic for Korean readability.
 
 ## Layout
+
+Global UI scale:
+
+- `$site-scale` is the single control and is `0.95` on both desktop and mobile,
+  applied through root layout zoom so typography, spacing, icons, and components
+  shrink together.
+- `body` and viewport-fixed drawer/search surfaces use the inverse width/height
+  compensation (`105.2631579%`) so the scaled UI still fills the physical
+  viewport without a right-side gap.
+- Desktop/tablet page maximum width and 320px sidebar grid tracks are also
+  inversely compensated. Their physical geometry stays centered at the original
+  positions while the content inside them remains visually scaled to 95%.
 
 Breakpoints in `variables.scss`:
 
@@ -117,14 +136,20 @@ Breakpoints in `variables.scss`:
 
 Content padding in `custom.scss`:
 
-| Viewport               | `.center` horizontal padding                                                     |
-| ---------------------- | -------------------------------------------------------------------------------- |
-| default / wide         | 48px                                                                             |
-| max-width 1100px       | 32px                                                                             |
-| mobile max-width 800px | `max(20px, env(safe-area-inset-left))` / `max(20px, env(safe-area-inset-right))` |
+| Viewport               | `.center` horizontal padding                                                                                     |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| default / wide         | 48px                                                                                                             |
+| max-width 1100px       | 32px                                                                                                             |
+| mobile max-width 800px | `max(20px, env(safe-area-inset-left))` / `max(20px, env(safe-area-inset-right))`; center width 100%, min-width 0 |
 
 `$sidePanelWidth` is 320px. Desktop grid has left, center, and right columns;
 tablet grid has left plus center; mobile stacks sections.
+
+- Mobile `#quartz-body` adds a symmetric 24px outer gutter before the existing
+  center/sidebar safe-area padding, placing primary content about 42px from each
+  physical viewport edge after 95% scaling.
+- Desktop/tablet left sidebar padding is 40px on both sides, keeping PROFILE,
+  Search, and Topics aligned farther from the page edge.
 
 ## Sidebar And TOC
 
@@ -146,12 +171,10 @@ Sidebar topics:
 - Sidebar topic boxes wrap naturally without an internal scroll area. Each box
   shows the topic name and its post count.
 - Topics include only tags prefixed with `topic/`, but display them without the
-  prefix, such as `#database`; tag links and home filtering keep the full tag
-  value.
+  prefix or hash, such as `database`.
 - Sidebar topics are hidden on the all-tags Tag Index page because the main page
   already contains the full tag navigation.
-- Sidebar and mobile topic clicks navigate to the relevant tag page on every
-  page, including the index.
+- Sidebar and mobile topic clicks open the corresponding individual tag page.
 - The all-tags action opens the complete leaf tag index, including non-topic
   tags while omitting grouping prefixes such as `topic` and `project`.
 
@@ -165,12 +188,14 @@ Explorer:
 
 TOC:
 
-- Sticky on desktop, `top: 24px`, max-height `calc(100vh - 48px)`.
-- Numbered headings are split when they match `2.5.1. Title`: prefix uses IBM
-  Plex Mono 10.5px, tabular nums, min-width 2.6em; body uses Noto Sans KR
-  11.5px.
-- Depth 3 body text is 11px `var(--gray)`.
-- In-view: prefix and body both become `var(--tertiary)`, weight 500.
+- Sticky in the desktop right rail, `top: 4rem`, max-height
+  `calc(100vh - 8rem)`, with internal vertical scrolling. Below the 1200px
+  desktop breakpoint the existing `DesktopOnly` wrapper keeps it collapsed out
+  of the layout.
+- Every item uses 14px type, line-height 1.5, and 2px row gap. Only levels below
+  the top heading level are indented; item text clamps at two lines.
+- Only the current item uses `var(--secondary)`, weight 600, and a 2px active
+  bar. Other entries remain `var(--gray)`.
 
 Breadcrumb:
 
@@ -178,11 +203,15 @@ Breadcrumb:
 
 Search:
 
+- The desktop/tablet sidebar trigger is a full-width `Search ⌘K` mono text row
+  with only a lightgray bottom border. Mobile shows the same search row inside
+  the slide-out drawer.
 - Full-screen search uses an opaque `var(--light)` overlay so page content does
   not show through behind the modal.
-- Default search results use a compact list: body-font title, one-line muted
-  snippet, and no article preview pane. Tag chips are shown only for tag-search
-  result context.
+- The search input placeholder and compact result list use IBM Plex Mono to
+  match the `Search ⌘K` trigger. Result titles are 0.82rem/500 and one-line muted
+  snippets are 0.74rem; no article preview pane is shown. Tag chips appear only
+  for tag-search result context.
 - Search highlights are suppressed for one-character terms to keep broad
   queries visually calm.
 - Search results do not receive an automatic selected-row background; keyboard
@@ -202,7 +231,7 @@ Post metadata:
 Current `defaultContentPageLayout.beforeBody` renders on every content page, but
 the custom home components return `null` unless `fileData.slug === "index"`:
 
-1. `MobileOnly(TagCloud({ limit: 8 }))`
+1. `MobileOnly(TagCloud({ limit: 8, variant: "sidebar" }))`
 2. `RecentNotesWithPreview({ limit: 20, showTags: true, showReadTime: true })`
 3. Breadcrumbs, ArticleTitle, ContentMeta, TagList for non-index pages
 
@@ -215,17 +244,19 @@ the hero, preserve its `fileData.slug === "index"` guard and place it before
 `TagCloud`.
 
 `content/index.md` contains only the short systems intro, set in 14px IBM Plex
-Mono. This places it below Pinned titles and above Pinned preview text on both
-desktop and mobile. PROFILE owns the contact links. Home listing content is
-otherwise component-driven.
+Mono on desktop and tag-scale 12px on mobile. PROFILE owns the contact links.
+Home listing content is otherwise component-driven.
 
 Profile card:
 
 - `.profile-name` is the dark identity anchor below a small mono PROFILE label.
 - `.profile-interest` uses IBM Plex Mono for the two-line systems focus.
+- Vertical spacing is staged rather than uniform: 4px from PROFILE to name, 4px
+  from name to interest, and 30px from interest to the link group.
 - `.profile-links` lists GitHub, e-mail, and LinkedIn as restrained mono rows.
   GitHub displays `github.com/jaeunda`; LinkedIn displays `Daeun Jang` without
   exposing its URL as text.
+- The profile card has no bottom divider before Topics.
 
 ### Section Header
 
@@ -239,7 +270,8 @@ Profile card:
 - `.top-tags`: `margin-bottom: 44px`; mobile 40px.
 - `.top-tag`: inline-flex, gap 6px, padding 5px 10px, 12px IBM Plex Mono,
   `var(--tertiary)` on `var(--highlight)`, 1px `lightgray` border, radius 5px.
-- Mobile `.top-tag`: padding 7px 10px, overflow-wrap anywhere.
+- Mobile home Topics use the same compact outlined sidebar chips as desktop:
+  11.5px type and 5px 9px padding.
 - Count: 10.5px, `var(--gray)`, `var(--light)` background, radius 3px.
 - Active: `var(--tertiary)` background and border, `var(--light)` text; dark
   theme overrides active text to `var(--dark)`.
@@ -269,6 +301,8 @@ Profile card:
   13px mobile.
 - Desktop cards retain their individual outlined boxes, while the extra
   horizontal divider between card rows is omitted.
+- The desktop two-column grid uses a compact 20px gap both horizontally and
+  vertically.
 - Mobile Pinned cards also omit per-card horizontal dividers.
 
 ### Tag Filter Interaction
@@ -317,6 +351,12 @@ Archive index:
   tab can be mirrored as `?group=project`.
 - Tag index post lists reuse the same Recent post-card structure and styling
   without smaller overrides, including tags and read-time metadata.
+- Individual tag pages use that same Archive/Recent post-card structure,
+  including previews, tags, read time, and the bordered back affordance; their
+  back action returns to Archive. The redundant `Posts` section heading is
+  omitted.
+- Individual tag titles mirror Archive tag headings: an 11px mono prefix, a
+  1.15rem Fraunces label, and an 11px mono count instead of the large `Tag:` h1.
 
 ## Mobile Drawer And Padding
 
@@ -324,11 +364,16 @@ Existing mobile behavior:
 
 - `.sidebar.right` hidden on mobile.
 - Body `overflow-x: hidden`.
-- `.readermode` hidden on mobile.
-- Search collapses to icon-only.
+- Reader Mode is not mounted in either content or list layouts, so its control
+  and client resources are absent on all viewports.
+- The mobile Explorer hamburger opens a full-width slide-out drawer with a
+  bordered back/close button at the top.
+- Search and dark/light controls share one row 24px below the close button, with
+  the theme control aligned at the right edge. The theme control hides while the
+  full-screen search overlay is active so it cannot overlap the search field.
+- The profile card follows the controls; the Explorer post tree is hidden in
+  the mobile drawer.
 - `.explorer-content` is fixed, top-left, `width: 100vw`.
-- `.sidebar.left .darkmode` is fixed at top-right and slides with
-  `html.mobile-no-scroll`.
 - `html.mobile-no-scroll` translates non-left-sidebar body content by
   `translateX(100dvw)`.
 
@@ -485,3 +530,45 @@ For visual changes, check as applicable:
   the remaining home introduction.
 - Set the revised home introduction to 14px so it sits between Pinned titles and
   previews, and removed the extra horizontal dividers between Pinned cards.
+- Matched the supplied spacing reference by staging PROFILE group gaps at
+  14/16/40px and tightening the desktop Pinned card grid to 20px in both axes.
+- Restyled the sidebar Search trigger as an underlined `Search ⌘K` mono row,
+  kept the mobile icon trigger, and removed the PROFILE-to-Topics divider.
+- Removed Reader Mode from both page layouts so the book control and its client
+  behavior are no longer shipped by the site.
+- Restored the mobile Explorer drawer with search, theme toggle, profile, and
+  navigation; reduced the mobile intro to 12px; removed hashes from Topics; and
+  routed topic clicks to the equivalent Archive filter state.
+
+### 2026-08-11
+
+- Unified individual tag listings with the Archive post-card layout and
+  restored direct tag-page navigation from Topics and post tag links.
+- Matched mobile home Topics to the desktop outlined-chip treatment.
+- Added an explicit mobile drawer close affordance, aligned the theme toggle to
+  the right of Search, and removed the post tree below the drawer profile.
+- Let the mobile center grid item shrink to the viewport so home topic chips and
+  intro text wrap instead of being clipped at the right edge.
+- Replaced the large individual `Tag:` title and redundant `Posts` heading with
+  the smaller Archive tag-heading hierarchy.
+- Matched the search input and result typography to the mono `Search ⌘K`
+  trigger, increased drawer control spacing, and hid the drawer theme control
+  while the full-screen search overlay is active.
+
+### 2026-08-12
+
+- Added a single 95% global UI scale for desktop and mobile, with inverse
+  viewport compensation for the page, mobile drawer, and search overlay so
+  fixed surfaces still cover the full screen.
+- Preserved the pre-scale desktop/tablet page width and sidebar track geometry
+  to remove the apparent left shift of the main content column.
+- Increased the mobile outer gutter to 24px and the web left-sidebar padding to
+  40px, aligning drawer controls to the same mobile edge token.
+- Added an isolated, one-switch readability pass: 17px/68ch long-form rhythm,
+  quieter link/code/quote treatments, and a single-active-item 14px desktop TOC.
+- Restored the base light/dark page and body colors, and let the mobile home
+  intro fill its content track so wide-mobile screens no longer leave a large
+  right-side void.
+- Reduced long-form body text from 17px to 16px and corrected Quartz's fixed
+  paragraph line-height override, using 1.72 lines with 1.25em paragraph gaps
+  for a more even Korean reading rhythm.

@@ -2,21 +2,24 @@
 
 .search {
   min-width: fit-content;
-  max-width: 14rem;
+  max-width: none;
+  width: 100%;
   @media all and ($mobile) {
     flex-grow: 0.3;
   }
 
   & > .search-button {
     background-color: transparent;
-    border: 1px var(--lightgray) solid;
-    border-radius: 4px;
-    font-family: inherit;
-    font-size: 0.9rem;
-    height: 2rem;
-    padding: 0 1rem 0 0;
+    border: 0;
+    border-bottom: 1px solid var(--lightgray);
+    border-radius: 0;
+    font-family: var(--codeFont);
+    font-size: 0.78rem;
+    height: 1.5rem;
+    padding: 0 0 0.5rem;
     display: flex;
     align-items: center;
+    gap: 0.65rem;
     text-align: inherit;
     cursor: pointer;
     white-space: nowrap;
@@ -26,9 +29,23 @@
       display: inline;
       color: var(--gray);
       text-wrap: unset;
+      margin: 0;
+    }
+
+    & > .search-shortcut {
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      color: var(--gray);
+      font-family: inherit;
+      font-size: inherit;
+      font-weight: inherit;
+      line-height: inherit;
+      padding: 0;
     }
 
     & svg {
+      display: none;
       cursor: pointer;
       width: 18px;
       min-width: 18px;
@@ -47,8 +64,8 @@
     contain: layout;
     z-index: 999;
     inset: 0;
-    width: 100dvw;
-    height: 100dvh;
+    width: var(--site-viewport-width, 100dvw);
+    height: var(--site-viewport-height, 100dvh);
     overflow-y: auto;
     display: none;
     background: var(--light);
@@ -80,10 +97,17 @@
       & > input {
         box-sizing: border-box;
         padding: 0.5em 1em;
-        font-family: var(--bodyFont);
+        font-family: var(--codeFont);
         color: var(--dark);
-        font-size: 0.9em;
+        font-size: 0.78rem;
+        letter-spacing: 0;
         border: 1px solid var(--lightgray);
+
+        &::placeholder {
+          color: var(--gray);
+          font-family: inherit;
+          opacity: 1;
+        }
 
         &:focus {
           outline: none;
@@ -189,9 +213,10 @@
             box-sizing: border-box;
 
             // normalize card props
-            font-family: inherit;
-            font-size: 0.92rem;
+            font-family: var(--codeFont);
+            font-size: 0.78rem;
             line-height: 1.35;
+            letter-spacing: 0;
             margin: 0;
             text-transform: none;
             text-align: left;
@@ -207,10 +232,10 @@
             & > h3 {
               margin: 0;
               color: var(--dark);
-              font-family: var(--bodyFont);
-              font-size: 0.98rem;
-              font-weight: 600;
-              line-height: 1.35;
+              font-family: var(--codeFont);
+              font-size: 0.82rem;
+              font-weight: 500;
+              line-height: 1.45;
             }
 
             & > ul.tags {
@@ -224,7 +249,9 @@
               padding: 0.2rem 0.4rem;
               margin: 0 0.1rem;
               line-height: 1.4rem;
-              font-weight: $boldWeight;
+              font-family: var(--codeFont);
+              font-size: 0.72rem;
+              font-weight: 500;
               color: var(--secondary);
 
               &.match-tag {
@@ -235,8 +262,9 @@
             & > p {
               color: var(--gray);
               display: -webkit-box;
-              font-size: 0.8rem;
-              line-height: 1.5;
+              font-family: var(--codeFont);
+              font-size: 0.74rem;
+              line-height: 1.55;
               margin-top: 0.35rem;
               margin-bottom: 0;
               -webkit-box-orient: vertical;

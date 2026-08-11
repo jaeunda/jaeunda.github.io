@@ -1,6 +1,6 @@
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
 import { classNames } from "../util/lang"
-import { FullSlug, resolveRelative } from "../util/path"
+import { FullSlug, getAllSegmentPrefixes, resolveRelative, simplifySlug } from "../util/path"
 
 const ArticleTitle: QuartzComponent = ({
   fileData,
@@ -10,22 +10,44 @@ const ArticleTitle: QuartzComponent = ({
   const title = fileData.frontmatter?.title
   if (title) {
     const isTagIndex = fileData.slug === "tags/index"
-    const itemCount = isTagIndex ? allFiles.filter((page) => page.slug !== "index").length : null
+    const isTagPage = fileData.slug?.startsWith("tags/") ?? false
+    const tag = isTagPage ? simplifySlug(fileData.slug!.slice("tags/".length) as FullSlug) : null
+    const itemCount = isTagIndex
+      ? allFiles.filter((page) => page.slug !== "index").length
+      : tag
+        ? allFiles.filter((page) =>
+            (page.frontmatter?.tags ?? []).flatMap(getAllSegmentPrefixes).includes(tag),
+          ).length
+        : null
+    const [tagPrefix, ...tagLabelParts] = tag?.split("/") ?? []
+    const tagLabel = tagLabelParts.length > 0 ? tagLabelParts.join("/") : tagPrefix
 
-    const titleElement = (
-      <h1 class={classNames(displayClass, "article-title")}>
-        {title}
-        {itemCount !== null && <span class="article-title-count">{itemCount}</span>}
-      </h1>
-    )
+    const titleElement =
+      !isTagIndex && tag ? (
+        <h1 class={classNames(displayClass, "article-title", "tag-page-title")} aria-label={title}>
+          <span class="tag-index-heading-prefix">
+            {tagLabelParts.length > 0 ? tagPrefix : "tag"}
+          </span>
+          <span class="tag-index-heading-label">{tagLabel}</span>
+          {itemCount !== null && <span class="tag-index-heading-count">{itemCount}</span>}
+        </h1>
+      ) : (
+        <h1 class={classNames(displayClass, "article-title")}>
+          {title}
+          {itemCount !== null && <span class="article-title-count">{itemCount}</span>}
+        </h1>
+      )
 
-    if (isTagIndex) {
+    if (isTagPage) {
+      const backHref = isTagIndex
+        ? resolveRelative(fileData.slug!, "index" as FullSlug)
+        : resolveRelative(fileData.slug!, "tags/" as FullSlug)
       return (
         <>
           <a
-            href={resolveRelative(fileData.slug!, "index" as FullSlug)}
+            href={backHref}
             class="tag-index-back"
-            aria-label="Back to home"
+            aria-label={isTagIndex ? "Back to home" : "Back to archive"}
           >
             ←
           </a>

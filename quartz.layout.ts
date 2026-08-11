@@ -6,7 +6,7 @@ export const sharedPageComponents: SharedLayout = {
   head: Component.Head(),
   header: [],
   afterBody: [
-    Component.MobileOnly(Component.TagCloud({ limit: 8 })),
+    Component.MobileOnly(Component.TagCloud({ limit: 8, variant: "sidebar" })),
     // EXPERIMENT: PinnedPosts (2×n grid). Rollback = swap back to RecentNotesWithPreview below.
     // Component.RecentNotesWithPreview({ limit: 5, showTags: true, showReadTime: true, mode: "featured" }),
     Component.PinnedPosts(),
@@ -49,9 +49,9 @@ export const defaultContentPageLayout: PageLayout = {
           grow: true,
         },
         { Component: Component.Darkmode() },
-        { Component: Component.ReaderMode() },
       ],
     }),
+    Component.MobileOnly(Component.Explorer()),
     Component.DesktopOnly(Component.ProfileCard()),
     Component.DesktopOnly(
       Component.TagCloud({ limit: 8, showOnAllPages: true, variant: "sidebar" }),
@@ -95,9 +95,9 @@ export const defaultListPageLayout: PageLayout = {
           grow: true,
         },
         { Component: Component.Darkmode() },
-        { Component: Component.ReaderMode() },
       ],
     }),
+    Component.MobileOnly(Component.Explorer()),
     Component.DesktopOnly(Component.ProfileCard()),
     Component.DesktopOnly(
       Component.TagCloud({ limit: 8, showOnAllPages: true, variant: "sidebar" }),

@@ -36,7 +36,6 @@ export default ((opts?: Partial<Options>) => {
     const topTags = [...tagCounts.entries()]
       .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
       .slice(0, options.limit)
-
     if (topTags.length === 0) return null
 
     return (
@@ -56,7 +55,7 @@ export default ((opts?: Partial<Options>) => {
 
             return (
               <a href={resolveRelative(fileData.slug!, `tags/${tag}` as FullSlug)} class="top-tag">
-                <span class="top-tag-label">#{label}</span>
+                <span class="top-tag-label">{label}</span>
                 <span class="top-tag-count">{count}</span>
               </a>
             )

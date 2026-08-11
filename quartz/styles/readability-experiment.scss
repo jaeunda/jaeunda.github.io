@@ -1,0 +1,181 @@
+@use "./variables.scss" as *;
+
+// Isolated reading treatment. Keep every experimental override inside this mixin
+// so custom.scss can disable the complete pass with one boolean switch.
+@mixin styles($enabled: true) {
+  @if $enabled {
+    :root {
+      --reading-surface: #eceee5;
+    }
+
+    :root[saved-theme="dark"] {
+      --reading-surface: #292d24;
+    }
+
+    // Apply long-form rhythm only to content articles. Home and list pages keep
+    // their compact, component-specific type scales.
+    body:not([data-slug="index"]) .center > article:not(:has(.page-listing)):not(:has(.tag-index)) {
+      width: 100%;
+      max-width: 68ch;
+      font-size: 16px;
+      line-height: 1.72;
+      letter-spacing: -0.01em;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+
+      p {
+        margin: 0 0 1.25em;
+        line-height: inherit;
+        text-wrap: pretty;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        margin: 2.5em 0 0.6em;
+      }
+
+      > :is(h1, h2, h3, h4, h5, h6):first-child {
+        margin-top: 0;
+      }
+
+      a:not(.tag-link):not(:has(> img)) {
+        padding: 0;
+        border-radius: 0;
+        border-bottom: 1px solid color-mix(in srgb, var(--secondary) 35%, transparent);
+        background: transparent;
+        color: var(--secondary);
+        text-decoration: none;
+        transition:
+          color 0.12s ease,
+          border-color 0.15s ease;
+
+        &:hover {
+          color: var(--dark);
+          border-bottom-color: var(--secondary);
+        }
+      }
+
+      p code,
+      li code,
+      td code {
+        border: 0;
+        background: var(--reading-surface);
+      }
+
+      pre {
+        border: 0;
+        background: var(--reading-surface);
+      }
+
+      blockquote {
+        margin: 0 0 1.4em;
+        padding: 0.85em 1.1em;
+        border: 0;
+        border-radius: 4px;
+        background: var(--reading-surface);
+      }
+    }
+
+    // The right rail already mounts only at the 1200px desktop breakpoint.
+    // Within that rail, keep one type size and use indentation only below the
+    // top heading level.
+    .sidebar.right .toc {
+      top: 4rem;
+      width: 100%;
+      min-width: 0;
+      max-height: calc(100vh - 8rem);
+      overflow-y: auto;
+
+      ul.toc-content.overflow {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        max-height: none;
+        overflow: visible;
+      }
+
+      .toc-content > li {
+        padding-left: 0;
+
+        &.depth-1,
+        &.depth-2,
+        &.depth-3,
+        &.depth-4,
+        &.depth-5,
+        &.depth-6 {
+          padding-left: 0.75rem;
+        }
+
+        > a {
+          position: relative;
+          display: flex;
+          align-items: flex-start;
+          gap: 6px;
+          padding: 3px 6px 3px 10px;
+          color: var(--gray);
+          font-size: 14px;
+          font-weight: 400;
+          line-height: 1.5;
+          opacity: 1;
+
+          &:hover {
+            color: var(--darkgray);
+          }
+        }
+      }
+
+      .toc-prefix,
+      .toc-body,
+      a.in-view .toc-prefix,
+      a.in-view .toc-body,
+      .depth-3 .toc-body {
+        color: inherit;
+        font-size: 14px;
+        font-weight: inherit;
+        line-height: 1.5;
+      }
+
+      .toc-prefix {
+        min-width: 0;
+      }
+
+      .toc-body {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+      }
+
+      // Quartz marks every heading above the viewport as in-view. Select only
+      // the last marked row so the reader sees one current location.
+      .toc-content > li:has(> a.in-view):not(:has(~ li > a.in-view)) > a {
+        color: var(--secondary);
+        font-weight: 600;
+
+        &::before {
+          position: absolute;
+          top: 0.32em;
+          bottom: 0.32em;
+          left: 0;
+          width: 2px;
+          border-radius: 1px;
+          background: var(--secondary);
+          content: "";
+        }
+      }
+    }
+
+    @media all and ($mobile) {
+      body:not([data-slug="index"])
+        .center
+        > article:not(:has(.page-listing)):not(:has(.tag-index)) {
+        max-width: 100%;
+        font-size: 16px;
+      }
+    }
+  }
+}

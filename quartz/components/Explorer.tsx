@@ -60,7 +60,7 @@ let numExplorers = 0
 export default ((userOpts?: Partial<Options>) => {
   const opts: Options = { ...defaultOptions, ...userOpts }
   const { OverflowList, overflowListAfterDOMLoaded } = OverflowListFactory()
-const ProfileCardComponent = ProfileCard()
+  const ProfileCardComponent = ProfileCard()
 
   const Explorer: QuartzComponent = (props: QuartzComponentProps) => {
     const { cfg, displayClass } = props
@@ -69,6 +69,7 @@ const ProfileCardComponent = ProfileCard()
     return (
       <div
         class={classNames(displayClass, "explorer")}
+        aria-expanded={false}
         data-behavior={opts.folderClickBehavior}
         data-collapsed={opts.folderDefaultState}
         data-savestate={opts.useSavedState}
@@ -123,6 +124,26 @@ const ProfileCardComponent = ProfileCard()
           </svg>
         </button>
         <div id={id} class="explorer-content" aria-expanded={false} role="group">
+          <button
+            type="button"
+            class="explorer-toggle mobile-drawer-close"
+            aria-controls={id}
+            aria-label="Close menu"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </button>
           <ProfileCardComponent {...props} explorerProfile={true} />
           <OverflowList class="explorer-ul" />
         </div>

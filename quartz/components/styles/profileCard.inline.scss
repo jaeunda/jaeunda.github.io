@@ -1,10 +1,9 @@
 .profile-card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
   padding: 0 0 24px;
-  border-bottom: 1px solid var(--lightgray);
-  margin-bottom: 24px;
+  margin-bottom: 10px;
 
   .profile-eyebrow {
     font-family: var(--codeFont);
@@ -12,6 +11,7 @@
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--gray);
+    margin-bottom: 4px;
   }
 
   .profile-name {
@@ -19,6 +19,7 @@
     font-weight: 600;
     letter-spacing: -0.02em;
     color: var(--dark);
+    margin-bottom: 4px;
   }
 
   .profile-interest {
@@ -26,12 +27,13 @@
     font-size: 0.78rem;
     color: var(--gray);
     line-height: 1.7;
+    margin-bottom: 30px;
   }
 
   .profile-links {
     display: flex;
     flex-direction: column;
-    margin-top: 6px;
+    margin-top: 0;
   }
 
   .profile-link-row {

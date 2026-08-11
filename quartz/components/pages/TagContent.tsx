@@ -1,13 +1,12 @@
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "../types"
 import style from "../styles/listPage.scss"
-import { byDateAndAlphabetical, PageList, SortFn } from "../PageList"
+import { byDateAndAlphabetical, SortFn } from "../PageList"
 import { FullSlug, getAllSegmentPrefixes, resolveRelative, simplifySlug } from "../../util/path"
 import { QuartzPluginData } from "../../plugins/vfile"
 import { Root } from "hast"
 import { htmlToJsx } from "../../util/jsx"
 import { i18n } from "../../i18n"
 import { ComponentChildren } from "preact"
-import { concatenateResources } from "../../util/resources"
 import { getDate } from "../Date"
 import readingTime from "reading-time"
 // @ts-ignore
@@ -96,7 +95,7 @@ export default ((opts?: Partial<TagContentOptions>) => {
   const options: TagContentOptions = { ...defaultOptions, ...opts }
 
   const TagContent: QuartzComponent = (props: QuartzComponentProps) => {
-    const { tree, fileData, allFiles, cfg } = props
+    const { tree, fileData, allFiles } = props
     const slug = fileData.slug
 
     if (!(slug?.startsWith("tags/") || slug === "tags")) {
@@ -241,26 +240,19 @@ export default ((opts?: Partial<TagContentOptions>) => {
       )
     } else {
       const pages = allPagesWithTag(tag)
-      const listProps = {
-        ...props,
-        allFiles: pages,
-      }
 
       return (
         <div class="popover-hint">
           <article class={classes}>{content}</article>
-          <div class="page-listing">
-            <p>{i18n(cfg.locale).pages.tagContent.itemsUnderTag({ count: pages.length })}</p>
-            <div>
-              <PageList {...listProps} sort={options?.sort} />
-            </div>
-          </div>
+          <section class="archive-posts-section tag-posts-section">
+            <ArchivePostList {...props} pages={pages} sort={options?.sort} />
+          </section>
         </div>
       )
     }
   }
 
-  TagContent.css = concatenateResources(style, PageList.css)
+  TagContent.css = style
   TagContent.afterDOMLoaded = tagIndexFilterScript
   return TagContent
 }) satisfies QuartzComponentConstructor
