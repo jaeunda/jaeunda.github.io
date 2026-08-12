@@ -1,0 +1,27 @@
+{
+  "projectId": "bfb2b169-0bf9-45b0-b1c0-e464e2ada2ac",
+  "shape": "package",
+  "pkg": "@jackyzha0/quartz",
+  "globalName": "QuartzDS",
+  "buildCmd": "node .design-sync/run-gen-tokens.mjs ./.design-sync/.cache/dist/tokens && node .design-sync/build-fixtures.mjs && node .design-sync/build-css.mjs && node .design-sync/build-dist.mjs",
+  "cssEntry": "ds-styles.css",
+  "guidelinesGlob": [
+    "../../../.agent/skills/design-system/references/design-system.md"
+  ],
+  "runtimeFontPrefixes": [
+    "Fraunces",
+    "Noto Sans KR",
+    "IBM Plex Mono"
+  ],
+  "overrides": {
+    "MobileOnly": {
+      "cardMode": "single",
+      "viewport": "420x520"
+    },
+    "VisitorCount": {
+      "cardMode": "single",
+      "viewport": "1400x320"
+    }
+  },
+  "readmeHeader": ".design-sync/conventions.md"
+}

@@ -1,0 +1,11 @@
+{
+  "//": "esbuild resolves the nearest tsconfig from each preview entry. Without this it inherits the repo root tsconfig, whose jsxImportSource is 'preact' — preview JSX would then build Preact vnodes that React cannot render, and every card would come up blank.",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "skipLibCheck": true
+  }
+}
