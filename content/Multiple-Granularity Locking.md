@@ -4,9 +4,7 @@ tags:
   - project/database-system
 Date: 2026-04-18
 ---
-## 2.2. Concurrency Control: Multiple Granularity Locking
-
-### 2.2.1. Multiple Granularity Locking
+## Multiple-Granularity Locking
 
 Multiple Granularity Locking은 lock을 걸 수 있는 데이터 단위(granularity)를 다양하게 허용한다.
 예를 들어 단순히 tuple 단위로만 lock을 걸면, 테이블 전체를 수정하는 Transaction은 모든 tuple에 대해 개별적으로 lock을 걸어야 한다. 반대로 테이블 단위로만 lock을 걸면 동시성이 크게 낮아진다. 따라서 상황에 따라 적절한 granularity를 선택할 수 있도록 계층적 구조를 도입한다.
@@ -36,7 +34,7 @@ Transaction이 임의 노드에 대하여 명시적으로(explicitly) 록을 잡
 - 소수의 tuple만 접근하는 Transaction은 다른 Transaction과의 충돌을 최소화하는 Fine granularity가 유리하다.
 - 대량의 데이터에 접근하는 Transaction은 lock 횟수를 최소화하는 Coarse granularity가 유리하다.
 
-### 2.2.2. Intention Lock Modes
+## Intention Lock Modes
 
 Intention Lock은 MGL(Multiple Granularity Locking)에서 상위노드만 확인해도 하위 노드의 lock 상태를 파악할 수 있도록 미래의 lock 계획을 상위 노드에 미리 표시하는 메커니즘이다. 
 
@@ -65,7 +63,7 @@ In addition to S and X, three additional lock modes for MGL:
 SIX는 해당 노드 전체에 대하여 읽기 연산을 하고, 그 중 일부 데이터에 (이후에) X 록을 걸겠다는 의도이다. 
 예를 들어 트랜잭션이 테이블 전체를 읽으면서 그 중 조건이 맞는 몇 개 레코드 값을 변경하고자 하는 연산에 적합하다.
 
-### 2.2.3. Compatibility Matrix with Intention Lock Modes
+## Compatibility Matrix with Intention Lock Modes
 
  **"현재 노드에서"** 두 lock mode가 동시에 존재할 수 있는지를 판단한다.
  Intention Lock은 현재 노드에서 실제 read/write를 하지 않고 하위 노드에서의 lock 계획만 표시하므로, 충돌 판단이 하위 노드로 미뤄지는 경우가 많다. 
@@ -89,12 +87,12 @@ SIX는 해당 노드 전체에 대하여 읽기 연산을 하고, 그 중 일부
 - **SIX ∧ SIX**
 	- SIX = S + IX
 	- S와 IX는 호환되지 않는다.
-### 2.2.4. MGL Scheme
+## MGL Scheme
 
 -  MGL에서 노드에 lock을 걸기 위해서는 반드시 부모 노드를 먼저 적절한 mode로 잠가야 한다.
 	- 어떤 노드에 **S 또는 IS** 록을 걸려면 → 부모가 **IS 또는 IX** 모드여야 함
 	- 어떤 노드에 **X, SIX, IX** 록을 걸려면 → 부모가 **IX 또는 SIX** 모드여야 함
-	- [Graph-based Protocol - 자식 노드에 접근하려면 반드시 부모 노드에 lock을 획득해야 한다.](Lock based Protocol)
+	- [Graph-Based Protocol - 자식 노드에 접근하려면 반드시 부모 노드에 lock을 획득해야 한다.](<Lock-Based Concurrency Control>)
 
 - Lock 획득은 root $\to$ leaf 방향, 해제는 leaf $\to$ root 방향으로 이루어진다.
 - 2PL을 준수해야 하므로 unlock을 시작하면 새로운 lock을 획득할 수 없고, 
@@ -120,7 +118,7 @@ Transaction $T_i$ can lock node Q using the following rules:
 - 이때 MGL Scheme에 따르면
 	- 상위 노드에서 SIX lock을 가지고 하위 노드에서 SIX lock을 요구하는 것은 S lock의 중복이므로 올바르지 않다.
 - 따라서 database에는 IX lock을 설정해야 한다.
-### 2.2.5. MGL Examples
+## MGL Examples
 
 ##### Example 1 
 ![](img/Pasted-image-20260419215348.png)

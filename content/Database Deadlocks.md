@@ -4,9 +4,7 @@ tags:
   - project/database-system
 Date: 2026-04-19
 ---
-## 2.3. Concurrency Control: Deadlock
-
-### 2.3.1. Deadlock Example
+## Deadlock Example
 
 ```
 T1: write(X)      T2: write(Y)
@@ -38,7 +36,7 @@ T2 → T1   (T2가 T1을 기다림)
 
 → 사이클 발생 = Deadlock!
 ```
-### 2.3.2. Deadlock Handling
+## Deadlock Handling
 
 교착상태를 처리하는 방식은 크게 세 가지로 분류할 수 있다.
 1. Timeout
@@ -63,7 +61,7 @@ Deadlock이 생길 수 있는 waiting 관계 자체를 제한하는 **prevention
 
 자세한 설명은 후술한다.
 
-### 2.3.3. Wait-die / Wound-wait Schemes
+## Wait-Die / Wound-Wait Schemes
 
 > - Use **transaction timestamps** to prevent deadlock. 
 > - A rolled back transaction is **restarted with its original timestamp** to avoid starvation.
@@ -105,7 +103,7 @@ Lock 충돌이 발생하면
 - May be **fewer rollbacks** than wait-die
 	- Wait-die scheme과 다르게 Younger Transaction은 필요할 때만 죽는다.
 
-### 2.3.4. Deadlock Detection
+## Deadlock Detection
 
 Detection 방식은 Prevention과 다르게 일단 시스템을 돌리다가 실제로 Deadlock이 생겼는지 검사하는 방식이다.
 
@@ -150,7 +148,7 @@ Deadlock은 "서로 기다리는 닫힌 관계", 즉 순환 의존성이어야 �
 
 어떤 Data item A에 대해 $T_1$이 shared lock을 보유하고, $T_2$ 도 Shared Lock을 보유하고 있다고 가정하자. 이 상태에서 $T_4$가 exclusive lock을 요청하면, $T_1$, $T_2$ 모두를 기다리게 된다. 이때 $T_4$는 두 개의 Transaction을 가리키게 되며 $T_4 \to T_1$, $T_4 \to T_2$로 두 개의 Edge가 생긴다.
 따라서 Wait-for Graph에서 한 노드의 out-degree는 1보다 클 수 있다.
-### 2.3.5. Deadlock Resolution
+## Deadlock Resolution
 
 Deadlock을 찾으면 풀어야 한다.
 

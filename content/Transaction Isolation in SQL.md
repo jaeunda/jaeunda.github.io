@@ -4,9 +4,7 @@ tags:
   - project/database-system
 Date: 2026-04-21
 ---
-## 2.5. Concurrency Control: Transaction Isolation in SQL
-
-### 2.5.1. Transactions in SQL
+## Transactions in SQL
 
 > In SQL, a transaction **begins implicitly**
 
@@ -44,7 +42,7 @@ COMMIT;
 
 `SAVEPOINT`는 Transaction의 중간 저장점이다. `SAVEPOINT`를 활용하면 전체를 rollback하지 않고 중간 지점으로 rollback할 수 있다. (`ROLLBACK TO SAVEPOINT`)
 
-### 2.5.2. Weak Levels of Consistency
+## Weak Levels of Consistency
 
 모든 Transaction이 항상 Serializable할 필요는 없다. Transaction에서 정확한 값을 도출해야 하는 경우가 아니라면 Serializable이 불필요하므로 Accuracy를 위한 Isolation 대신 Performance를 택할 수 있다. (Trade-off)
 
@@ -57,7 +55,7 @@ Such transactions need not be serializable with respect to other transactions.
 > **Tradeoff: accuracy for performance.** 
 > Performance is the most important concern in database communities.
 
-### 2.5.3. Degree-two Consistency
+## Degree-Two Consistency
 
 Weak Levels of Consistency로 보편적으로 지원되는 형식이 Degree-two Consistency이다. Degree-two Consistency에서는 2PL과 달리 S-lock을 제한 없이 해제할 수 있어 Serializable Transaction이 보장되지는 않는다.
 
@@ -101,7 +99,7 @@ Cursor가 위치한 데이터는 타 Transaction에 의해 변경될 수 없다.
 - T2에서 Q에 대하여 lock-X를 획득하면 T2가 끝날 때까지 lock-X를 보유하고 있어야 한다.
 
 이 예시에서, T1이 한 Transaction 안에서 Q의 값을 두 번 읽었는데 값이 달라졌다. Unrepeatable Read가 발생하였으므로 Serializable하지 않다.
-### 2.5.4. Transaction Isolation in SQL
+## SQL Isolation Levels
 
 SQL은 non-serializable execution을 지원한다. 이를 위한 4가지 격리 수준이 있다. 격리 수준이 낮을수록 performance는 높지만 accuracy는 떨어진다.
 
@@ -160,7 +158,7 @@ SET TRANSACTION [READ ONLY | READ WRITE]
 |**Dirty data**|Don't overwrite dirty data; others don't overwrite yours|Additionally, don't read dirty data|Additionally, others don't read dirty data|
 |**Committed data**|Writes visible at EOT|Same|Same|
 
-### 2.5.5. Transaction Isolation Example
+## Transaction Isolation Example
 
 **시나리오:** 비행기 좌석 예약 시스템
 

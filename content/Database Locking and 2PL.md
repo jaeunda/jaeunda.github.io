@@ -3,11 +3,8 @@ tags:
   - topic/database
   - project/database-system
 Date: 2026-04-17
-featured: true
 ---
-## 2.1. Concurrency Control: Lock-based Protocols
-
-### 2.1.1. Lock-based Protocols
+## Lock-Based Protocols
 
 Locking Protocol은 Transaction의 동시성 제어를 위해 사용된다. 
 Concurrent execution을 수행하면서도 Isolation과 Consistency를 충족하는 schedule을 생성하도록 한다.
@@ -69,7 +66,7 @@ display(A+B)
 이를 해결하기 위해 Two-Phase Locking(2PL)이 필요하다.
 - 모든 Lock 요청이 끝난 뒤에야 release를 시작하도록 강제하여 Conflict Serializability를 보장한다.
 
-### 2.1.2. Two-phase Locking Protocol (2PL)
+## Two-Phase Locking Protocol (2PL)
 
 | **Phase 1<br>Growing phase**                                                  | **Phase 2<br>Shrinking phase**                                                |
 | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
@@ -126,7 +123,7 @@ Lock Point란 Transaction이 **마지막 Lock을 획득하는 시점**이다. �
 | Strict 2PL   | Lock Point      | Recoverability 보장<br>(Dirty Read, Cascading Rollback 방지) |                |
 | Rigorous 2PL | Commit Order    | Read Stability 보장<br>(Repeatable Read)                   | 낮은 Concurrency |
 Lock 해제를 commit/abort 시점으로 강제하면 일반 2PL에 비해 Lock을 오래 유지하게 된다. Dirty Read를 차단하여 예방할 수 있지만, 동시에 Concurrency가 낮아진다는 trade-off가 존재한다.
-### 2.1.3. Lock Conversions
+## Lock Conversions
 
 Two-phase locking(2PL) with lock conversions:
 
@@ -140,7 +137,7 @@ Growing Phase에서는 lock-S를 lock-X로 변환하여 lock의 강도를 높일
 Shrinking Phase에서는 lock-X를 lock-S로 변환하여 lock을 약하게 풀 수 있다.
 
 2PL의 Phase 규칙을 준수하고 있으므로 Conflict Serializability도 그대로 보장된다.
-### 2.1.4. Why 2PL Ensures Conflict Serializability
+## Why 2PL Ensures Conflict Serializability
 
 **Proof by contradiction:**
 1. Suppose 2PL $\nrightarrow$ Conflict Serializabiltiy.
@@ -190,7 +187,7 @@ Lock Point 순서가 정확히 이 조건을 만족하므로, Lock Point 순서�
 Lock Point 순서는 모든 Serial Order의 기준이 된다. Lock Point가 빠른 Transaction이 먼저 실행된 것으로 간주한다. 반면 Transaction 간의 충돌 의존성은 Partial Order를 형성한다. 이러한 Partial Order를 모두 준수하는 Serial Order가 Conflict Serializable Schedule이다. 
 2PL 프로토콜은 이 Partial Order가 반드시 Lock Point 순서를 따르도록 강제함으로써 Serializability를 보장한다. 하지만 충돌이 없는 Transaction들 사이에서도 Lock Point의 선후 관계는 결정된다. 따라서 Lock Point가 앞선다고 해서 반드시 데이터 충돌 의존성이 존재하는 것은 아니다. 따라서 해당 Property의 역은 성립하지 않는다.
  
-### 2.1.5. Automatic Acquisition of Locks
+## Automatic Acquisition of Locks
 
 상용 DBMS는 lock에 대한 제어를 사용자의 권한으로 운영하지 않는다. 
 데이터 읽기 및 쓰기 연산에 관련되는 lock 관리는 DBMS의 고유 영역이다.
@@ -228,7 +225,7 @@ Lock 요청이 거절된 Transaction들은 waiting queue에 들어가 대기한�
 또한 여러 Transaction이 서로의 lock 해제를 기다리는 상황이 발생하면 **Deadlock**이 된다.
 - DBMS는 이를 감지하기 위해 `Wait-for Graph`를 주기적으로 검사한다.
 
-### 2.1.6. Implementation of Locking
+## Implementation of Locking
 
 **Lock Manager**는 lock 요청/해제를 전담하는 별도의 프로세스이다. 
 Transaction은 직접 lock을 관리하지 않고 Lock Manager에게 요청을 보내고 응답을 기다린다.
@@ -262,7 +259,7 @@ Lock Manager는 **In-memory Hash Table** 형태의 Lock Table을 유지한다. D
 	- (T1, T23): (lock-S, lock-X) | (lock-X, lock-S) | (lock-X, lock-X)
 - Data Item I44: T8(granted)
 
-### 2.1.7. [Deadlock](Deadlocks)
+## [Deadlock](<Database Deadlocks: Prevention, Detection, and Resolution>)
 
 Deadlock은 두 개 이상의 Transaction이 서로 상대방이 보유한 lock이 해제되기를 기다리며 무한히 대기하는 상태이다.
 
@@ -289,7 +286,7 @@ Lock을 사용하는 한 Deadlock을 원천적으로 완전히 없애기는 어�
 Concurrency를 허용하면서 동시에 Serializability를 보장하려면 lock이 필요하고, lock이 있는 한 Deadlock의 가능성은 항상 존재한다. 따라서 Deadlock을 **감지하여 해소**하는 방식으로 대처한다.
 - e.g., Deadlock을 감지하면 victim 선정 후 rollback하여 해소한다.
 
-### 2.1.8. Starvation
+## Starvation
 
 특정 Transaction이 lock을 획득하지 못하고 무한히 대기하는 상태이다. Deadlock과 달리 다른 Transaction들은 정상적으로 진행되지만, 특정 Transaction만 계속 대기한다.
 
@@ -314,7 +311,7 @@ X-lock을 기다리는 Transaction이 queue에 있으면 이후에 들어오는 
 
 데이터베이스 시스템에서 기아상태는 없어야 하며, 교착상태는 불가분하게 발생한다.
 
-### 2.1.9. Graph-based Protocol
+## Graph-Based Protocol
 
 Graph-based protocols are an **alternative to 2PL**..
 데이터 항목 간에 Partial Ordering을 미리 정의하고 이를 기반으로 lock을 관리하는 프로토콜이다.

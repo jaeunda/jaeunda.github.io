@@ -3,11 +3,8 @@ tags:
   - topic/database
   - project/database-system
 Date: 2026-04-20
-featured: true
 ---
-## 2.4. Concurrency Control: Insert and Delete Operations
-
-### 2.4.1. Insert and Delete Operations
+## Insert and Delete Operations
 
 - A **delete** operation may be performed only if the transaction has an **X-mode lock** on the tuple
 - A transaction that **inserts** a new tuple is given an **X-mode lock** on the tuple
@@ -29,7 +26,7 @@ Delete와 Insert Operation은 X-mode lock을 획득해야만 수행 가능하다
 > A transaction that scans a relation to find sum of balances of all accounts in Busan, and another transaction that inserts a new Busan account, are **conceptually in conflict despite not accessing any tuple in common**. If only tuple locks are used, non-serializable schedules can result.
 
 예를 들어 한 Transaction은 Busan의 모든 계좌의 합을 계산하고, 다른 Transaction은 새로운 Busan account tuple을 추가한다고 하자. 이러한 경우 **물리적으로는 lock conflict가 발생하지 않는다**. Busan account는 기존 Table에 없던 새로운 tuple이기 때문이다. 하지만 둘 다 동일한 Busan account 집합을 다루고 있으므로 논리적으로 semantic conflict가 발생한다.
-### 2.4.2. Phantom Phenomenon Example
+## Phantom Phenomenon Example
 
 **Bank databases:**
 
@@ -84,7 +81,7 @@ Tuple locking이 아닌 Table locking을 사용하는 방식으로 Phantom Pheno
 
 하지만 Concurrency는 박살난다...
 
-### 2.4.3. How to Handle Phantom Problem
+## How to Handle the Phantom Problem
 
 Phantom Problem을 방지하기 위해 Table Locking 대신 실질적으로 Index Locking을 사용할 수 있다.
 집합 조건을 Index로 표현하여 Tuple이 아니라 Index entry에 lock을 건다.
@@ -126,7 +123,7 @@ Index 기반에서는 lookup을 수행하기 위해 internal nodes와 leaf nodes
 
 하지만 Index 구조에서는 자연적으로 데이터 간의 순서가 발생한다. 2PL을 그대로 적용하면 Index의 Internal node lock을 Shrinking phase 이전에 해제하지 못하므로 병목이 발생한다. 따라서 Index에는 Graph-based Protocol을 사용하는 것이 더 효율적이다.
 
-### 2.4.4. Concurrency in Index Structures
+## Concurrency in Index Structures
 
 > Index structures are accessed **very often** (much more than other data items). 
 > Applying 2PL to index structures → **low concurrency**. 
