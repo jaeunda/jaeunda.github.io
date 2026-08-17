@@ -18,7 +18,7 @@ Transaction은 commit work 또는 rollback 문장으로 종료된다.
 - Commit work는 Transaction이 성공적으로 종료되었음을 의미한다.
 - Rollback은 실패에 의한 Transaction 종료를 의미한다. (Abort)
 
-##### Auto Commit
+### Auto Commit
 
 > In almost all database systems, by default, every SQL statement also **commits implicitly** if it executes successfully (**auto commit**).
 
@@ -27,7 +27,7 @@ SQL은 기본적으로 statement 하나를 transaction 하나로 간주한다. �
 하지만 auto commit으로 인해 Atomicity가 깨지는 경우가 생길 수 있다. 이러한 경우 여러 statement가 하나의 단위가 되어 Transaction을 구성해야 한다. 이때는 명시적으로 auto commit을 끄고 직접 Transaction을 관리해야 한다.
 - SQL transaction statements: `SET TRANSACTION`, `COMMIT`, `ROLLBACK`, `SAVEPOINT`, `ROLLBACK TO SAVEPOINT`
 
-###### `SAVEPOINT` Example 
+#### `SAVEPOINT` Example
 
 — Kim 계좌에서 Lee 계좌로 이체:
 ```sql
@@ -52,7 +52,7 @@ COMMIT;
 
 Such transactions need not be serializable with respect to other transactions.
 
-> **Tradeoff: accuracy for performance.** 
+> **Tradeoff: accuracy for performance.**
 > Performance is the most important concern in database communities.
 
 ## Degree-Two Consistency
@@ -68,7 +68,7 @@ Weak Levels of Consistency로 보편적으로 지원되는 형식이 Degree-two 
 Consistency를 보장하기 위해 lock을 획득하고 해제하는 시점을 제한할 수 있다. 이때 Degree-two Consistency는 2PL에 비해 시점을 약하게 제한하며 Serializability를 보장하지 않는다.
 - X-lock은 언제 잡아도 상관 없으나 transaction의 끝까지 들고 있어야 한다.
 
-##### Cursor stability (special case of degree-two):
+### Cursor stability (special case of degree-two):
 
 > - For reads: each tuple is locked → read → lock **immediately released** (커서가 위치하는 동안에만 읽기 록 보유)
 > - X-locks held till end of transaction
@@ -103,30 +103,30 @@ Cursor가 위치한 데이터는 타 Transaction에 의해 변경될 수 없다.
 
 SQL은 non-serializable execution을 지원한다. 이를 위한 4가지 격리 수준이 있다. 격리 수준이 낮을수록 performance는 높지만 accuracy는 떨어진다.
 
-##### Problem
+### Problem
 먼저 세 가지 이상 현상을 이해해야 한다.
-###### 1. Lost Update $\to$ Long X-lock
+#### 1. Lost Update $\to$ Long X-lock
 두 Transaction이 같은 데이터를 동시에 수정할 때 먼저 쓴 값이 사라지는 현상이다. 한 Transaction에서 write한 데이터를 commit하지 않은 채로  다른 Transaction에서 같은 데이터를 write하면 Lost Update가 발생한다. 따라서 Lost update를 방지하기 위해서는 해당 데이터에 대한 X-lock을 commit/abort까지 유지해야 한다.
 ```
 T1: Read(X=100) → Write(X=150)
 T2: Read(X=100) → Write(X=200)  ← T1의 수정이 사라짐!
 ```
 
-###### 2. Dirty Read $\to$ acquire S-lock
+#### 2. Dirty Read $\to$ acquire S-lock
 아직 commit되지 않은 데이터를 읽는 현상이다. Cascading Rollback의 원인이 될 수 있다.
 ```
 T1: Write(X=200) (미완료)
 T2: Read(X=200)  ← T1이 rollback하면 없던 값을 읽은 것!
 ```
-###### 3. Unrepeatable Read $\to$ Long S-lock
-한 Transaction 내에서 같은 데이터를 두 번 읽었는데 값이 다른 현상이다. S-lock을 commit/abort 시에만 해제할 수 있도록 강제하면 Unrepeatable Read를 방지할 수 있으나 performance가 저하된다. 
+#### 3. Unrepeatable Read $\to$ Long S-lock
+한 Transaction 내에서 같은 데이터를 두 번 읽었는데 값이 다른 현상이다. S-lock을 commit/abort 시에만 해제할 수 있도록 강제하면 Unrepeatable Read를 방지할 수 있으나 performance가 저하된다.
 ```
 T1: Read(X=100)
 T2: Write(X=200), Commit
 T1: Read(X=200)  ← 같은 트랜잭션인데 값이 바뀜!
 ```
 
-##### Isolation Level
+### Isolation Level
 
 SQL allows **non-serializable** executions. Four isolation levels:
 
@@ -145,11 +145,11 @@ SET TRANSACTION [READ ONLY | READ WRITE]
 
 - SQL2 default: **READ WRITE, SERIALIZABLE**
 	- Exception: `READ UNCOMMITTED` → automatically **READ ONLY**
-- **In many commercial DB systems, `READ COMMITTED` is the actual default** 
+- **In many commercial DB systems, `READ COMMITTED` is the actual default**
 	- — must be explicitly changed to serializable when required
 
 
-##### Transaction Isolation Effect:
+### Transaction Isolation Effect:
 
 |Common Name|Read Uncommitted|Read Committed|Serializable|
 |---|:-:|:-:|:-:|

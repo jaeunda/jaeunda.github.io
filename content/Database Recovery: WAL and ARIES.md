@@ -8,9 +8,9 @@ pinOrder: 3
 ---
 1. 커밋했는데 서버가 꺼지면?
 2. 커밋 중에 죽으면, 절반만 쓰인 데이터는?
-##### Durability
+**Durability**
 "커밋했다"는 약속은 서버가 꺼져도 유효해야 한다.
-##### Atomicity
+**Atomicity**
 트랜잭션은 전부 반영되거나, 전혀 반영되지 않아야 한다.
 
 ## 1. System Failure
@@ -80,14 +80,14 @@ Buffer Pool을 어떻게 관리하는지에 따라 복구 방식이 결정된다
 ### 2.2. Steal 정책
 Buffer Pool에 공간이 부족하면 DB는 어떤 페이지를 밀어내야 한다.
 이때 아직 커밋되지 않은 트랜잭션의 Dirty Page도 디스크로 밀어낼 수 있게 허용하는 정책이 Steal Policy이다.
-##### Steal Policy $\rightarrow$ Undo Log 필요
+#### Steal Policy $\rightarrow$ Undo Log 필요
 - 커밋되지 않은 데이터가 디스크에 쓰일 수 있다.
 - 나중에 해당 트랜잭션이 롤백되거나, 크래시로 인해 취소되어야 할 수 있다.
 - 이미 디스크에 쓰인 값을 되돌려야 한다.
 ### 2.3. No-Force 정책
 커밋할 때 모든 Dirty Page를 즉시 디스크에 강제로 쓰지 않는 정책이 No-Force Policy이다.
 커밋 응답을 빠르게 반환하기 위해 실제 디스크 쓰기는 나중으로 미룬다.
-##### No-Force Policy $\rightarrow$ Redo Log 필요
+#### No-Force Policy $\rightarrow$ Redo Log 필요
 - 커밋했더라도 데이터가 아직 디스크에 없을 수 있다.
 - 서버 크래시가 나면 그 데이터는 사라진다.
 
@@ -136,7 +136,7 @@ LSN으로부터 어떤 로그 레코드가 먼저 쓰였는지, 어떤 데이터
 - `pageLSN`은 트랜잭션이 데이터 페이지의 레코드를 수정할 때마다,
 - `flushedLSN`은 DBMS가 WAL buffer의 내용을 디스크에 쓸 때마다 업데이트된다.
 
-##### **WAL의 핵심 원칙**: `pageLSN ≤ FlushedLSN`
+#### **WAL의 핵심 원칙**: `pageLSN ≤ FlushedLSN`
 Buffer Pool Manager가 메모리의 특정 Dirty Page를 디스크로 flush하려 할 때
 반드시 해당 페이지의 수정 내역을 담은 로그가 먼저 디스크에 안전하게 기록되어 있어야만 페이지 쓰기를 허용한다.
 (=`flushedLSN` 갱신이 되어 있어야 페이지 쓰기를 허용한다.)

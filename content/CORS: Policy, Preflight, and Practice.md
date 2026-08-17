@@ -2,7 +2,7 @@
 Date: 2026-05-03
 tags:
   - topic/network
-  - topic/HTTP
+  - topic/http
   - project/team-po
 ---
 
@@ -31,7 +31,7 @@ CORS는 브라우저의 보안 정책으로, 다른 출처(origin)에서 오는 
 
 이를 막기 위해 Same-Origin Policy를 도입했다.
 
-#### Same-Origin Policy
+### Same-Origin Policy
 
 > Today, browsers enforce that clients can only send requests to a resource with **the same origin as the client's URL**..
 > **The protocol, port, and hostname of the client's URL** should all match the server it requests.
@@ -88,7 +88,7 @@ Cross-origin 요청이 발생하면 아래와 같은 순서로 진행된다.
 
 Content Type이 `application/json`인 경우도 complex request에 해당한다. 따라서 REST API 요청은 거의 항상 preflight가 발생한다. (서버에서 CORS 설정을 제대로 해야 함.)
 
-#### How preflight requests work
+### How preflight requests work
 
 - Link: [AWS - What is a CORS preflight request?](https://aws.amazon.com/what-is/cross-origin-resource-sharing/#what-is-a-cors-preflight-request--17inh0i)
   ![](img/Pasted-image-20260503222455.png)
@@ -119,7 +119,7 @@ Access-Control-Allow-Headers: Content-Type
 3. 브라우저 $\to$ 서버
    - Preflight 통과 후에 실체 요청이 전송된다.
 
-##### Access-Control-Max-Age
+#### Access-Control-Max-Age
 
 > The preflight response sometimes includes an additional Access-Control-Max-Age header. This metric **specifies the duration (in seconds) for the browser to cache preflight results** in the browser. Caching allows the browser to send several complex requests between preflight requests. It **doesn’t have to send another preflight request until the time specified** by max-age elapses.
 
@@ -129,7 +129,7 @@ Access-Control-Allow-Headers: Content-Type
 
 서버에서 CORS 설정 시 다음과 같은 사항을 유념해야 한다.
 
-#### 1. Define appropriate access lists
+### 1. Define appropriate access lists
 
 > Avoid using wildcards unless you want to make the API public.
 > Otherwise, using wildcards and regular expressions may create vulnerabilities.
@@ -140,7 +140,7 @@ Access-Control-Allow-Headers: Content-Type
 
 참고로 쿠키, 세션과 같은 인증 정보를 포함한 요청은 `allowCredentials(true)`를 사용한다. 이는 와일드카드와 함께 사용할 수 없으므로 반드시 출처를 명시해야 한다.
 
-#### 2. Avoid using null origin in your list
+### 2. Avoid using null origin in your list
 
 파일 요청 또는 local host의 요청 등 일부 상황에서 브라우저가 `null`을 Origin으로 보내는 경우가 있다.
 하지만 `null`을 허용 목록에 넣으면 의도치 않은 접근이 허용될 수 있으므로 피해야 한다.
@@ -151,7 +151,7 @@ Access-Control-Allow-Headers: Content-Type
 
 - Link: [Team-po/Server - Refactor: www.team-po.cloud CORS 허용 Origin 추가](https://github.com/Team-po/Server/pull/49#pullrequestreview-4216160624)
 
-##### Problem
+### Problem
 
 기존 `CorsConfigurationSource`의 `setAllowedOrigins` 리스트에는 로컬 개발 origin과 `https://team-po.cloud`만 등록되어 있었다.
 
@@ -159,11 +159,11 @@ Access-Control-Allow-Headers: Content-Type
 
 <img src="img/Pasted-image-20260503231235.png" width="400">
 
-##### Changes
+### Changes
 
 `setAllowedOrigins` 리스트에 `https://www.team-po.cloud`를 추가하였다.
 
-##### Why This Approach
+### Why This Approach
 
 해당 서비스는 JWT를 `Authorization` 응답 헤더로 전달하며, Cross-Origin 환경에서 클라이언트가 이 헤더를 읽을 수 있도록 `setExposedHeaders`와 `allowCredentials(true)`를 함께 사용한다. 이 경우 와일드카드 방식을 사용할 수 없으므로 필요한 origin을 명시적으로 추가하는 방식을 선택했다.
 
@@ -181,7 +181,7 @@ configuration.setAllowedOrigins(List.of(
 		configuration.setMaxAge(3600L);
 ```
 
-#### References
+## References
 
 - [MDN - Cross-Origin Resource Sharing](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS)
 - [AWS - What is CORS?](https://aws.amazon.com/what-is/cross-origin-resource-sharing/)

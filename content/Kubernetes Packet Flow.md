@@ -41,17 +41,17 @@ Service: iptables DNAT로 Pod IP로 변환
 	- 쿠버네티스에서 배포/실행의 최소 단위.
 	- 하나 이상의 컨테이너 묶음.
 	- 고유한 IP를 할당받는다.
-#### Control Plane
+### Control Plane
 - 클러스터 전체의 상태를 관리하는 두뇌.
 - Pod 스케줄링, 상태 감시, Endpoints 갱신 등을 담당한다.
 - 직접 패킷을 처리하지는 않는다.
-#### Worker Node
+### Worker Node
 - 실제로 Pod가 실행되는 노드.
 - 각 노드에는 다음 컴포넌트가 항상 실행된다.
 	- kubelet: Control Plane의 지시를 받아 Pod를 생성/삭제하고 CNI 플러그인을 호출
 	- **kube-proxy**: iptables 룰을 관리해 Service → Pod 트래픽을 처리
 	- **CNI Plugin**: Pod 생성 시 네트워크 인터페이스(veth)를 구성하고 라우팅을 설정
-#### Storage Node
+### Storage Node
 - 퍼시스턴트 볼륨을 제공하는 노드.
 - 네트워크 흐름과는 직접 관련이 없으므로 다루지 않는다.
 ## 2. 클러스터 진입 — Exposing Service
@@ -226,7 +226,7 @@ Node 1 (192.168.1.10)                Node 2 (192.168.1.11)
 
 ### 5.2. CNI 플러그인
 CNI 플러그인이 이 문제를 해결한다.
-##### 오버레이(Overlay)
+#### 오버레이(Overlay)
 Pod 패킷을 물리 네트워크가 이해할 수 있는 패킷으로 한 번 더 감싸서(encapsulation) 전달한다.
 
 ```
@@ -237,7 +237,7 @@ Pod 패킷을 물리 네트워크가 이해할 수 있는 패킷으로 한 번 �
 [Pod IP 패킷]
 ```
 
-##### 언더레이(Underlay)
+#### 언더레이(Underlay)
 물리 네트워크 장비에 Pod 라우트를 직접 알려준다. encapsulation 없이 패킷이 직접 라우팅된다.
 
 ```

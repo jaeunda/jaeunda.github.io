@@ -9,11 +9,11 @@ pinOrder: 2
 ---
 ## Host-to-Host vs Process-to-Process
  Whereas a **transport-layer protocol** provides logical communication between **processes** running on different hosts, a **network-layer protocol** provides logical communication between **hosts.** - *Computer Networking, A Top Down Approach, 7th ed.*
-#### L3(Network Layer)의 역할
+### L3(Network Layer)의 역할
 - **Host-to-Host**: 패킷을 목적지 **호스트**까지 전달하는 계층
 	- $\rightarrow$ "어디까지 보낼 것인가"
 - Best-effort 방식으로 패킷 전달하며, 순서나 도착 여부를 보장하지 않음.
-#### L3의 한계
+### L3의 한계
 - 하나의 호스트에는 여러 네트워크 프로세스가 동시에 존재하므로
 - IP 주소만으로는 어떤 프로세스가 수신자인지 알 수 없다.
 ## 1. L4(Transport Layer)의 역할과 기능
@@ -356,11 +356,11 @@ send(fd, buf, len, 0);
 - Transport Layer는 데이터를 보낼지 말지, 언제 보낼지, 어떤 크기로 보낼지 결정하는 계층층
 ### 3.3. Transport Layer의 책임 경계
 > Transport Layer는 전송이 성립되기 위한 조건을 관리
-##### L4(Transport Layer)
+#### L4(Transport Layer)
 - 전송 가능 여부 판단
 - 데이터의 분할 및 세그먼트 구성
 - 순서, 재전송, 흐름 제어를 위한 상태 관리
-##### L3(Network Layer, IP)
+#### L3(Network Layer, IP)
 - 실제 패킷 전달
 - 경로 선택
 - 패킷 전달 성공/실패
@@ -420,13 +420,13 @@ Transport Layer는 패킷을 전달하는 계층이 아니라, 패킷을 애플�
 |              | `recv/send(write)` | `recvfrom/sendto` |
 - L4에서 TCP와 UDP의 차이는 신뢰성 여부가 아니라, 어떤 추상화와 상태를 구현하느냐의 차이
 ### 4.3. 수신 경로에서의 책임 경계
-##### L4가 관리하는 것
+#### L4가 관리하는 것
 - 데이터 전달을 보장하지 않으나 **전달이 성립되기 위한 조건**을 관리함.
 	- 순서 관리 (시퀀스 번호 기반)
 	- 손실 감지 (ACK, timeout)
 	- 재조립 (out-of-order 처리)
 	- 상태 관리 (connection state)
-##### L4가 책임지지 않는 것
+#### L4가 책임지지 않는 것
 - 실제 패킷 전달 성공 여부
 - 네트워크 경로의 신뢰성
 - 물리적 손실

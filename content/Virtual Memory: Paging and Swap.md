@@ -1,6 +1,6 @@
 ---
 tags:
-  - topic/operating-system
+  - topic/operating-systems
   - topic/linux-kernel
   - project/csocrates2
 Date: 2026-06-23
@@ -46,7 +46,7 @@ pinOrder: 1
 
 각 프로세스가 `malloc()`으로 얻은 주소와 그 주소에 저장한 값을 출력해 볼 수 있다. 두 인스턴스를 동시에 실행했을 때 주소가 같게 보일 수도 있고 ASLR(Address Space Layout Randomization) 때문에 다르게 보일 수도 있다. 어느 경우든 한 프로세스의 `*p` 증가가 다른 프로세스의 값에 영향을 주지 않는 것이 핵심이다.
 
-H:\My Drive\obsidian\eunda\04-Archives\csocrates2-os\memory-virtualization-linux.md- **Address Space Layout Randomization(ASLR)**: 실행할 때마다 스택·힙·공유 라이브러리·실행 코드 등의 시작 주소를 무작위로 바꾸는 보안 기법이다. 공격자가 특정 주소를 미리 예측해 악용하기 어렵게 만든다. 그래서 같은 프로그램을 여러 번 실행해도 관찰되는 가상 주소가 매번 달라질 수 있다.
+**Address Space Layout Randomization(ASLR)**: 실행할 때마다 스택·힙·공유 라이브러리·실행 코드 등의 시작 주소를 무작위로 바꾸는 보안 기법이다. 공격자가 특정 주소를 미리 예측해 악용하기 어렵게 만든다. 그래서 같은 프로그램을 여러 번 실행해도 관찰되는 가상 주소가 매번 달라질 수 있다.
 
 ```c
 // mem_isolation.c
