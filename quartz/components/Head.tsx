@@ -5,6 +5,7 @@ import { googleFontHref, googleFontSubsetHref } from "../util/theme"
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
 import { unescapeHTML } from "../util/escape"
 import { CustomOgImagesEmitterName } from "../plugins/emitters/ogImage"
+import { isUnlisted } from "../util/visibility"
 export default (() => {
   const Head: QuartzComponent = ({
     cfg,
@@ -85,6 +86,7 @@ export default (() => {
         <link rel="icon" href={iconPath} />
         <meta name="description" content={description} />
         <meta name="generator" content="Quartz" />
+        {isUnlisted(fileData) && <meta name="robots" content="noindex, nofollow" />}
 
         {css.map((resource) => CSSResourceToStyleElement(resource, true))}
         {js

@@ -416,6 +416,17 @@ For visual changes, check as applicable:
 - Code blocks scroll horizontally instead of clipping.
 - `git diff --check` passes.
 
+## Unlisted Portfolio Pages
+
+- Frontmatter `unlisted: true` keeps the page HTML directly accessible while
+  excluding it from the shared Search/Explorer/Graph index, sitemap, RSS, tag
+  pages, folder pages, recent posts, and other listings that consume `allFiles`.
+- Unlisted pages emit `noindex, nofollow` and use a centered single-column shell
+  without the blog sidebars, post metadata, related content, or footer.
+- `portfolio-shell` uses the existing display, body, and code fonts plus current
+  color tokens. Its desktop content width is 720px inside an 800px center column;
+  mobile preserves the 20px safe-area padding floor.
+
 ## Design Decisions Log
 
 ### 2026-05-27
@@ -572,3 +583,9 @@ For visual changes, check as applicable:
 - Reduced long-form body text from 17px to 16px and corrected Quartz's fixed
   paragraph line-height override, using 1.72 lines with 1.25em paragraph gaps
   for a more even Korean reading rhythm.
+
+### 2026-09-18
+
+- Added a reusable unlisted-page shell for direct-link portfolios: it preserves
+  the quiet green-gray typography and theme while removing blog navigation and
+  widening the page into a restrained single content column.

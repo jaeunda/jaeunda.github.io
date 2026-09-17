@@ -14,6 +14,7 @@ import { BuildCtx } from "../../util/ctx"
 import { Node } from "unist"
 import { StaticResources } from "../../util/resources"
 import { QuartzPluginData } from "../vfile"
+import { listedFiles } from "../../util/visibility"
 
 async function processContent(
   ctx: BuildCtx,
@@ -74,7 +75,7 @@ export const ContentPage: QuartzEmitterPlugin<Partial<FullPageLayout>> = (userOp
       ]
     },
     async *emit(ctx, content, resources) {
-      const allFiles = content.map((c) => c[1].data)
+      const allFiles = listedFiles(content.map((c) => c[1].data))
       let containsIndex = false
 
       for (const [tree, file] of content) {
@@ -98,7 +99,7 @@ export const ContentPage: QuartzEmitterPlugin<Partial<FullPageLayout>> = (userOp
       }
     },
     async *partialEmit(ctx, content, resources, changeEvents) {
-      const allFiles = content.map((c) => c[1].data)
+      const allFiles = listedFiles(content.map((c) => c[1].data))
 
       // find all slugs that changed or were added
       const changedSlugs = new Set<string>()
