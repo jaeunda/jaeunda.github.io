@@ -1,0 +1,1655 @@
+@use "./variables.scss" as *;
+
+// Portfolio page (unlisted `portfolio-shell`).
+//
+// This page steps outside the blog's reading layout: it owns its own page
+// gutters, type scale and grid. Everything is scoped under the unlisted body so
+// no blog surface is affected.
+//
+// Craft rules applied here (ui-skills playbook):
+// - one accent colour per view, reserved for links, labels and actions
+// - group with spacing before reaching for a divider
+// - tighter line-height and negative tracking on display type; balanced wrap
+// - tabular-nums on every metric
+// - entrance motion only on first load, ease-out, never from scale 0
+// - visible :focus-visible rings on every interactive element
+// - list values render as chips instead of dot-separated runs, so a group can
+//   be scanned instead of read
+@mixin styles() {
+  // Self-hosted so the page renders identically on networks that block font
+  // CDNs, and so there is no swap on first paint. See scripts/fonts/README.md
+  // for the subset and how to regenerate it.
+  @font-face {
+    font-family: "Pretendard Portfolio";
+    src: url("/static/fonts/pretendard-variable-subset.woff2") format("woff2-variations");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Space Grotesk Portfolio";
+    src: url("/static/fonts/space-grotesk-variable.woff2") format("woff2-variations");
+    font-weight: 300 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html:has(> body[data-slug="portfolio-it"]) {
+      scroll-behavior: smooth;
+    }
+  }
+
+  .page:has(> #quartz-body[data-unlisted="true"]) {
+    max-width: none;
+  }
+
+  .page > #quartz-body[data-unlisted="true"] {
+    background: #fafaf8;
+
+    .center {
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      background: #fafaf8;
+    }
+
+    article.portfolio-shell {
+      --pf-max: 1180px;
+      --pf-gut: clamp(20px, 5vw, 64px);
+      --pf-bar-h: 3.5rem;
+      // Literal values, not theme variables: this page is light only, so a
+      // reader who left the blog in dark mode still sees the intended design.
+      --pf-page: #fafaf8;
+      --pf-ink: #1a1d17;
+      --pf-body: #33362f;
+      --pf-mute: #5f6259;
+      --pf-line: #e3e4df;
+      --pf-accent: #4f5e3c;
+      --pf-tint: rgb(79 94 60 / 12%);
+      --pf-card: #ffffff;
+      --pf-surface: #f4f5f0;
+      --pf-shadow: 0 1px 2px rgb(0 0 0 / 4%), 0 8px 24px -12px rgb(0 0 0 / 10%);
+      --pf-shadow-lift: 0 1px 2px rgb(0 0 0 / 5%), 0 18px 40px -18px rgb(0 0 0 / 16%);
+      // Type system for this page only; both faces are self-hosted above.
+      //   Pretendard    — Korean and Latin UI, body copy. Variable 100–900.
+      //   Space Grotesk — Latin display: product names and metric figures.
+      // Both fall back to the site's Noto Sans KR stack.
+      --pf-sans: "Pretendard Portfolio", var(--bodyFont);
+      --pf-display: var(--pf-sans);
+      --pf-latin: "Space Grotesk Portfolio", var(--pf-sans);
+      --pf-mono: "IBM Plex Mono", var(--pf-sans);
+
+      max-width: none;
+      margin: 0;
+      background: var(--pf-page);
+      color-scheme: light;
+      font-family: var(--pf-sans);
+      font-size: 16px;
+      line-height: 1.7;
+      letter-spacing: -0.005em;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+
+      // Two globals leak into this page: `header { display: flex; margin: 2rem 0 }`
+      // from Header.tsx and `article { max-width: 680px }` from the blog reading
+      // column. Neutralise both here, then opt back in per component.
+      :is(h1, h2, h3, h4, p, ul, ol, li, figure, blockquote) {
+        margin: 0;
+        padding: 0;
+      }
+
+      :is(article, section, header, footer, main, div) {
+        max-width: none;
+      }
+
+      :is(header, footer, main, section, article) {
+        margin: 0;
+        padding: 0;
+        gap: 0;
+      }
+
+      ul,
+      ol {
+        list-style: none;
+      }
+
+      a {
+        text-decoration: none;
+        border-bottom: 0;
+      }
+
+      a:focus-visible,
+      [tabindex]:focus-visible {
+        outline: 2px solid var(--pf-accent);
+        outline-offset: 3px;
+        border-radius: 3px;
+      }
+
+      [id] {
+        scroll-margin-top: calc(var(--pf-bar-h) + 1.5rem);
+      }
+
+      // A thin separator that reads more clearly than a middle dot.
+      i:not([class]) {
+        margin: 0 0.5em;
+        font-style: normal;
+        color: color-mix(in oklab, var(--pf-mute) 45%, transparent);
+      }
+
+      // ----------------------------------------------------------- sticky bar
+      .pf-bar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: color-mix(in oklab, var(--pf-page) 82%, transparent);
+        backdrop-filter: saturate(150%) blur(10px);
+        -webkit-backdrop-filter: saturate(150%) blur(10px);
+      }
+
+      .pf-bar-in {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        max-width: var(--pf-max);
+        height: var(--pf-bar-h);
+        margin: 0 auto;
+        padding: 0 var(--pf-gut);
+      }
+
+      .pf-bar-id {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        color: var(--pf-ink);
+        font-weight: 400;
+
+        b {
+          font-family: var(--pf-display);
+          font-size: 0.95rem;
+          font-weight: 700;
+          letter-spacing: -0.02em;
+        }
+
+        span {
+          font-family: var(--pf-mono);
+          font-size: 0.68rem;
+          letter-spacing: 0.02em;
+          color: var(--pf-mute);
+        }
+      }
+
+      .pf-bar-nav {
+        display: flex;
+        gap: 1.1rem;
+
+        a {
+          color: var(--pf-mute);
+          font-size: 0.8rem;
+          font-weight: 400;
+          transition: color 0.15s ease;
+
+          &:hover {
+            color: var(--pf-ink);
+          }
+        }
+      }
+
+      // ----------------------------------------------------------------- hero
+      .pf-hero {
+        display: flex;
+        align-items: center;
+        min-height: calc(100vh - var(--pf-bar-h));
+        min-height: calc(100svh - var(--pf-bar-h));
+        padding: clamp(1.5rem, 3.5vh, 3rem) 0 clamp(1rem, 2.5vh, 2rem);
+        background:
+          radial-gradient(
+            120% 80% at 8% -10%,
+            color-mix(in oklab, var(--pf-accent) 9%, transparent),
+            transparent 60%
+          ),
+          radial-gradient(
+            90% 60% at 100% 0%,
+            color-mix(in oklab, var(--pf-accent) 5%, transparent),
+            transparent 55%
+          );
+      }
+
+      .pf-hero-in {
+        width: 100%;
+        max-width: var(--pf-max);
+        margin: 0 auto;
+        padding: 0 var(--pf-gut);
+      }
+
+      // Korean sits here now, so the wide uppercase tracking is dropped.
+      .pf-eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        font-family: var(--pf-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.01em;
+        color: var(--pf-mute);
+      }
+
+      .pf-dot {
+        width: 0.38rem;
+        height: 0.38rem;
+        border-radius: 50%;
+        background: var(--pf-accent);
+      }
+
+      h1.pf-display {
+        margin-top: clamp(0.9rem, 2.2vh, 1.4rem);
+        font-family: var(--pf-display);
+        font-size: clamp(1.8rem, 4vw, 3.05rem);
+        font-weight: 700;
+        line-height: 1.24;
+        letter-spacing: -0.04em;
+        color: var(--pf-ink);
+        text-wrap: balance;
+      }
+
+      // Marker underline on the two phrases that map to the evidence cards.
+      // Overrides the blog's `article em { background }`.
+      .pf-hl {
+        padding: 0;
+        border-radius: 0;
+        background: linear-gradient(
+          to top,
+          color-mix(in oklab, var(--pf-accent) 24%, transparent) 0.34em,
+          transparent 0.34em
+        );
+        font-style: normal;
+        font-weight: inherit;
+      }
+
+      .pf-deck {
+        max-width: 30em;
+        margin-top: clamp(0.9rem, 2vh, 1.25rem);
+        font-size: clamp(0.98rem, 1.2vw, 1.09rem);
+        line-height: 1.75;
+        color: var(--pf-body);
+        text-wrap: pretty;
+      }
+
+      .pf-caps {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: clamp(1rem, 2.4vh, 1.8rem);
+
+        li {
+          padding: 0.4rem 0.9rem;
+          border: 1px solid var(--pf-line);
+          border-radius: 999px;
+          background: var(--pf-card);
+          font-size: 0.85rem;
+          font-weight: 600;
+          letter-spacing: -0.015em;
+          color: var(--pf-ink);
+        }
+      }
+
+      // ------------------------------------------------------- evidence cards
+      .pf-ev {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+        margin-top: clamp(1.2rem, 3vh, 2.4rem);
+      }
+
+      .pf-ev-card {
+        position: relative;
+        padding: 1.35rem 1.5rem 1.2rem;
+        border: 1px solid var(--pf-line);
+        border-radius: 14px;
+        background: var(--pf-card);
+        box-shadow: var(--pf-shadow);
+        transition:
+          transform 0.18s ease-out,
+          box-shadow 0.18s ease-out,
+          border-color 0.18s ease-out;
+
+        &:hover,
+        &:focus-within {
+          transform: translateY(-3px);
+          border-color: color-mix(in oklab, var(--pf-accent) 45%, var(--pf-line));
+          box-shadow: var(--pf-shadow-lift);
+        }
+
+        &:hover .pf-ev-go::after,
+        &:focus-within .pf-ev-go::after {
+          transform: translateX(3px);
+        }
+      }
+
+      .pf-ev-tag {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        font-family: var(--pf-mono);
+        font-size: 0.66rem;
+        letter-spacing: 0.02em;
+        color: var(--pf-mute);
+
+        span {
+          padding: 0.14rem 0.45rem;
+          border-radius: 4px;
+          background: var(--pf-tint);
+          color: var(--pf-accent);
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+      }
+
+      .pf-ev-title {
+        margin-top: 0.7rem;
+        font-family: var(--pf-latin);
+        font-size: clamp(1.7rem, 2.7vw, 2.2rem);
+        font-weight: 700;
+        line-height: 1.05;
+        letter-spacing: -0.035em;
+        color: var(--pf-ink);
+      }
+
+      .pf-ev-one {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        line-height: 1.7;
+        color: var(--pf-body);
+        text-wrap: pretty;
+      }
+
+      .pf-ev-nums {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.9rem;
+        margin-top: 1.15rem;
+        padding-top: 1.05rem;
+        border-top: 1px solid var(--pf-line);
+
+        b {
+          display: block;
+          font-family: var(--pf-latin);
+          font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+          font-weight: 700;
+          line-height: 1.15;
+          letter-spacing: -0.03em;
+          font-variant-numeric: tabular-nums;
+          color: var(--pf-ink);
+          white-space: nowrap;
+        }
+
+        span {
+          display: block;
+          margin-top: 0.3rem;
+          font-size: 0.74rem;
+          line-height: 1.55;
+          color: var(--pf-mute);
+        }
+      }
+
+      .pf-ev-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 1.15rem;
+      }
+
+      .pf-ev-stack {
+        font-family: var(--pf-mono);
+        font-size: 0.68rem;
+        color: var(--pf-mute);
+      }
+
+      .pf-ev-go {
+        flex: 0 0 auto;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--pf-accent);
+
+        // Stretched link: the whole card is the target, the label is the cue.
+        &::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+        }
+
+        &:focus-visible {
+          outline: none;
+        }
+
+        &:focus-visible::before {
+          outline: 2px solid var(--pf-accent);
+          outline-offset: 3px;
+          border-radius: 14px;
+        }
+
+        &::after {
+          content: "→";
+          display: inline-block;
+          margin-left: 0.35rem;
+          transition: transform 0.18s ease-out;
+        }
+      }
+
+      .pf-cue {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.7rem;
+        min-height: 2.75rem;
+        margin-top: clamp(0.5rem, 1.6vh, 1.2rem);
+        font-family: var(--pf-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.06em;
+        color: var(--pf-mute);
+        font-weight: 400;
+
+        &:hover {
+          color: var(--pf-ink);
+        }
+
+        &:hover .pf-cue-a {
+          border-color: var(--pf-accent);
+          color: var(--pf-accent);
+          transform: translateY(2px);
+        }
+      }
+
+      .pf-cue-a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.75rem;
+        height: 1.75rem;
+        border: 1px solid var(--pf-line);
+        border-radius: 50%;
+        background: var(--pf-card);
+        color: var(--pf-mute);
+        font-size: 0.78rem;
+        font-style: normal;
+        line-height: 1;
+        transition:
+          transform 0.18s ease-out,
+          border-color 0.18s ease-out,
+          color 0.18s ease-out;
+
+        &::before {
+          content: "↓";
+        }
+      }
+
+      // -------------------------------------------------------------- shared
+      .pf-main {
+        display: block;
+        max-width: var(--pf-max);
+        margin: 0 auto;
+        padding: 0 var(--pf-gut);
+      }
+
+      .pf-idx {
+        font-family: var(--pf-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--pf-accent);
+      }
+
+      h2.pf-h {
+        margin-top: 0.7rem;
+        font-family: var(--pf-display);
+        font-size: clamp(1.5rem, 2.6vw, 2rem);
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: -0.035em;
+        color: var(--pf-ink);
+      }
+
+      .pf-lead {
+        max-width: 34em;
+        margin-top: 0.8rem;
+        font-size: 0.95rem;
+        line-height: 1.75;
+        color: var(--pf-mute);
+        text-wrap: pretty;
+
+        a {
+          color: var(--pf-accent);
+          font-weight: 600;
+          border-bottom: 1px solid color-mix(in oklab, var(--pf-accent) 35%, transparent);
+
+          &:hover {
+            color: var(--pf-ink);
+          }
+        }
+      }
+
+      .pf-li {
+        display: grid;
+        gap: 0.55rem;
+        max-width: 36em;
+
+        li {
+          position: relative;
+          padding-left: 1rem;
+          font-size: 0.94rem;
+          line-height: 1.75;
+          color: var(--pf-body);
+          text-wrap: pretty;
+
+          &::before {
+            content: "";
+            position: absolute;
+            top: 0.78rem;
+            left: 0;
+            width: 0.42rem;
+            height: 1px;
+            background: var(--pf-mute);
+          }
+        }
+      }
+
+      .pf-li--sm li {
+        font-size: 0.87rem;
+        line-height: 1.72;
+      }
+
+      // ---------------------------------------------------------- case study
+      .pf-case {
+        padding: clamp(4.5rem, 9vh, 7rem) 0 clamp(1rem, 2vh, 2rem);
+      }
+
+      .pf-case + .pf-case,
+      .pf-case + .pf-block,
+      .pf-block + .pf-block {
+        border-top: 1px solid var(--pf-line);
+      }
+
+      h2.pf-case-h {
+        margin-top: 0.7rem;
+        font-family: var(--pf-latin);
+        font-size: clamp(2.5rem, 5.6vw, 3.9rem);
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: -0.045em;
+        color: var(--pf-ink);
+      }
+
+      .pf-case-sub {
+        max-width: 40em;
+        margin-top: 1rem;
+        font-size: clamp(0.98rem, 1.2vw, 1.1rem);
+        line-height: 1.75;
+        color: var(--pf-body);
+        text-wrap: pretty;
+      }
+
+      .pf-case-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 2rem;
+        margin-top: 1.6rem;
+
+        li {
+          font-size: 0.83rem;
+          color: var(--pf-body);
+        }
+
+        li > span {
+          display: inline-block;
+          min-width: 2.6rem;
+          font-family: var(--pf-mono);
+          font-size: 0.66rem;
+          letter-spacing: 0.02em;
+          color: var(--pf-mute);
+        }
+
+        a {
+          color: var(--pf-accent);
+          font-weight: 400;
+          border-bottom: 1px solid color-mix(in oklab, var(--pf-accent) 35%, transparent);
+
+          &:hover {
+            color: var(--pf-ink);
+          }
+        }
+      }
+
+      .pf-sec {
+        display: grid;
+        grid-template-columns: 8.5rem minmax(0, 1fr);
+        gap: 0 2.5rem;
+        margin-top: clamp(2.8rem, 5vh, 4rem);
+      }
+
+      .pf-sec-k {
+        position: sticky;
+        top: calc(var(--pf-bar-h) + 1.4rem);
+        align-self: start;
+        padding-top: 0.3rem;
+        font-family: var(--pf-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.04em;
+        color: var(--pf-mute);
+
+        &::before {
+          content: "";
+          display: block;
+          width: 1.6rem;
+          height: 2px;
+          margin-bottom: 0.7rem;
+          background: var(--pf-accent);
+        }
+      }
+
+      .pf-ask {
+        margin-bottom: 1.6rem;
+        font-family: var(--pf-display);
+        font-size: clamp(1.32rem, 2.4vw, 1.9rem);
+        font-weight: 700;
+        line-height: 1.42;
+        letter-spacing: -0.035em;
+        color: var(--pf-ink);
+        text-wrap: balance;
+      }
+
+      // --------------------------------------------------------- design cards
+      .pf-dec {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+      }
+
+      .pf-dec > li {
+        padding: 1.15rem 1.2rem 1.3rem;
+        border: 1px solid var(--pf-line);
+        border-radius: 12px;
+        background: var(--pf-surface);
+      }
+
+      .pf-dec-n {
+        font-family: var(--pf-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.08em;
+        color: var(--pf-accent);
+      }
+
+      .pf-dec-t {
+        margin-top: 0.5rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        line-height: 1.5;
+        color: var(--pf-ink);
+        text-wrap: balance;
+      }
+
+      .pf-dec-d {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        line-height: 1.75;
+        color: var(--pf-body);
+        text-wrap: pretty;
+      }
+
+      // --------------------------------------------------------- attempt list
+      .pf-try {
+        display: grid;
+        gap: 1.1rem;
+      }
+
+      .pf-try > li {
+        display: grid;
+        grid-template-columns: 9.5rem minmax(0, 1fr);
+        gap: 0 1.6rem;
+        padding-left: 1.1rem;
+        border-left: 2px solid var(--pf-accent);
+      }
+
+      .pf-try > li[data-state="dropped"] {
+        border-left-color: var(--pf-line);
+      }
+
+      .pf-try-k {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--pf-ink);
+
+        em {
+          align-self: start;
+          padding: 0.1rem 0.4rem;
+          border: 1px solid transparent;
+          border-radius: 4px;
+          background: var(--pf-tint);
+          font-family: var(--pf-mono);
+          font-size: 0.62rem;
+          font-style: normal;
+          font-weight: 400;
+          letter-spacing: 0.06em;
+          color: var(--pf-accent);
+        }
+      }
+
+      .pf-try > li[data-state="dropped"] .pf-try-k {
+        color: var(--pf-mute);
+
+        em {
+          border-color: var(--pf-line);
+          background: transparent;
+          color: var(--pf-mute);
+        }
+      }
+
+      .pf-try-d {
+        font-size: 0.89rem;
+        line-height: 1.78;
+        color: var(--pf-body);
+        text-wrap: pretty;
+      }
+
+      // ---------------------------------------------------------------- flow
+      .pf-flow {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 1.2rem 1.1rem;
+      }
+
+      .pf-flow > li {
+        position: relative;
+        padding-top: 0.8rem;
+        border-top: 2px solid var(--pf-accent);
+
+        &::after {
+          content: "→";
+          position: absolute;
+          top: 0.5rem;
+          right: -0.88rem;
+          width: 0.7rem;
+          font-size: 0.72rem;
+          line-height: 1;
+          text-align: center;
+          color: var(--pf-mute);
+        }
+
+        &:last-child::after {
+          content: none;
+        }
+
+        > b {
+          display: block;
+          font-family: var(--pf-mono);
+          font-size: 0.64rem;
+          font-weight: 400;
+          letter-spacing: 0.06em;
+          color: var(--pf-mute);
+        }
+      }
+
+      .pf-flow > li[data-zone="in"] {
+        border-top-color: var(--pf-line);
+      }
+
+      .pf-flow > li[data-zone="ai"] {
+        border-top-style: dashed;
+      }
+
+      .pf-fl-t {
+        display: block;
+        margin: 0.3rem 0 0.35rem;
+        font-size: 0.92rem;
+        font-weight: 600;
+        line-height: 1.45;
+        color: var(--pf-ink);
+      }
+
+      .pf-fl-d {
+        display: block;
+        font-size: 0.79rem;
+        line-height: 1.65;
+        color: var(--pf-mute);
+      }
+
+      .pf-key {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem 1.5rem;
+        margin-top: 1.3rem;
+        font-size: 0.76rem;
+        color: var(--pf-mute);
+
+        > span {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          &::before {
+            content: "";
+            width: 1.4rem;
+            height: 0;
+            border-top: 2px solid var(--pf-accent);
+          }
+        }
+      }
+
+      .pf-key-ai::before {
+        border-top-style: dashed;
+      }
+
+      // -------------------------------------------------------------- metrics
+      .pf-met {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+
+        > li {
+          padding: 1.15rem 1.2rem 1.25rem;
+          border: 1px solid var(--pf-line);
+          border-radius: 12px;
+          background: var(--pf-card);
+          box-shadow: var(--pf-shadow);
+        }
+
+        b {
+          display: block;
+          font-family: var(--pf-latin);
+          font-size: clamp(1.45rem, 2.4vw, 1.95rem);
+          font-weight: 700;
+          line-height: 1.15;
+          letter-spacing: -0.035em;
+          font-variant-numeric: tabular-nums;
+          color: var(--pf-ink);
+        }
+
+        code {
+          padding: 0;
+          border: 0;
+          background: transparent;
+          font-size: 0.95em;
+        }
+      }
+
+      .pf-met-t {
+        display: block;
+        margin-top: 0.6rem;
+        font-size: 0.85rem;
+        line-height: 1.6;
+        color: var(--pf-body);
+      }
+
+      .pf-met-d {
+        display: block;
+        margin-top: 0.35rem;
+        font-size: 0.76rem;
+        line-height: 1.6;
+        color: var(--pf-mute);
+      }
+
+      // A footnote, not body copy: one tier down and set off from the metrics.
+      .pf-note {
+        max-width: 46em;
+        margin-top: 1.6rem;
+        padding-left: 0.9rem;
+        border-left: 1px solid var(--pf-line);
+        font-size: 0.78rem;
+        line-height: 1.8;
+        color: color-mix(in oklab, var(--pf-mute) 85%, transparent);
+        text-wrap: pretty;
+
+        > span {
+          display: block;
+          margin-bottom: 0.2rem;
+          font-family: var(--pf-mono);
+          font-size: 0.62rem;
+          letter-spacing: 0.04em;
+          color: var(--pf-mute);
+        }
+      }
+
+      // --------------------------------------------------------------- blocks
+      .pf-block {
+        padding: clamp(4.5rem, 9vh, 7rem) 0 clamp(1rem, 2vh, 2rem);
+      }
+
+      .pf-block-h {
+        margin-bottom: 2.4rem;
+      }
+
+      // ------------------------------------------------- grouped sub-sections
+      .pf-group + .pf-group {
+        margin-top: 3rem;
+      }
+
+      .pf-group-k,
+      .pf-found-k {
+        margin-bottom: 1.1rem;
+        padding-bottom: 0.6rem;
+        border-bottom: 1px solid var(--pf-line);
+        font-size: 0.9rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--pf-ink);
+      }
+
+      // --------------------------------------------------- team project cards
+      .pf-grid2 {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.6rem;
+
+        > li {
+          padding: 1.5rem 1.6rem 1.6rem;
+          border: 1px solid var(--pf-line);
+          border-radius: 14px;
+          background: var(--pf-card);
+          box-shadow: var(--pf-shadow);
+        }
+      }
+
+      .pf-mini-m {
+        font-family: var(--pf-mono);
+        font-size: 0.66rem;
+        line-height: 1.6;
+        color: var(--pf-mute);
+      }
+
+      h3.pf-mini-t {
+        margin-top: 0.5rem;
+        font-family: var(--pf-latin);
+        font-size: 1.6rem;
+        font-weight: 700;
+        line-height: 1.1;
+        letter-spacing: -0.035em;
+        color: var(--pf-ink);
+      }
+
+      .pf-mini-o {
+        margin: 0.4rem 0 1rem;
+        font-size: 0.9rem;
+        line-height: 1.65;
+        color: var(--pf-body);
+      }
+
+      .pf-mini-l {
+        margin-top: 1.1rem;
+        padding-top: 0.9rem;
+        border-top: 1px solid var(--pf-line);
+
+        a {
+          font-family: var(--pf-mono);
+          font-size: 0.7rem;
+          color: var(--pf-mute);
+
+          &:hover {
+            color: var(--pf-accent);
+          }
+        }
+      }
+
+      // Secondary project: same content model, one tier quieter.
+      .pf-side {
+        display: grid;
+        grid-template-columns: 16rem minmax(0, 1fr);
+        gap: 0 2.5rem;
+        margin-top: 1.6rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--pf-line);
+      }
+
+      .pf-side-m {
+        font-family: var(--pf-mono);
+        font-size: 0.64rem;
+        line-height: 1.6;
+        color: var(--pf-mute);
+      }
+
+      h3.pf-side-t {
+        margin-top: 0.35rem;
+        font-family: var(--pf-latin);
+        font-size: 1.15rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        color: var(--pf-ink);
+      }
+
+      .pf-card-l,
+      .pf-side-l {
+        margin-top: 1rem;
+        padding-top: 0.8rem;
+        border-top: 1px solid var(--pf-line);
+        font-family: var(--pf-mono);
+        font-size: 0.68rem;
+        line-height: 1.7;
+        color: var(--pf-mute);
+
+        a {
+          font-family: var(--pf-mono);
+          font-size: 0.68rem;
+          color: var(--pf-mute);
+
+          &:hover {
+            color: var(--pf-accent);
+          }
+        }
+      }
+
+      .pf-side-l {
+        margin-top: 0.55rem;
+        padding-top: 0;
+        border-top: 0;
+      }
+
+      .pf-side-o {
+        max-width: 40em;
+        font-size: 0.87rem;
+        line-height: 1.75;
+        color: var(--pf-body);
+        text-wrap: pretty;
+      }
+
+      .pf-side-n {
+        max-width: 40em;
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+        line-height: 1.7;
+        color: var(--pf-mute);
+        text-wrap: pretty;
+      }
+
+      // --------------------------------------------------------------- topics
+      .pf-topics {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.1rem;
+
+        > li {
+          padding: 1.4rem 1.5rem 1.5rem;
+          border: 1px solid var(--pf-line);
+          border-radius: 12px;
+          background: var(--pf-surface);
+        }
+      }
+
+      h3.pf-topic-t {
+        font-family: var(--pf-display);
+        font-size: 1.05rem;
+        font-weight: 700;
+        line-height: 1.4;
+        letter-spacing: -0.03em;
+        color: var(--pf-ink);
+      }
+
+      .pf-topic-d {
+        margin-top: 0.4rem;
+        font-size: 0.85rem;
+        line-height: 1.7;
+        color: var(--pf-body);
+        text-wrap: pretty;
+      }
+
+      // The posts are supporting evidence for the topic, so they sit one tier
+      // below it: smaller, muted, and only coloured on hover.
+      .pf-posts {
+        display: grid;
+        gap: 0.75rem;
+        margin-top: 1.1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--pf-line);
+
+        > li {
+          display: grid;
+          gap: 0.15rem;
+        }
+
+        a {
+          font-family: var(--pf-latin);
+          font-size: 0.84rem;
+          font-weight: 500;
+          letter-spacing: -0.015em;
+          color: var(--pf-mute);
+          transition: color 0.15s ease;
+
+          &::after {
+            content: "→";
+            display: inline-block;
+            margin-left: 0.3rem;
+            font-size: 0.85em;
+            color: var(--pf-accent);
+            opacity: 0;
+            transform: translateX(-2px);
+            transition:
+              opacity 0.15s ease,
+              transform 0.15s ease;
+          }
+
+          &:hover {
+            color: var(--pf-accent);
+          }
+
+          &:hover::after {
+            opacity: 1;
+            transform: none;
+          }
+        }
+
+        span {
+          font-size: 0.76rem;
+          line-height: 1.6;
+          color: color-mix(in oklab, var(--pf-mute) 78%, transparent);
+          text-wrap: pretty;
+        }
+      }
+
+      // ---------------------------------------------------------------- stack
+      .pf-stack {
+        display: grid;
+        gap: 0;
+        border-top: 1px solid var(--pf-line);
+
+        > li {
+          display: grid;
+          grid-template-columns: 7rem minmax(0, 1fr);
+          gap: 0 1.5rem;
+          align-items: baseline;
+          padding: 0.9rem 0;
+          border-bottom: 1px solid var(--pf-line);
+        }
+      }
+
+      .pf-stack-k {
+        font-family: var(--pf-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.02em;
+        color: var(--pf-mute);
+      }
+
+      .pf-stack-v {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+
+        span {
+          padding: 0.22rem 0.65rem;
+          border: 1px solid var(--pf-line);
+          border-radius: 6px;
+          background: var(--pf-card);
+          font-family: var(--pf-latin);
+          font-size: 0.79rem;
+          font-weight: 500;
+          letter-spacing: -0.01em;
+          color: var(--pf-body);
+        }
+      }
+
+      .pf-cards3 {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1.1rem;
+
+        > li {
+          padding: 1.25rem 1.3rem 1.35rem;
+          border: 1px solid var(--pf-line);
+          border-radius: 12px;
+          background: var(--pf-surface);
+        }
+      }
+
+      .pf-card-m {
+        font-family: var(--pf-mono);
+        font-size: 0.64rem;
+        line-height: 1.6;
+        color: var(--pf-mute);
+      }
+
+      h3.pf-card-t {
+        margin-top: 0.45rem;
+        font-family: var(--pf-display);
+        font-size: 1.02rem;
+        font-weight: 700;
+        line-height: 1.35;
+        letter-spacing: -0.03em;
+        color: var(--pf-ink);
+        text-wrap: balance;
+      }
+
+      .pf-cards3 .pf-li {
+        margin-top: 0.7rem;
+      }
+
+      // -------------------------------------------------------------- profile
+      .pf-profile {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 19rem;
+        gap: 0 3.5rem;
+        align-items: start;
+      }
+
+      .pf-profile-k,
+      .pf-sum-k {
+        font-family: var(--pf-mono);
+        font-size: 0.66rem;
+        letter-spacing: 0.04em;
+        color: var(--pf-mute);
+      }
+
+      .pf-profile-k {
+        margin-bottom: 1rem;
+      }
+
+      .pf-time {
+        display: grid;
+        margin-left: 0.3rem;
+        border-left: 1px solid var(--pf-line);
+
+        > li {
+          position: relative;
+          display: grid;
+          grid-template-columns: 10rem minmax(0, 1fr);
+          gap: 0 1.6rem;
+          padding: 0.8rem 0 0.8rem 1.7rem;
+
+          &::before {
+            content: "";
+            position: absolute;
+            top: 1.3rem;
+            left: -0.3rem;
+            width: 0.55rem;
+            height: 0.55rem;
+            border: 1px solid var(--pf-line);
+            border-radius: 50%;
+            background: var(--pf-card);
+          }
+
+          // The two running projects are the live end of the timeline.
+          &:nth-child(-n + 2)::before {
+            border-color: var(--pf-accent);
+            background: var(--pf-accent);
+          }
+        }
+      }
+
+      .pf-time-w {
+        font-family: var(--pf-mono);
+        font-size: 0.68rem;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.01em;
+        color: var(--pf-mute);
+        padding-top: 0.2rem;
+      }
+
+      .pf-time-t {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 0.2rem 0.6rem;
+        font-size: 0.92rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        color: var(--pf-ink);
+
+        span {
+          font-size: 0.74rem;
+          font-weight: 400;
+          letter-spacing: 0;
+          color: var(--pf-mute);
+        }
+      }
+
+      .pf-time-d {
+        margin-top: 0.15rem;
+        font-size: 0.82rem;
+        line-height: 1.6;
+        color: var(--pf-body);
+      }
+
+      // Everything that is not the timeline lives in one card, in priority
+      // order: 학력, 자격, 어학, 링크.
+      .pf-card-side {
+        padding: 1.4rem 1.5rem 1.5rem;
+        border: 1px solid var(--pf-line);
+        border-radius: 12px;
+        background: var(--pf-surface);
+      }
+
+      .pf-sum-g + .pf-sum-g {
+        margin-top: 1.3rem;
+        padding-top: 1.3rem;
+        border-top: 1px solid var(--pf-line);
+      }
+
+      .pf-sum-v {
+        margin-top: 0.5rem;
+        font-size: 0.98rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        color: var(--pf-ink);
+      }
+
+      .pf-sum-s {
+        margin-top: 0.25rem;
+        font-size: 0.8rem;
+        color: var(--pf-mute);
+      }
+
+      .pf-sum-l {
+        display: grid;
+        gap: 0.4rem;
+        margin-top: 0.6rem;
+
+        > li {
+          display: flex;
+          align-items: baseline;
+          justify-content: space-between;
+          gap: 1rem;
+          font-size: 0.85rem;
+          line-height: 1.5;
+        }
+
+        b {
+          font-weight: 600;
+          letter-spacing: -0.015em;
+          color: var(--pf-ink);
+        }
+
+        span {
+          flex: 0 0 auto;
+          font-family: var(--pf-mono);
+          font-size: 0.7rem;
+          font-variant-numeric: tabular-nums;
+          color: var(--pf-mute);
+        }
+      }
+
+      // The score carries as much weight as the test name, unlike a date.
+      .pf-sum-l--score span {
+        font-family: inherit;
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: -0.015em;
+        color: var(--pf-ink);
+      }
+
+      .pf-links {
+        display: grid;
+        gap: 0.45rem;
+        margin-top: 0.6rem;
+
+        a {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.55rem;
+          font-family: var(--pf-mono);
+          font-size: 0.72rem;
+          font-weight: 400;
+          letter-spacing: -0.01em;
+          color: var(--pf-body);
+          transition: color 0.15s ease;
+
+          &:hover {
+            color: var(--pf-accent);
+          }
+        }
+
+        svg {
+          width: 0.9rem;
+          height: 0.9rem;
+          flex: 0 0 auto;
+          fill: var(--pf-mute);
+        }
+
+        a:hover svg {
+          fill: var(--pf-accent);
+        }
+      }
+
+      // --------------------------------------------------------------- footer
+      .pf-foot {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1.5rem;
+        max-width: var(--pf-max);
+        margin: clamp(4rem, 8vh, 6rem) auto 0;
+        padding: 1.6rem var(--pf-gut) clamp(3rem, 6vh, 4.5rem);
+        border-top: 1px solid var(--pf-line);
+      }
+
+      .pf-foot-l {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.5rem;
+
+        a {
+          color: var(--pf-accent);
+          font-size: 0.88rem;
+          font-weight: 400;
+          border-bottom: 1px solid color-mix(in oklab, var(--pf-accent) 30%, transparent);
+
+          &:hover {
+            color: var(--pf-ink);
+          }
+        }
+      }
+
+      .pf-foot-r {
+        font-family: var(--pf-mono);
+        font-size: 0.7rem;
+        color: var(--pf-mute);
+      }
+
+      .external-icon {
+        display: none;
+      }
+    }
+  }
+
+  // ------------------------------------------------------------------ motion
+  @media (prefers-reduced-motion: no-preference) {
+    // First load only: stagger the hero in. Never from scale 0.
+    .page > #quartz-body[data-unlisted="true"] article.portfolio-shell .pf-hero-in > * {
+      animation: pf-rise 0.55s cubic-bezier(0.16, 0.84, 0.44, 1) backwards;
+    }
+
+    @for $i from 1 through 6 {
+      .page
+        > #quartz-body[data-unlisted="true"]
+        article.portfolio-shell
+        .pf-hero-in
+        > *:nth-child(#{$i}) {
+        animation-delay: #{($i - 1) * 70}ms;
+      }
+    }
+
+    // Scroll-linked reveal. Deliberately transform-only: if a browser resolves
+    // the timeline to a dead range the content stays fully readable and is only
+    // offset by a few pixels, never invisible.
+    @supports (animation-timeline: view()) {
+      .page > #quartz-body[data-unlisted="true"] article.portfolio-shell {
+        .pf-case-top,
+        .pf-sec-b,
+        .pf-block-h,
+        .pf-grid2 > li,
+        .pf-topics > li,
+        .pf-cards3 > li,
+        .pf-group-k,
+        .pf-card-side {
+          animation: pf-slide linear both;
+          animation-timeline: view();
+          animation-range: entry 5% entry 60%;
+        }
+      }
+    }
+  }
+
+  @keyframes pf-slide {
+    from {
+      transform: translateY(18px);
+    }
+
+    to {
+      transform: none;
+    }
+  }
+
+  @keyframes pf-rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  // ------------------------------------------------------------------ tablet
+  @media all and ($tablet) {
+    .page > #quartz-body[data-unlisted="true"] article.portfolio-shell {
+      .pf-dec,
+      .pf-met,
+      .pf-cards3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .pf-profile {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 2.5rem;
+      }
+
+      .pf-sec {
+        grid-template-columns: 7rem minmax(0, 1fr);
+        gap: 0 1.6rem;
+      }
+
+      .pf-side {
+        grid-template-columns: 12rem minmax(0, 1fr);
+        gap: 0 1.6rem;
+      }
+    }
+  }
+
+  // ------------------------------------------------------------------ mobile
+  @media all and ($mobile) {
+    .page > #quartz-body[data-unlisted="true"] article.portfolio-shell {
+      font-size: 15px;
+
+      .pf-bar-id {
+        flex: 0 0 auto;
+
+        span {
+          display: none;
+        }
+      }
+
+      .pf-bar-nav {
+        gap: 0.9rem;
+        overflow-x: auto;
+        // Fade the edge instead of clipping, so the scroll is legible.
+        mask-image: linear-gradient(90deg, #000 85%, transparent);
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+
+        a {
+          white-space: nowrap;
+        }
+      }
+
+      .pf-hero {
+        min-height: 0;
+        padding: 3rem 0 2.5rem;
+      }
+
+      .pf-ev,
+      .pf-dec,
+      .pf-met,
+      .pf-grid2,
+      .pf-topics,
+      .pf-cards3,
+      .pf-profile {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .pf-profile {
+        gap: 2.5rem;
+      }
+
+      .pf-sec,
+      .pf-side {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1rem;
+      }
+
+      .pf-sec-k {
+        position: static;
+        padding-top: 0;
+
+        &::before {
+          margin-bottom: 0.5rem;
+        }
+      }
+
+      .pf-flow {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1.7rem;
+      }
+
+      .pf-flow > li::after {
+        content: "↓";
+        top: auto;
+        right: auto;
+        bottom: -1.25rem;
+        left: 0;
+      }
+
+      .pf-try > li,
+      .pf-stack > li,
+      .pf-time > li {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.35rem;
+      }
+
+      .pf-try-k {
+        flex-direction: row;
+        align-items: baseline;
+        gap: 0.5rem;
+      }
+
+      .pf-foot {
+        flex-direction: column;
+        gap: 0.9rem;
+      }
+    }
+  }
+
+  // ------------------------------------------------------------------- print
+  @media print {
+    .page > #quartz-body[data-unlisted="true"] article.portfolio-shell {
+      .pf-bar,
+      .pf-cue {
+        display: none;
+      }
+
+      .pf-hero {
+        min-height: 0;
+        background: none;
+      }
+
+      .pf-case,
+      .pf-block {
+        break-inside: avoid;
+      }
+    }
+  }
+}
