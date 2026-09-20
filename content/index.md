@@ -2,6 +2,7 @@
 title: jaeunda.log
 ---
 
-Interested in **the systems behind reliable software.** <br />
-Building on Linux and database internals, with a growing focus on <br />
-runtime execution and hardware-aware performance.
+# Systems are clearest at the point they fail.
+
+Linux and database internals, followed down to the mechanism — and lately to
+how the hardware executes it.

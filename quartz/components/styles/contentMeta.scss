@@ -1,18 +1,8 @@
+// The visual treatment lives in the project layer — `.content-meta` in
+// quartz/styles/custom.scss — which sets the mono face, the tabular figures
+// and the middot separator this site uses everywhere it prints post metadata.
+// This file previously restated the same properties with slightly different
+// values and was overridden in full, so the two could drift silently.
 .content-meta {
   margin-top: 0;
-  margin-bottom: 0.65rem;
-  font-family: var(--codeFont);
-  font-size: 0.82rem;
-  line-height: 1.35;
-  color: color-mix(in oklab, var(--gray) 82%, var(--light));
-
-  &[show-comma="true"] {
-    > *:not(:last-child) {
-      margin-right: 8px;
-
-      &::after {
-        content: ",";
-      }
-    }
-  }
 }

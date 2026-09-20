@@ -1,12 +1,16 @@
 @use "sass:map";
 @use "sass:math";
 @use "./variables.scss" as *;
+@use "./fonts.scss";
 @use "./base.scss";
 @use "./readability-experiment.scss" as readability;
 @use "./portfolio.scss" as portfolio;
 
-/* Global UI scale — keep one reversible control for desktop and mobile. */
-$site-scale: 0.95;
+/* Global UI scale — keep one reversible control for desktop and mobile.
+   Held at 0.95 until 2026-09-20, which shrank every declared size by 5%: the
+   home index shipped a 15px title as 14.25px and its metadata as 9.5px. The
+   scale is now 1 and the sizes below are the real ones. */
+$site-scale: 1;
 $site-scale-inverse: math.div(1, $site-scale);
 $site-page-max-width: (map.get($breakpoints, desktop) + 300px) * $site-scale-inverse;
 $site-side-panel-width: $sidePanelWidth * $site-scale-inverse;
@@ -59,6 +63,11 @@ body {
 }
 
 /* 헤딩 */
+/* 650, not 700. Pretendard is a variable face and Hangul is a run of full-width
+   squares with no ascender rhythm to break up the ink, so a Korean heading at
+   700 sits noticeably heavier than the same weight in Latin — heavy enough
+   that, on a page whose body is 400, the headings were the only thing the eye
+   could see. 650 keeps the step and takes the weight off. */
 h1,
 h2,
 h3,
@@ -66,17 +75,18 @@ h4,
 h5,
 h6 {
   color: var(--dark);
-  font-weight: 700;
+  font-weight: 650;
   letter-spacing: -0.02em;
 }
 
 /* 타이틀 시그니처 */
 .page-title {
+  font-family: var(--wordmarkFont);
   font-weight: 600;
   font-size: 2rem;
   margin-left: 0.15em;
   letter-spacing: -0.03em;
-  color: var(--dark);
+  color: var(--tertiary);
 }
 
 /* 링크 */
@@ -92,39 +102,77 @@ a {
   border-radius: 3px;
 }
 
+// Post header. Same vocabulary as the home index: Latin display face for the
+// title, mono for the metadata line, and tags as quiet outline chips rather
+// than filled pills, so the header reads as part of one system.
 .article-title {
-  font-family: var(--headerFont);
-  font-size: clamp(28px, 3vw, 36px);
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: 0;
+  font-family: var(--displayFont);
+  font-size: clamp(30px, 3.4vw, 40px);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.032em;
   color: var(--dark);
-  margin-bottom: 0.72rem;
+  margin-bottom: 0.7rem;
+  text-wrap: balance;
 }
 
 .content-meta {
   margin-top: 0;
-  margin-bottom: 0.65rem;
+  margin-bottom: 0.7rem;
   font-family: var(--codeFont);
-  font-size: 0.82rem;
-  line-height: 1.35;
-  color: color-mix(in oklab, var(--gray) 82%, var(--light));
+  font-size: 12.5px;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: var(--gray);
+  font-variant-numeric: tabular-nums;
+
+  // `showComma: false` in quartz.layout.ts turns off contentMeta.scss's comma,
+  // which ran "Apr 19, 2026, 10 min read" — a second comma inside a date. The
+  // home index and the archive have always separated with a middot.
+  //
+  // The segments are adjacent elements with no whitespace between them, so the
+  // separator has to carry its own space on both sides; with only the leading
+  // one it set "Apr 19, 2026 ·10 min read".
+  & > *:not(:last-child)::after {
+    content: " · ";
+    white-space: pre;
+  }
 }
 
 .content-meta + .content-tags {
   margin-top: 0;
-  margin-bottom: 1.8rem;
+  margin-bottom: 2.2rem;
 }
 
-.center > .content-tags {
+// The post's topic chips. This was written as `.center > .content-tags`, but
+// the list renders inside `.page-header > .popover-hint`, so the child
+// combinator never matched and the whole block was dead: what actually painted
+// was TagList.css's `--highlight` fill, which is the exact costume
+// `.topic-chip[aria-current="true"]` wears. A post's tag looked like a filter
+// that was switched on. Outline chip, same as every other tag on the site.
+.content-tags {
   gap: 0.35rem;
 
+  // 6px, not 3px: the boxes on this site are now 10px (layer tabs, topic
+  // chips) and 12-14px (the two cards). An inline tag is the smallest member
+  // of that family, not a different one — but it keeps a tighter corner than a
+  // control, because it is a label and not something you pick from a row.
   a.internal.tag-link {
-    border-radius: 5px;
-    padding: 0.18rem 0.48rem;
+    border-radius: 6px;
+    padding: 5px 9px;
+    border: 1px solid var(--lightgray);
+    background: transparent;
     font-family: var(--codeFont);
-    font-size: 0.78rem;
-    color: var(--tertiary);
+    font-size: 11.5px;
+    letter-spacing: 0.02em;
+    // Metadata, so `--gray` — a post's tags are how it files, not what it says.
+    color: var(--gray);
+
+    &:hover {
+      border-color: var(--tertiary);
+      background: var(--highlight);
+      color: var(--tertiary);
+    }
   }
 }
 
@@ -145,10 +193,73 @@ code {
   background: var(--highlight);
 }
 
-/* 푸터 */
+/* 푸터 — footer.scss dims the whole element to `opacity: 0.7`, which took
+   --gray from 6.26:1 to roughly 4.4:1 and put the only sitewide links below the
+   contrast floor. Full opacity, and the colour carries the hierarchy instead. */
 footer {
-  font-size: 0.8rem;
+  margin-top: 3rem;
+  font-size: 0.85rem;
   color: var(--gray);
+  opacity: 1;
+
+  /* The rule is a block pseudo-element rather than the element's own
+     `border-top`, because a border is drawn on the border box: with the column
+     gutter applied here so the links line up with the text, the border ran one
+     gutter wider on each side than every other divider on the page. A block
+     child spans the content box exactly.
+
+     Scoped to the footer in the page shell. The portfolio page renders its own
+     `<footer class="pf-foot">` inside the article, and a bare `footer::before`
+     put a zero-width flex item into it — which its `justify-content:
+     space-between` and its 1.5rem gap both counted. */
+  #quartz-body > &::before {
+    content: "";
+    display: block;
+    border-top: 1px solid var(--lightgray);
+    margin-bottom: 1.5rem;
+  }
+
+  /* footer.scss pulls the list up by 1rem to sit under the colophon that used
+     to come first. The links lead now, so there is nothing above to tuck under. */
+  & > ul {
+    margin-top: 0;
+    gap: 1.25rem;
+
+    /* `--gray`, not `--darkgray`: the footer is the last thing on the page and
+       the first thing that should get out of the way. 6.26:1 on the page
+       ground, so the step down stays well clear of the contrast floor — which
+       is why `opacity: 0.7` had to go and the colour carries it instead. */
+    a {
+      color: var(--gray);
+      text-decoration: none;
+      /* 0.85rem text is a 17px target. Padding opens it past the 24px floor;
+         the negative margin keeps the row where it was. */
+      padding: 6px 0;
+      margin: -6px 0;
+      border-bottom: 1px solid transparent;
+
+      &:hover {
+        color: var(--tertiary);
+        border-bottom-color: var(--tertiary);
+      }
+    }
+  }
+}
+
+.footer-colophon {
+  margin: 1rem 0 0;
+  font-family: var(--codeFont);
+  font-size: 11.5px;
+  color: var(--gray);
+
+  a {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      color: var(--tertiary);
+    }
+  }
 }
 
 /* ============================================================
@@ -172,8 +283,10 @@ footer {
     overflow-x: hidden;
   }
 
-  /* 모바일 드로어 검색 — 닫힘 상태에서는 화면 밖, 열리면 첫 번째 컨트롤 */
-  .search {
+  /* 모바일 드로어 검색 — 닫힘 상태에서는 화면 밖, 열리면 첫 번째 컨트롤.
+     좌측 사이드바(드로어)를 걷어낸 뒤로는 적용 대상이 없다. 스코프를 좁혀
+     두지 않으면 상단 바의 검색 버튼까지 화면 밖(-100vw)으로 밀려난다. */
+  .sidebar.left .search {
     min-width: unset;
     display: block;
     position: fixed;
@@ -219,13 +332,6 @@ footer {
     flex-basis: auto !important;
   }
 
-  /* Darkmode wrapper — 드로어의 두 번째 컨트롤을 wrapper 밖에 배치 */
-  .sidebar.left .flex-component > div:has(> .darkmode) {
-    width: 0 !important;
-    flex-basis: 0 !important;
-    overflow: visible !important;
-  }
-
   /* 드로어 폭 100vw + 닫기/검색 컨트롤 아래에서 프로필 시작 */
   .sidebar.left .explorer-content {
     position: fixed !important;
@@ -234,39 +340,12 @@ footer {
     width: var(--site-viewport-width) !important;
     padding: 8.75rem var(--mobile-edge-gutter) 2rem;
   }
-
-  /* 다크모드 — 닫힘 상태에서는 화면 밖, 열리면 검색 행 오른쪽에 표시 */
-  .sidebar.left .darkmode {
-    display: flex;
-    position: fixed;
-    top: 4.5rem;
-    left: calc(0px - var(--site-viewport-width));
-    right: auto;
-    width: 32px;
-    height: 32px;
-    z-index: 102;
-    transition: left 200ms ease;
-
-    svg {
-      left: 6px;
-    }
-  }
 }
 
-/* 드로어 열림 — 검색과 다크모드 컨트롤 슬라이드 인 */
+/* 드로어 열림 — 검색 컨트롤 슬라이드 인 */
 @media all and ($mobile) {
-  html.mobile-no-scroll .sidebar.left .search,
-  html.mobile-no-scroll .sidebar.left .darkmode {
+  html.mobile-no-scroll .sidebar.left .search {
     left: var(--mobile-edge-gutter);
-  }
-
-  html.mobile-no-scroll .sidebar.left .darkmode {
-    left: calc(var(--site-viewport-width) - 3.5rem);
-  }
-
-  .sidebar.left:has(.search-container.active) .darkmode {
-    opacity: 0;
-    pointer-events: none;
   }
 }
 
@@ -281,9 +360,9 @@ article {
   line-height: 1.72;
   font-family: var(--bodyFont);
   color: var(--darkgray);
-  letter-spacing: -0.005em;
+  letter-spacing: -0.003em;
   word-break: keep-all;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   max-width: 680px;
   font-variant-numeric: proportional-nums;
 
@@ -293,10 +372,13 @@ article {
     text-wrap: pretty;
   }
 
+  /* h1 and h2 were 1.55em/700 and 1.47em/600 — a 1.3px size difference carried
+     by a whole weight step, so the chapter above a section was not bigger than
+     it, only blacker. The size does the work now and both sit at 650. */
   h1 {
     font-family: var(--headerFont);
-    font-size: 1.55em;
-    font-weight: 700;
+    font-size: 1.62em;
+    font-weight: 650;
     line-height: 1.25;
     letter-spacing: 0;
     margin-top: 0;
@@ -304,8 +386,8 @@ article {
 
   h2 {
     font-family: var(--headerFont);
-    font-size: 1.47em;
-    font-weight: 600;
+    font-size: 1.4em;
+    font-weight: 650;
     line-height: 1.28;
     letter-spacing: 0;
     margin-top: 2.7em;
@@ -327,10 +409,13 @@ article {
     letter-spacing: 0;
   }
 
+  /* h4 and h5 are set at body size, where 700 Hangul reads as a solid bar
+     rather than as a heading. 620 is enough to separate them from the
+     paragraph they sit above. */
   h4 {
     font-family: var(--bodyFont);
     font-size: 1em;
-    font-weight: 700;
+    font-weight: 620;
     line-height: 1.38;
     margin-top: 1.8em;
     margin-bottom: 0.4em;
@@ -340,7 +425,7 @@ article {
   h5 {
     font-family: var(--bodyFont);
     font-size: 0.93em;
-    font-weight: 700;
+    font-weight: 620;
     line-height: 1.4;
     margin-top: 1.8em;
     margin-bottom: 0.4em;
@@ -409,18 +494,91 @@ article {
   }
 
   pre {
-    border-radius: 8px;
-    padding: 16px 20px;
-    margin-bottom: 1.5em;
+    border-radius: 6px;
+    padding: 18px 20px;
+    margin: 1.25em 0 1.65em;
     border: 1px solid var(--lightgray);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
 
     code {
       font-family: var(--codeFont);
-      font-size: 12.5px;
-      line-height: 1.62;
+      font-size: 13.5px;
+      // Source is read line by line and indentation is structure, so it wants
+      // less leading than prose but more than it had: 1.66 on 13.5px is 22px
+      // against the 31px the paragraph above it runs at.
+      line-height: 1.72;
       background: none;
       border: none;
       padding: 0;
+    }
+  }
+
+  // Two shapes, one inset. A fence that declares a language becomes
+  // `<figure><pre data-language>`, and base.scss zeroes that `pre`'s padding
+  // and puts the real inset on the code grid's line rows — 4px at the left
+  // edge. A fence with no language is a bare `<pre>` and keeps the 18/20 above.
+  // The same block was therefore inset differently depending on whether its
+  // fence said `c`.
+  figure[data-rehype-pretty-code-figure] > pre {
+    padding: 18px 20px;
+  }
+
+  pre > code {
+    padding: 0;
+  }
+
+  pre > code > [data-line] {
+    padding: 0;
+
+    // base.scss's line numbers are a blue-gray from outside this palette.
+    // `--gray` is the token for a number that is metadata; `--lightgray` is
+    // for borders, and this is text.
+    &::before {
+      color: var(--gray);
+      margin-right: 1.15rem;
+    }
+  }
+
+  // rehype-pretty-code puts the language on the `pre`, but the `pre` scrolls
+  // horizontally, so a badge positioned inside it slides away with the code.
+  // It goes on the figure instead — which means one rule per language, since
+  // CSS cannot read an attribute off a descendant. `text` is deliberately
+  // absent: it is the absence of a language, not a language.
+  figure[data-rehype-pretty-code-figure] {
+    position: relative;
+    margin: 0;
+
+    &::before {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      font-family: var(--codeFont);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray);
+      pointer-events: none;
+    }
+
+    &:has(> pre[data-language="c"])::before {
+      content: "c";
+    }
+
+    &:has(> pre[data-language="bash"])::before {
+      content: "bash";
+    }
+
+    &:has(> pre[data-language="sql"])::before {
+      content: "sql";
+    }
+
+    // Keep the first line clear of the badge.
+    &:has(> pre[data-language="c"]) > pre,
+    &:has(> pre[data-language="bash"]) > pre,
+    &:has(> pre[data-language="sql"]) > pre {
+      padding-top: 30px;
     }
   }
 
@@ -440,28 +598,57 @@ article {
     }
   }
 
+  // These tables are schedules and state grids — two transactions against six
+  // steps, page tables, lock matrices — so they are read cell by cell down a
+  // column, not skimmed. They get rules, alignment and air rather than fills.
   table {
     width: 100%;
     max-width: 100%;
     table-layout: auto;
     border-collapse: collapse;
-    margin-bottom: 1.5em;
+    margin: 1.25em 0 1.65em;
     font-size: 0.92em;
+    line-height: 1.6;
+    font-variant-numeric: tabular-nums;
   }
 
+  // A filled header band was the only tinted box in the article besides code,
+  // and at a glance the two read as the same thing. The header is a label now,
+  // in the vocabulary the rest of the site uses for labels, over a solid rule.
   th {
-    background: var(--highlight);
-    font-weight: 600;
-    padding: 9px 14px;
+    padding: 7px 14px;
+    background: transparent;
+    font-family: var(--codeFont);
+    font-size: 0.76em;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gray);
     text-align: left;
-    border-bottom: 2px solid var(--lightgray);
-    font-size: 0.88em;
+    vertical-align: bottom;
+    border-bottom: 1.5px solid var(--darkgray);
   }
 
   td {
-    padding: 8px 14px;
+    padding: 10px 14px;
     border-bottom: 1px solid var(--lightgray);
-    font-variant-numeric: tabular-nums;
+    vertical-align: top;
+  }
+
+  // Rows alone gave a schedule no column to read down. The rule sits *between*
+  // columns only — the outer edges stay open, so the table is a grid rather
+  // than a boxed-in block — and it is half the weight of the row rules, which
+  // is what keeps a six-column table from reading as a cage.
+  th + th,
+  td + td {
+    border-left: 1px solid color-mix(in srgb, var(--lightgray) 55%, transparent);
+  }
+
+  // An empty cell in a schedule is information — it is the step where that
+  // transaction did nothing — so the column has to stay visible through it.
+  td:empty::after {
+    content: "";
+    display: inline-block;
   }
 
   td code {
@@ -472,11 +659,16 @@ article {
   tr:last-child td {
     border-bottom: none;
   }
-  tr:hover td {
-    background: var(--highlight);
+
+  // Wide grids are read across; the tint is the reader's finger on the row.
+  tbody tr:hover td {
+    background: color-mix(in srgb, var(--highlight) 60%, transparent);
   }
 
-  blockquote {
+  // `:not(.callout)` for the same reason as in readability-experiment.scss: a
+  // callout is a blockquote, and `p { margin-bottom: 0 }` would run every
+  // paragraph of a multi-paragraph callout together.
+  blockquote:not(.callout) {
     border-left: 3px solid color-mix(in oklab, var(--secondary) 42%, var(--lightgray));
     padding: 0.1em 0 0.1em 1em;
     margin: 0.2em 0 1.35em;
@@ -495,11 +687,12 @@ article {
     color: var(--dark);
   }
 
+  // Emphasis used to carry a green box. In a post that emphasises a term every
+  // other paragraph the page filled with swatches and `mark` — the one element
+  // that is meant to be highlighted — lost its meaning. Italic is the emphasis.
   em {
     font-style: italic;
-    background: var(--highlight);
-    padding: 0 0.15em;
-    border-radius: 2px;
+    color: var(--dark);
   }
 
   a {
@@ -611,7 +804,10 @@ article {
     &.depth-3 {
       padding-left: 22px;
       font-size: 11px;
-      color: var(--lightgray);
+      // `--lightgray` is for borders and faint surfaces; on text it is barely
+      // visible against the ground. A deep outline entry is metadata, so it
+      // takes the metadata colour.
+      color: var(--gray);
     }
 
     &.in-view {
@@ -743,6 +939,9 @@ article {
   }
 }
 
+// The base tag chip, inherited from the Quartz layer. `.content-tags` above
+// restates it for a post header; both are 6px now, the smallest step of the
+// site's one radius family.
 a.internal.tag-link {
   font-size: 12px;
   line-height: 1.5;
@@ -750,7 +949,7 @@ a.internal.tag-link {
   background: var(--highlight);
   color: var(--tertiary);
   border: 1px solid var(--lightgray);
-  border-radius: 4px;
+  border-radius: 6px;
   padding: 2px 9px;
   margin: 0;
   text-decoration: none;
@@ -764,825 +963,1400 @@ a.internal.tag-link {
   }
 }
 
-.tag-index-filter {
-  margin: 8px 0 34px;
-
-  .section-header {
-    margin-bottom: 12px;
-  }
-
-  .tag-index-tabs {
-    display: inline-flex;
-    gap: 4px;
-    padding: 3px;
-    margin-bottom: 16px;
-    border: 1px solid var(--lightgray);
-    border-radius: 6px;
-    background: var(--light);
-  }
-
-  .tag-index-tab {
-    border: 0;
-    border-radius: 4px;
-    background: transparent;
-    color: var(--gray);
-    cursor: pointer;
-    font-family: var(--codeFont);
-    font-size: 11.5px;
-    line-height: 1.2;
-    padding: 5px 11px;
-    transition:
-      background 0.12s,
-      color 0.12s;
-
-    &:hover {
-      color: var(--tertiary);
-    }
-
-    &.active {
-      background: var(--highlight);
-      color: var(--dark);
-    }
-  }
-
-  .tag-index-filter-groups {
-    display: grid;
-    gap: 10px;
-  }
-
-  .tag-index-filter-group {
-    display: block;
-  }
-
-  .top-tags-list {
-    gap: 7px;
-  }
-
-  .top-tag {
-    padding: 5px 9px;
-    font-size: 11.5px;
-    line-height: 1.35;
-  }
-}
-
-.tag-index-heading,
-.tag-page-title {
+// A list page's title — Posts, Topics, #database. These are chrome, not the
+// document's own name, so they sit a step below a post title (40px) rather than
+// matching it: the word "Posts" was the loudest type anywhere on the site while
+// a leaf topic was 16px and looked unrendered. This is the same step the home
+// page's featured title uses, which is this system's section-level display.
+.article-title.tag-page-title {
   display: flex;
   align-items: baseline;
   gap: 7px;
-
-  .tag-index-heading-prefix {
-    font-family: var(--codeFont);
-    font-size: 11px;
-    font-weight: 400;
-    color: var(--gray);
-  }
-
-  .tag-index-heading-label {
-    font-family: var(--headerFont);
-    font-size: 1.15rem;
-    font-weight: 600;
-    color: inherit;
-  }
-
-  .tag-index-heading-count {
-    font-family: var(--codeFont);
-    font-size: 11px;
-    font-weight: 400;
-    color: var(--gray);
-  }
-}
-
-.tag-index-heading {
-  margin-top: 2em;
-  margin-bottom: 0.55em;
-
-  a {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 7px;
-    color: var(--dark);
-    text-decoration: none;
-
-    &:hover {
-      color: var(--tertiary);
-    }
-  }
-}
-
-.article-title.tag-page-title {
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.35;
+  font-size: clamp(22px, 2.7vw, 27px);
+  font-weight: 600;
+  line-height: 1.2;
   margin-bottom: 1.35rem;
+
+  // Shown only for namespaces a reader is not already inside — `project/`,
+  // `type/`. `topic/` is the only one the site links to, so naming it would
+  // say nothing.
+  .tag-page-ns {
+    font-family: var(--codeFont);
+    font-size: 11.5px;
+    font-weight: 400;
+    color: var(--gray);
+  }
+
+  // A leaf is a tag, so it takes the `#` every tag chip on the site carries.
+  &[data-leaf="true"] .tag-page-label::before {
+    content: "#";
+    color: var(--gray);
+  }
 }
 
 .tag-posts-section {
   margin-top: 0;
 }
 
-.tag-index-sections [hidden] {
-  display: none !important;
+// ── Topics ────────────────────────────────────────────────
+// One switcher, one open panel. A strip of subjects that scrolls sideways, a
+// step button at each end, and the posts below — so the page is a chooser that
+// fits one screen rather than a nine-section scroll, and nothing about it is
+// sized to the current number of subjects.
+.topic-switcher {
+  margin-top: 4px;
 }
 
-.archive-posts-section[hidden] {
-  display: none !important;
-}
-
-.tag-index-filter [hidden] {
-  display: none !important;
-}
-
-@media all and ($mobile) {
-  .tag-index-filter {
-    .tag-index-tabs {
-      display: flex;
-      width: fit-content;
-      max-width: 100%;
-    }
-  }
-}
-
-// ============================================================
-// Home Page Redesign — 2026-05-26
-// ============================================================
-
-// ── 공통 섹션 헤더 ─────────────────────────────────────────
-.section-header {
+// The chips wrap. This was a horizontal scroller with a step button at each
+// end, which at 1440 sliced `#distribut…` against a hard edge inside a column
+// that was mostly empty below it — it read as a rendering fault, not as an
+// affordance — and at 390 spent a third of the row on two arrows to show two
+// of nine subjects. Wrapping is just as count-agnostic, needs no script, and
+// is how tags wrap everywhere else on the site.
+.topic-bar {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 14px;
-
-  .section-title {
-    font-family: var(--headerFont);
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--dark);
-    letter-spacing: -0.2px;
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-
-    // Turn 3 확정 시안 — 블로그·포트폴리오 공용 섹션 마커
-    &::before {
-      content: "";
-      display: inline-block;
-      width: 2px;
-      height: 0.85em;
-      background: var(--dark);
-      align-self: center;
-      flex: 0 0 auto;
-    }
-  }
-  .section-title-count {
-    font-family: var(--codeFont);
-    font-size: 11px;
-    font-weight: 400;
-    color: var(--gray);
-  }
-  .section-action {
-    font-size: 12px;
-    color: var(--gray);
-    text-decoration: none;
-    font-family: var(--codeFont);
-    &:hover {
-      color: var(--tertiary);
-    }
-  }
-}
-
-// ── Hero ──────────────────────────────────────────────────
-.hero {
-  margin-bottom: 40px;
-  padding-bottom: 32px;
+  align-items: center;
+  margin-bottom: 22px;
+  padding-bottom: 14px;
   border-bottom: 1px solid var(--lightgray);
-
-  .hero-greeting {
-    font-family: var(--headerFont);
-    font-size: 28px;
-    font-weight: 600;
-    color: var(--dark);
-    letter-spacing: -0.5px;
-    line-height: 1.25;
-    margin-bottom: 10px;
-    margin-top: 0;
-    border-bottom: none;
-    padding-bottom: 0;
-
-    .accent {
-      color: var(--tertiary);
-      font-style: italic;
-      font-weight: 400;
-    }
-  }
-  .hero-sub {
-    font-size: 14px;
-    line-height: 1.7;
-    color: var(--gray);
-    max-width: 540px;
-    word-break: keep-all;
-    margin-bottom: 0;
-  }
 }
 
-// ── Top Tags ──────────────────────────────────────────────
-.top-tags {
-  margin-bottom: 44px;
-
-  .top-tags-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .top-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 5px 10px;
-    font-size: 12px;
-    font-family: var(--codeFont);
-    color: var(--tertiary);
-    background: var(--highlight);
-    border: 1px solid var(--lightgray);
-    border-radius: 5px;
-    text-decoration: none;
-    transition: all 0.12s;
-    max-width: 100%;
-
-    &:hover {
-      background: rgba(154, 168, 136, 0.3);
-      color: var(--dark);
-      border-color: var(--secondary);
-    }
-
-    .top-tag-count {
-      font-size: 10.5px;
-      color: var(--gray);
-      background: var(--light);
-      padding: 1px 5px;
-      border-radius: 3px;
-      font-weight: 500;
-    }
-    &:hover .top-tag-count {
-      color: var(--tertiary);
-    }
-
-    &.active {
-      background: var(--tertiary);
-      color: var(--light);
-      border-color: var(--tertiary);
-      cursor: pointer;
-
-      .top-tag-count {
-        background: rgba(0, 0, 0, 0.15);
-        color: var(--light);
-      }
-      &:hover {
-        background: var(--dark);
-        border-color: var(--dark);
-      }
-    }
-  }
-}
-
-.sidebar-topics {
+.topic-strip {
   display: flex;
-  flex: 0 1 auto;
-  flex-direction: column;
-  margin-bottom: 0;
-
-  &.mobile-only {
-    display: none;
-
-    @media all and ($mobile) {
-      display: flex;
-    }
-  }
-
-  .section-header {
-    margin-bottom: 12px;
-  }
-
-  .section-header .section-title {
-    font-size: 18px;
-  }
-
-  .top-tags-list {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 6px;
-    max-height: none;
-    overflow: visible;
-    padding-right: 0;
-  }
-
-  // Sidebar Topics — 배경 없이 테두리만 사용하는 compact tag box
-  .top-tag {
-    display: inline-flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 6px;
-    padding: 5px 9px;
-    font-size: 11.5px;
-    line-height: 1.35;
-    color: var(--tertiary);
-    background: transparent;
-    border: 1px solid var(--lightgray);
-    border-radius: 5px;
-    width: auto;
-
-    .top-tag-label {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .top-tag-count {
-      background: transparent;
-      padding: 0;
-      font-weight: 500;
-      color: var(--gray);
-    }
-
-    &:hover {
-      background: transparent;
-      color: var(--dark);
-      border-color: var(--secondary);
-
-      .top-tag-count {
-        color: var(--tertiary);
-        background: transparent;
-      }
-    }
-
-    &.active {
-      background: transparent;
-      color: var(--tertiary);
-      border-color: var(--tertiary);
-
-      .top-tag-count {
-        background: transparent;
-        color: var(--tertiary);
-      }
-
-      &:hover {
-        background: none;
-        color: var(--dark);
-      }
-    }
-  }
-}
-
-// ── Recent Posts ──────────────────────────────────────────
-.recent-posts-section {
-  margin-bottom: 32px;
-}
-.recent-posts {
-  display: flex;
-  flex-direction: column;
-}
-
-// ── Pinned Posts (2×n card grid) ─────────────────────────
-.pinned-posts-section {
-  margin-bottom: 32px;
-}
-
-.pinned-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-// Each row: two cards side-by-side without an additional row divider
-.pin-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 20px;
-}
-
-.pin-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 6px;
-  cursor: pointer;
-
-  .pin-card-link {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-  }
-
-  .pin-card-date {
-    display: none; // shown only in mobile list mode
-  }
-
-  &:hover .pin-card-title {
-    color: var(--tertiary);
-  }
-}
-
-.pin-card-body {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex: 1 1 auto;
   min-width: 0;
 }
 
-.pin-card-title {
-  font-family: var(--headerFont);
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--dark);
-  line-height: 1.3;
-  letter-spacing: -0.1px;
-  word-break: keep-all;
-  transition: color 0.12s;
-  /* z-index 제거: div에 z-index:2를 주면 overlay(z-index:1) 위를 막아 클릭 불가 */
-}
-
-.pin-card-preview {
-  font-size: 12.5px;
-  line-height: 1.58;
-  color: var(--gray);
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  margin: 0;
-  word-break: keep-all;
-  flex: 1;
-}
-
-.pin-card-meta {
+// These are tags, so they take the tag vocabulary: outline chips, no fills
+// except on the open one.
+.topic-chip {
   display: flex;
-  align-items: center;
-  gap: 5px;
-  flex-wrap: wrap;
-  margin-top: auto;
-  padding-top: 2px;
-}
-
-.pin-card-tag {
-  font-size: 10px;
+  align-items: baseline;
+  gap: 7px;
+  flex: 0 0 auto;
+  // Only `body` carries `box-sizing: border-box` in base.scss and it does not
+  // inherit, so `min-height` was measuring the content box: a chip asking for
+  // 38px came out at 58, and the 44px phone rule made 64px chips stacked five
+  // rows deep.
+  box-sizing: border-box;
+  min-height: 38px;
+  padding: 9px 13px;
+  // The same box the home page's layer tabs are: 10px radius, the softened
+  // edge, the whisper contact shadow. These two strips are the only "pick one
+  // of a row" control on the site and they sat in two shapes — a 3px outline
+  // here, a 10px card there — on pages one click apart.
+  border: 1px solid color-mix(in srgb, var(--surface-line) 55%, transparent);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 3%);
   font-family: var(--codeFont);
-  color: var(--gray);
-  background: transparent;
-  border: 1px solid var(--lightgray);
-  border-radius: 3px;
-  padding: 1px 5px;
+  font-size: 13px;
+  color: var(--darkgray);
   text-decoration: none;
-  transition: all 0.12s;
-  position: relative;
-  z-index: 2;
+  white-space: nowrap;
+  transition:
+    transform 0.15s ease-out,
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
 
   &:hover {
-    border-color: var(--secondary);
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--tertiary) 40%, var(--surface-line));
+    box-shadow: var(--shadow);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--tertiary);
+    outline-offset: 3px;
+  }
+
+  // Accent border and accent text, no fill: `--highlight` is the hover tint
+  // everywhere else on the site, and a post's own tag chip was rendering in
+  // exactly this costume — a tag looked like a filter that was switched on.
+  // Open, so it sits flat — the same rule the layer tabs follow. A control that
+  // is switched on must not also be the thing floating highest.
+  &[aria-current="true"] {
+    transform: none;
+    border-color: var(--tertiary);
+    background: color-mix(in srgb, var(--tertiary) 8%, var(--surface));
+    box-shadow: none;
     color: var(--tertiary);
-    background: var(--highlight);
+    font-weight: 500;
   }
 }
 
-.pin-card-readtime {
-  font-size: 10px;
-  font-family: var(--codeFont);
-  color: var(--gray);
-  margin-left: auto;
+@media (prefers-reduced-motion: reduce) {
+  .topic-chip:hover {
+    transform: none;
+  }
 }
 
-.pin-card-date-full {
+.topic-chip-count {
+  font-size: 11.5px;
+  color: var(--gray);
+  font-variant-numeric: tabular-nums;
+}
+
+.topic-chip[aria-current="true"] .topic-chip-count {
+  color: inherit;
+}
+
+// `hidden` is a presentation hint that any `display` declaration overrides, and
+// the rows inside are flex.
+.topic-panel[hidden] {
   display: none;
 }
 
-// ── Pinned cards: bordered box on desktop (Turn 3 확정 시안) ─
-@media all and (min-width: 801px) {
-  .pin-card {
-    padding: 20px;
-    border: 1px solid var(--lightgray);
-    border-radius: 4px;
-    min-height: 168px;
-    transition: border-color 0.12s;
-
-    &:hover {
-      border-color: var(--tertiary);
-    }
-  }
-
-  .pin-card-date-full {
-    display: block;
-    font-family: var(--codeFont);
-    font-size: 12px;
-    color: var(--gray);
-  }
-
-  .pin-card-preview {
-    -webkit-line-clamp: 2;
+@media all and ($mobile) {
+  .topic-chip {
+    min-height: 44px;
   }
 }
 
-.post-card {
-  position: relative;
-  padding: 22px 0;
+// Posts and Topics open on a list, so the first row sits straight under the
+// title rather than behind an empty `.page-header` gap.
+.archive-posts-section > .post-rows {
+  border-top: 1px solid var(--lightgray);
+}
+
+// ── Site shell ────────────────────────────────────────────
+// A horizontal nav bar at the top of the content column, and the content. On a
+// reading page the left rail carries the outline and nothing else; the home and
+// list pages have no rail at all. The outline was a 230px *right* rail —
+// narrower than most of the headings it had to print — while this side carried
+// a profile card on every page.
+$site-rail-width: 268px;
+
+.page {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1320px;
+}
+
+// Below the desktop breakpoint the shell is a single column. Both sidebars keep
+// `grid-area: grid-sidebar-left|right` from base.scss, and a named area with no
+// slot in the template makes Grid open an *implicit* column beside the content:
+// the empty rail was holding 286px — 29% of a 1000px viewport — blank from top
+// to bottom, squeezing the column to 427px at 820px wide, and the profile card
+// inside it was placed in the fourth row, ~2000px below the fold. Name both rows
+// so nothing can be auto-placed out of the column.
+.page > #quartz-body {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "grid-header"
+    "grid-sidebar-left"
+    "grid-center"
+    "grid-sidebar-right"
+    "grid-footer";
+  column-gap: 2.5rem;
+
+  @media all and ($tablet) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media all and ($desktop) {
+    grid-template-columns: $site-rail-width minmax(0, 1fr);
+    grid-template-areas:
+      "grid-sidebar-left grid-header"
+      "grid-sidebar-left grid-center"
+      "grid-sidebar-left grid-footer";
+  }
+}
+
+// Reading pages: the outline on the left, the post taking everything else.
+// `right: []` still renders an empty wrapper, and a named `grid-area` with no
+// slot in the template makes Grid open an implicit column for it, so the row is
+// named and the wrapper is hidden.
+body:not([data-slug="index"]) {
+  .page > #quartz-body > .sidebar.right {
+    display: none;
+  }
+
+  @media all and ($desktop) {
+    .page {
+      max-width: 1200px;
+    }
+
+    .page > #quartz-body {
+      column-gap: 3rem;
+      grid-template-columns: $site-rail-width minmax(0, 1fr);
+      grid-template-areas:
+        "grid-sidebar-left grid-header"
+        "grid-sidebar-left grid-center"
+        "grid-sidebar-left grid-sidebar-right"
+        "grid-sidebar-left grid-footer";
+    }
+  }
+}
+
+// Posts and Topics are lists, not documents: no outline and no profile, so the
+// shell is the home page's — one centred column at the same measure.
+body[data-slug^="tags"] {
+  .page > #quartz-body > .sidebar.left,
+  .page > #quartz-body > .sidebar.right {
+    display: none;
+  }
+
+  @media all and ($desktop) {
+    .page {
+      max-width: 820px;
+    }
+
+    .page > #quartz-body {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        "grid-header"
+        "grid-sidebar-left"
+        "grid-center"
+        "grid-sidebar-right"
+        "grid-footer";
+    }
+
+    .page {
+      --gutter-start: 0px;
+      --gutter-end: 0px;
+    }
+  }
+}
+
+// The rail itself is a desktop device: below 1200px both sidebars are empty of
+// anything the column needs, so they come out of the flow entirely. The home
+// page keeps the identity — see `.page-header .profile-card` below, which puts
+// the same card in the column where the reading order actually reaches it.
+@media all and not ($desktop) {
+  .page > #quartz-body > .sidebar.left,
+  .page > #quartz-body > .sidebar.right {
+    display: none;
+  }
+}
+
+// With the rails gone the column inherits the whole viewport, and at 1000px a
+// paragraph ran 855px — roughly 120 characters to the line, about twice a
+// comfortable measure. Cap it and centre it: the leftover space is now even on
+// both sides instead of a blank column on the right. Phones keep full width.
+@media all and ($tablet) {
+  .page > #quartz-body > .center,
+  .page > #quartz-body > footer {
+    min-width: 0;
+    // Both are grid items, and auto margins on a grid item size it to its
+    // content instead of stretching. `.center` did not show it because its
+    // content is wider than the cap, but the footer — three links and a
+    // colophon — shrank to 380px and centred, so its rule closed the page
+    // across half the text column at every width between 800 and 1200.
+    width: 100%;
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+// ── Identity in the column (below desktop) ────────────────
+// ── The home masthead byline ──────────────────────────────
+// `ProfileCard` is mounted on index only, in the column, at every width. Its
+// own styles live in `components/styles/profileCard.inline.scss`; this is only
+// the rule that closes the masthead.
+//
+// It used to be mounted twice — the rail at desktop, the foot of the column
+// below it — so identity changed address with the viewport.
+.page-footer .profile-card {
+  padding-bottom: 26px;
+  margin-bottom: 30px;
   border-bottom: 1px solid var(--lightgray);
-  display: grid;
-  grid-template-columns: 78px 1fr;
-  gap: 24px;
-  transition: padding-left 0.18s ease;
-  cursor: pointer;
+}
 
-  &:last-child {
-    border-bottom: none;
+body[data-slug="index"] {
+  .page {
+    max-width: 1240px;
   }
-  &:hover {
-    padding-left: 8px;
-    .post-title {
-      color: var(--tertiary);
+
+  // The home page has no rail at any width — `left` is conditioned off index in
+  // quartz.layout.ts — so the shell is one centred column and the nav, the
+  // masthead, the featured post, the chips and the index all share one measure.
+  // It was a 264px rail plus a ~950px column spent on two columns of posts,
+  // which is what forced the index type down to 15/12.5px.
+  //
+  // Both empty sidebar wrappers still render, and a named `grid-area` with no
+  // slot in the template makes Grid open an implicit column for them.
+  .page > #quartz-body > .sidebar.left,
+  .page > #quartz-body > .sidebar.right {
+    display: none;
+  }
+
+  @media all and ($desktop) {
+    // One column, so the page max-width *is* the measure. 820px less the 32px
+    // `#quartz-body` gutter leaves 788px: a 96px date column and a ~672px row.
+    .page {
+      max-width: 820px;
+    }
+
+    .page > #quartz-body {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        "grid-header"
+        "grid-sidebar-left"
+        "grid-center"
+        "grid-sidebar-right"
+        "grid-footer";
+    }
+
+    // The page is already narrow; a further 48px of content gutter inside it
+    // would only shorten the measure. Mobile keeps its gutter.
+    .page {
+      --gutter-start: 0px;
+      --gutter-end: 0px;
     }
   }
+}
 
-  .post-card-link {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-  }
-  .post-title,
-  .post-tag {
-    position: relative;
-    z-index: 2;
+// The home page is sized to one screen, so the six-rem opener is too much.
+// `.page-header` sits inside `.center`, not directly under `#quartz-body`.
+.page > #quartz-body .page-header {
+  margin-top: 2rem;
+}
+
+.page > #quartz-body > .sidebar.left {
+  padding: 2rem 0 2rem;
+  height: auto;
+  gap: 0;
+}
+
+// ── Top bar ───────────────────────────────────────────────
+header:has(.site-nav) {
+  align-items: center;
+  gap: 1.5rem;
+  margin: 0 0 2rem;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--lightgray);
+
+  // search.scss gives `.search` `width: 100%`, which squeezed the nav links to
+  // one character per line, so the width is reset here as well.
+  & > .search {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+
+    & > .search-button {
+      width: auto;
+      gap: 0.5rem;
+      padding-right: 0.1rem;
+    }
   }
 }
 
-.post-date-col {
-  font-family: var(--codeFont);
-  font-size: 11px;
-  color: var(--gray);
-  padding-top: 4px;
-
-  .day {
-    display: block;
-    font-size: 20px;
-    font-weight: 500;
-    color: var(--dark);
-    line-height: 1;
-    margin-bottom: 2px;
-    font-variant-numeric: tabular-nums;
-  }
-  .month-year {
-    display: block;
-    text-transform: uppercase;
-    font-size: 10px;
-    color: var(--gray);
-    letter-spacing: 0.08em;
-  }
-}
-
-.post-content-col {
+.site-nav {
+  display: flex;
+  align-items: baseline;
+  gap: 1.75rem;
+  flex: auto;
   min-width: 0;
 }
 
-.post-title {
-  font-family: var(--headerFont);
-  font-size: 19px;
+.site-nav-mark {
+  font-family: var(--wordmarkFont);
+  font-size: 23px;
   font-weight: 600;
-  color: var(--dark);
-  line-height: 1.3;
-  letter-spacing: -0.2px;
-  margin-bottom: 8px;
+  letter-spacing: -0.03em;
+  color: var(--tertiary);
   text-decoration: none;
-  display: block;
-  word-break: keep-all;
-  transition: color 0.12s;
+  white-space: nowrap;
 }
 
-.post-preview {
-  font-size: 13.5px;
-  line-height: 1.65;
+.site-nav-links {
+  display: flex;
+  align-items: baseline;
+  gap: 1.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  flex: 0 0 auto;
+  white-space: nowrap;
+
+  a {
+    display: inline-block;
+    padding: 6px 0;
+    font-size: 15px;
+    color: var(--gray);
+    text-decoration: none;
+    border-bottom: 1.5px solid transparent;
+    transition:
+      color 0.12s ease,
+      border-color 0.12s ease;
+
+    &:hover {
+      color: var(--dark);
+    }
+
+    // `page` is the destination itself; `true` is a page inside it, such as a
+    // leaf topic under Topics. Same underline either way — the rule says where
+    // you are in the menu, and the menu has one level.
+    &[aria-current] {
+      color: var(--dark);
+      border-bottom-color: var(--tertiary);
+    }
+  }
+}
+
+// `renderPage.tsx` closes every article with an `<hr>`. Nothing needs it: the
+// home page has the profile byline's rule under it, a post has ReadNext's, a
+// list page has the footer's. Left on, it drew a second hairline 57px above
+// the next one on posts and a lone rule 100px above the footer everywhere
+// else. The footer closes the page.
+.center > hr {
+  display: none;
+}
+
+// `content/index.md` carries the masthead: an `h1` tagline and one line under
+// it. It is the page's only h1 and it is copy the author edits as content, not
+// as a string in a component.
+body[data-slug="index"] {
+}
+
+// ── Shared post row ───────────────────────────────────────
+// One row design for the home index and the archive.
+.post-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.post-row {
+  border-bottom: 1px solid var(--lightgray);
+
+  &.is-hidden {
+    display: none;
+  }
+
+  // The divider belongs between rows, not after the last one: a trailing
+  // hairline sat a hundred pixels above the footer's own rule and read as a
+  // stray second line closing nothing. `:last-child` is not enough on the home
+  // index, where the layer filter hides rows — the last *visible* row is the
+  // one with no visible row after it.
+  &:not(.is-hidden):not(:has(~ .post-row:not(.is-hidden))) {
+    border-bottom: none;
+  }
+}
+
+.post-row-link {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 20px;
+  // A negative margin pays for the inset, so the row tint reaches past the text
+  // on both sides while the text stays on the column's own left edge. Rows do
+  // not lift: twelve cards rising on a list is noise, and the one card on the
+  // page is the pick above them.
+  padding: 14px 12px;
+  margin: 0 -12px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    background: color-mix(in srgb, var(--tertiary) 4%, transparent);
+  }
+
+  &:hover .post-row-title,
+  &:focus-visible .post-row-title {
+    color: var(--tertiary);
+  }
+
+  // The arrow is the row's affordance, and it appears rather than travels: the
+  // title recolouring alone was too faint to notice from the date gutter, which
+  // sits 96px away and does not change at all.
+  &:hover .post-row-title::after,
+  &:focus-visible .post-row-title::after {
+    opacity: 1;
+    transform: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--tertiary);
+    outline-offset: 2px;
+  }
+}
+
+.post-row-date {
+  font-family: var(--codeFont);
+  font-size: 12px;
   color: var(--gray);
+  font-variant-numeric: tabular-nums;
+  padding-top: 5px;
+}
+
+.post-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.post-row-title {
+  font-family: var(--displayFont);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  color: var(--dark);
+  transition: color 0.15s ease;
+
+  &::after {
+    content: "→";
+    display: inline-block;
+    margin-left: 6px;
+    color: var(--tertiary);
+    opacity: 0;
+    transform: translateX(-3px);
+    transition:
+      opacity 0.15s ease,
+      transform 0.15s ease;
+  }
+}
+
+.post-row-desc {
+  font-size: 14px;
+  line-height: 1.62;
+  color: var(--gray);
+  word-break: keep-all;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  word-break: keep-all;
-  margin-bottom: 12px;
 }
 
-.post-meta-row {
+.post-row-meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-family: var(--codeFont);
+  font-size: 11.5px;
+  color: var(--gray);
+  font-variant-numeric: tabular-nums;
+}
+
+// ── Home ──────────────────────────────────────────────────
+.home-stack {
+  margin-bottom: 32px;
+}
+
+// The first screen. Everything below this comment exists because the home page
+// read as a filing cabinet next to the portfolio page by the same author: one
+// page that moves and one that does not. The gap was never type or colour — it
+// was that the portfolio has three planes and a lift and this had one plane and
+// colour-only hover. See **Mood** in the reference for the whole budget.
+//
+// The wash is the accent at 4–7%, sized to the opening screen and anchored to
+// the top, so it is gone by the time the reader is in the index and it never
+// sits behind body copy at a contrast that matters. `Posts` and `Topics` take a
+// weaker version; a reading page takes none.
+body[data-slug="index"] {
+  background-image:
+    radial-gradient(
+      118% 72% at 6% -10%,
+      color-mix(in oklab, var(--tertiary) 7%, transparent),
+      transparent 62%
+    ),
+    radial-gradient(
+      82% 52% at 100% -2%,
+      color-mix(in oklab, var(--tertiary) 4%, transparent),
+      transparent 58%
+    );
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: 100% clamp(440px, 62vh, 760px);
+  background-attachment: scroll;
+}
+
+body[data-slug^="tags"] {
+  background-image: radial-gradient(
+    110% 64% at 8% -12%,
+    color-mix(in oklab, var(--tertiary) 4%, transparent),
+    transparent 60%
+  );
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: 100% clamp(300px, 40vh, 520px);
+}
+
+// One entrance, ease-out, 10px of travel and never from `scale: 0` — the same
+// rule the portfolio page follows.
+//
+// It is gated on `.home-entering`, which `homeStack.inline.ts` adds once per
+// document, and that is two fixes in one class. The server-rendered page has no
+// class, so a browser that never runs the animation renders it finished rather
+// than holding it at `opacity: 0` behind a `backwards` fill. And Quartz keeps
+// one document across SPA navigation, so without the once-per-document flag a
+// reader coming back from a post watched the home page reassemble — the
+// animation punished exactly the reader who was browsing.
+//
+// Three steps, not five. The index is the point of the page and it used to wait
+// 280ms to appear; the masthead and its byline are one beat, the pick is the
+// second, the control and the list arrive together.
+@keyframes home-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  body.home-entering {
+    .center > article,
+    .page-footer .profile-card,
+    .hs-featured,
+    .hs-layers,
+    .hs-index {
+      animation: home-rise 0.5s var(--lift-ease) backwards;
+    }
+
+    .hs-featured {
+      animation-delay: 70ms;
+    }
+
+    .hs-layers,
+    .hs-index {
+      animation-delay: 140ms;
+    }
+  }
+
+  // Switching layers replaces the whole list, which used to happen in one
+  // frame: the page blinked and there was nothing to tell the reader the list
+  // they were looking at was a different one. `homeStack.inline.ts` numbers the
+  // visible rows in `--hs-i` and restarts this by re-adding the class, so the
+  // delay follows what is on screen rather than `nth-child`, which counts the
+  // hidden rows of every other layer too.
+  //
+  // The script caps `--hs-i`, because the stagger has to finish before the
+  // reader does: an uncapped ladder ran the six-row Storage tab for 490ms,
+  // which is slower than the eye that asked for it.
+  .hs-index.is-swapping .post-row:not(.is-hidden) {
+    animation: home-rise 0.3s var(--lift-ease) backwards;
+    animation-delay: calc(var(--hs-i, 0) * 24ms);
+  }
+}
+
+// ── Featured post ─────────────────────────────────────────
+// One post, and the only card on the home page.
+//
+// It was flat type closed by a `--lightgray` hairline — the *same declaration*
+// `.post-row` carries — so it was row zero set large, and the one filled plane
+// on the screen was the ASCII cover inside it, which out-weighted its own
+// parent. A reader could not see that the whole block was a single link.
+//
+// The card is the only element on this page with fill *and* radius *and*
+// shadow; the rows below stay transparent, square and unshadowed. They share a
+// left edge, so the card's padding indents its title 24px past every row title
+// — that offset is the tell that reads "one pick, then the list".
+//
+// Values are the portfolio's `.pf-ev-card`, translated to the blog's tokens:
+// 14px radius, the two-layer `--shadow`, and a 3px lift on hover.
+.hs-featured {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 22px 24px 20px;
+  margin-bottom: 32px;
+  border: 1px solid var(--lightgray);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  text-decoration: none;
+  color: inherit;
+  transition:
+    transform 0.18s ease-out,
+    box-shadow 0.18s ease-out,
+    border-color 0.18s ease-out;
+
+  // The rail script swaps this with its row in the index.
+  &.is-hidden {
+    display: none;
+  }
+
+  // `:focus-within` as well as `:hover`, like the portfolio card: a keyboard
+  // reader gets the same lift, not just the ring.
+  &:hover,
+  &:focus-within {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--tertiary) 45%, var(--lightgray));
+    box-shadow: var(--shadow-lift);
+  }
+
+  &:hover .hs-featured-title,
+  &:focus-within .hs-featured-title {
+    color: var(--tertiary);
+  }
+
+  &:hover .hs-featured-arrow,
+  &:focus-within .hs-featured-arrow {
+    transform: translateX(3px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--tertiary);
+    outline-offset: 3px;
+    border-radius: 14px;
+  }
+}
+
+// The lift is the one thing that goes; the colour and the border stay, so the
+// card still answers a pointer.
+@media (prefers-reduced-motion: reduce) {
+  .hs-featured:hover,
+  .hs-featured:focus-within {
+    transform: none;
+  }
+
+  .hs-featured-arrow {
+    transition: none;
+  }
+}
+
+// One eyebrow. The small uppercase mono label that opens a block: the featured
+// post's line, the Layers heading, Read next, Linked from. These had four
+// specs for one role — 11px/0.12em/olive, 11.5/0.14em/gray, 11.5/0.13em/gray
+// and 11.5/0.13em/gray — so the two that sit on the same screen did not match.
+// Grouped here so they cannot drift apart again. Olive is reserved for links
+// and active state; an eyebrow is metadata, so it takes `--gray` like the
+// rest of the metadata on the page.
+.hs-featured-eyebrow,
+.hs-layers-label,
+.rn-label,
+.page-footer .backlinks > h3 {
+  font-family: var(--codeFont);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--gray);
+}
+
+// The eyebrow used to be the layer alone, so the one post the author picked to
+// open the site was labelled `KERNEL` — which is where it files, not why it is
+// there. `Featured post` says what the block is; the layer follows it as
+// metadata. The dot is the one mark on the page that is purely a marker, and
+// it is the accent: this whole block is a link, which is what olive is for.
+.hs-featured-eyebrow {
   display: flex;
   align-items: center;
-  gap: 10px;
   flex-wrap: wrap;
+  gap: 4px 9px;
 }
 
-.post-tag {
-  font-size: 11px;
-  font-family: var(--codeFont);
+.hs-featured-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--tertiary);
+}
+
+.hs-featured-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--tertiary);
+}
+
+.hs-featured-layer {
+  position: relative;
+  padding-left: 11px;
   color: var(--gray);
-  background: transparent;
-  border: 1px solid var(--lightgray);
-  border-radius: 3px;
-  padding: 1px 7px;
+
+  // A separator between two runs of uppercase mono, drawn rather than typed:
+  // a literal `·` in the markup would have to be hidden from the accessibility
+  // tree by hand.
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 4px;
+    height: 1px;
+    background: currentcolor;
+  }
+}
+
+.hs-featured-title {
+  font-family: var(--displayFont);
+  font-size: clamp(22px, 2.7vw, 27px);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.028em;
+  color: var(--dark);
+  text-wrap: balance;
+  // Slower than the lift, so the colour does not land before the card moves.
+  transition: color 0.15s ease;
+}
+
+.hs-featured-desc {
+  max-width: 52ch;
+  font-size: 15px;
+  line-height: 1.66;
+  color: var(--gray);
+  word-break: keep-all;
+  text-wrap: pretty;
+}
+
+// The cover is three lines of aligned mono, so it takes the same recessed plate
+// the article's code blocks use. It has no border of its own: a framed plate
+// inside a framed card is two boxes, and against the card's white it finally
+// has a real delta to read against — on the page ground it was a stray code
+// block dropped mid-page.
+.hs-featured-cover {
+  margin: 6px 0 4px;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--reading-surface, #f2f3ed);
+  font-family: var(--codeFont);
+  font-size: 12px;
+  line-height: 1.72;
+  color: var(--darkgray);
+  white-space: pre;
+  overflow-x: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+// The length and, opposite it, the one affordance on the block, over the
+// card's own internal hairline — `--surface-line` is the lighter of the two
+// line tokens and this is what it is for: a rule *inside* a card.
+.hs-featured-foot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--surface-line);
+}
+
+.hs-featured-meta {
+  font-family: var(--codeFont);
+  font-size: 11.5px;
+  color: var(--gray);
+  font-variant-numeric: tabular-nums;
+}
+
+.hs-featured-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--codeFont);
+  font-size: 12px;
+  color: var(--tertiary);
+}
+
+.hs-featured-arrow {
+  display: inline-block;
+  font-style: normal;
+  transition: transform 0.18s ease-out;
+
+  &::before {
+    content: "→";
+  }
+}
+
+// ── Layers ────────────────────────────────────────────────
+// The layers of the request path as one axis cut into parts, not five loose
+// filters. The heading says what the control does, each tab keeps the blurb it
+// was always given in `postMeta`, and there is no `All` — the link beside the
+// heading goes everywhere, which is what `All` was doing.
+//
+// Tabs, not chips: chips are this site's tag vocabulary and these are not tags.
+//
+// They used to be borderless underline tabs, which was the last flat vocabulary
+// left on a screen that now opens with a shadowed card — it read as unfinished.
+// Each tab is its own surface now, and **the open one sits down rather than
+// floating**: hover lifts 2px onto `--shadow`, `aria-pressed` takes the accent
+// tint and border with no shadow and no transform. A pressed control is pressed.
+//
+// Three earlier legibility faults, all fixed here: the heading said `Layers`, a
+// noun that names the taxonomy without saying the thing under it can be
+// clicked; the open tab was marked only by a 2px underline across a five-column
+// grid; and the block closed with a `--lightgray` hairline 16px under tabs that
+// already ended in their own border, so the strip appeared underlined twice and
+// the second line belonged to nothing.
+.hs-layers {
+  margin-bottom: 8px;
+}
+
+.hs-layers-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.hs-layers-label {
+  margin: 0;
+}
+
+// `All 12 posts →`. The count is the one credibility number the home page never
+// printed, it is free — the component already knows it — and it stays true.
+//
+// 12px mono is a 21px-tall target, under the 24px floor. The padding opens it
+// and the matching negative margin takes the space back out of the layout, so
+// the baseline row it sits in does not move. Same device as the mobile search
+// button.
+.hs-layers-all {
+  font-family: var(--codeFont);
+  font-size: 12px;
+  color: var(--gray);
   text-decoration: none;
-  transition: all 0.12s;
+  white-space: nowrap;
+  padding: 8px 2px;
+  margin: -8px -2px;
+  transition: color 0.15s ease;
 
   &:hover {
-    border-color: var(--secondary);
     color: var(--tertiary);
-    background: var(--highlight);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--tertiary);
+    outline-offset: 2px;
+    border-radius: 4px;
   }
 }
 
-.post-readtime {
-  font-size: 11px;
-  font-family: var(--codeFont);
-  color: var(--gray);
-  margin-left: auto;
+// `auto-fit` rather than a fixed column count: a sixth layer joins the grid
+// without touching this file, and at phone width the same rule gives fewer
+// columns instead of five squeezed ones.
+.hs-layers-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(156px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
 }
 
-@media all and (min-width: 801px) and (max-width: 1100px) {
-  .post-card {
-    grid-template-columns: 64px 1fr;
-    gap: 20px;
-  }
-}
+.hs-layer {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-height: 44px;
+  padding: 10px 12px 12px;
+  // The resting edge is carried by light, not by a line. A full-strength
+  // `--surface-line` box drew five hard rectangles across the first screen and
+  // made the strip the most ruled thing on a page whose whole vocabulary is
+  // hairlines; at 55% the card is still a card and the edge stops competing
+  // with the card above it. The contact shadow does the rest of the work.
+  border: 1px solid color-mix(in srgb, var(--surface-line) 55%, transparent);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 3%);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.16s ease-out,
+    box-shadow 0.16s ease-out,
+    border-color 0.16s ease-out,
+    background-color 0.16s ease;
 
-@media all and ($mobile) {
-  .top-tags {
-    margin-bottom: 0;
-
-    .top-tags-list {
-      gap: 8px;
-    }
-
-    .top-tag {
-      padding: 7px 10px;
-      font-size: 12px;
-      overflow-wrap: anywhere;
-    }
-  }
-
-  /* 모바일 홈 Topics도 데스크톱 사이드바와 같은 compact outlined chip 사용 */
-  [data-slug="index"] .sidebar-topics .top-tag {
-    padding: 5px 9px;
-    font-size: 11.5px;
-    line-height: 1.35;
-    overflow-wrap: normal;
-  }
-
-  /* Topics → 다음 섹션 구분선: 프로필 섹션의 border-bottom과 대칭 */
-  .recent-posts-section,
-  .pinned-posts-section {
-    margin-top: 32px;
-    padding-top: 28px;
-    border-top: 1px solid var(--lightgray);
-    margin-bottom: 28px;
+  // Hover and the open state are where the edge is allowed to be definite:
+  // they are the two moments the reader is asking which box is which.
+  &:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--tertiary) 40%, var(--surface-line));
+    box-shadow: var(--shadow);
   }
 
-  // Pinned: 모바일에서는 2-col grid → 단일 컬럼 목록으로 전환
-  .pinned-grid {
-    gap: 0;
-  }
-
-  .pin-row {
-    display: contents; // 행 래퍼를 해체해 pin-card가 직접 배치되게 함
-  }
-
-  .pin-card {
-    display: grid;
-    grid-template-columns: 60px 1fr;
-    column-gap: 20px;
-    padding: 22px 0;
-    border-bottom: none;
-
-    .pin-card-date {
-      display: flex;
-      flex-direction: column;
-      font-family: var(--codeFont);
-      padding-top: 4px;
-
-      .day {
-        display: block;
-        font-size: 18px;
-        font-weight: 500;
-        color: var(--dark);
-        line-height: 1;
-        margin-bottom: 2px;
-        font-variant-numeric: tabular-nums;
-      }
-      .month-year {
-        display: block;
-        font-size: 10px;
-        color: var(--gray);
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-    }
-
-    .pin-card-title {
-      font-size: 17px;
-      line-height: 1.28;
-      margin-bottom: 6px;
-    }
-
-    .pin-card-preview {
-      font-size: 13px;
-      line-height: 1.62;
-      -webkit-line-clamp: 2;
-      margin-bottom: 10px;
-    }
-
-    .pin-card-readtime {
-      font-size: 11px;
-      width: 100%;
-      margin-left: 0;
-      margin-top: 2px;
-    }
-  }
-
-  .post-card {
-    grid-template-columns: 1fr;
-    gap: 10px;
-    padding: 26px 0;
-
-    &:hover {
-      padding-left: 0;
-    }
-  }
-
-  .post-date-col {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    padding-top: 0;
-    line-height: 1;
-
-    .day {
-      display: inline;
-      font-size: 15px;
-      margin-bottom: 0;
-    }
-
-    .month-year {
-      display: inline;
-      font-size: 10px;
-    }
-  }
-
-  .post-title {
-    font-size: 20px;
-    line-height: 1.28;
-    margin-bottom: 10px;
-  }
-
-  .post-preview {
-    font-size: 13.5px;
-    line-height: 1.62;
-    margin-bottom: 14px;
-  }
-
-  .post-meta-row {
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  .post-readtime {
-    width: 100%;
-    margin-left: 0;
-    margin-top: 2px;
-  }
-}
-
-:root[saved-theme="dark"] {
-  .top-tag.active {
+  &:hover .hs-layer-name {
     color: var(--dark);
   }
 
-  article {
-    color: #b8bdb6;
+  &:focus-visible {
+    outline: 2px solid var(--tertiary);
+    outline-offset: 3px;
+  }
 
-    blockquote,
-    blockquote p,
-    h4,
-    h5,
-    h6,
-    p code,
-    li code,
-    td code {
-      color: #b8bdb6;
+  // The open tab. Tinted, bordered in the accent, and flat on the page — it is
+  // pressed, so it must not be the thing floating highest on the screen.
+  &[aria-pressed="true"] {
+    transform: none;
+    border-color: var(--tertiary);
+    background: color-mix(in srgb, var(--tertiary) 8%, var(--surface));
+    box-shadow: none;
+  }
+
+  &[aria-pressed="true"] .hs-layer-name,
+  &[aria-pressed="true"] .hs-layer-no {
+    color: var(--tertiary);
+  }
+
+  &[aria-pressed="true"] .hs-layer-name {
+    font-weight: 600;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hs-layer:hover {
+    transform: none;
+  }
+}
+
+// The meta line: the tab's place in the order at one end, its post count at the
+// other. Both mono, both `--gray`, so the line reads as the card's label strip
+// and the name below it is the only thing competing for attention.
+.hs-layer-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+// The tab's place in the author's order. The strip is not sorted by post count
+// and never will be again (`LAYERS` in postMeta.ts is the order), so it prints
+// the number that ordering produced: `01 Kernel` is a first chapter, `Kernel`
+// on its own was one of five equal boxes.
+.hs-layer-no {
+  font-family: var(--codeFont);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--gray);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.16s ease;
+}
+
+// A full line to itself. `Storage Engine` is 14 characters and the widest label
+// the taxonomy has; it fits a 132px column at this size, which is what the meta
+// line above bought it.
+//
+// This is the page's primary control and it was set like a caption — 15px/500
+// on `--darkgray`, a step *below* the row descriptions underneath it, so the
+// five layer names read as labels on boxes rather than as the thing you are
+// meant to choose from. They take the display face now, like every other title
+// on the site: the layer ids are English by definition (`postMeta` `LAYERS`),
+// so Space Grotesk is safe here — it carries no Hangul and must never sit
+// where Korean can appear.
+.hs-layer-name {
+  font-family: var(--displayFont);
+  font-size: 15.5px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--dark);
+  text-wrap: balance;
+  transition: color 0.15s ease;
+}
+
+// At the tab's right edge, so five counts line up as a column instead of
+// trailing five names of different lengths.
+.hs-layer-count {
+  font-family: var(--codeFont);
+  font-size: 11.5px;
+  color: var(--gray);
+  font-variant-numeric: tabular-nums;
+}
+
+// Three or four words, on the tab it belongs to. It used to be one line under
+// the strip that the script rewrote on every click, so four of the five layers
+// never said what they covered.
+.hs-layer-blurb {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--gray);
+  text-wrap: pretty;
+}
+
+// Every other divider on the page is a lightgray hairline; a near-black rule
+// here read as a table header and made the list a third box on the page.
+// No border-top here either: the tabs are their own surfaces now and the card
+// above closes itself.
+.hs-index .post-rows {
+  border-top: 0;
+}
+
+.hs-index {
+  margin-top: 18px;
+}
+
+@media all and ($mobile) {
+  header:has(.site-nav) {
+    margin-bottom: 1.5rem;
+    gap: 0.9rem;
+
+    // At phone width the label and the shortcut collided with the nav links.
+    // The icon alone is enough, and ⌘K means nothing on a phone anyway.
+    //
+    // A bare 16px icon is a 16x24 target, under the 24x24 floor. The padding
+    // opens the hit area to 44x44 and the matching negative margin takes the
+    // space back out of the layout, so nothing moves.
+    & > .search > .search-button {
+      // search.scss pins the height at 1.5rem, which caps the target at 29px.
+      height: auto;
+      padding: 14px;
+      margin: -14px;
+
+      & > p,
+      & > .search-shortcut {
+        display: none;
+      }
+
+      // Quartz ships the magnifier hidden; it is the whole control here.
+      & > svg {
+        display: block;
+        width: 16px;
+        min-width: 16px;
+        height: 16px;
+        margin: 0;
+      }
     }
   }
+
+  // Three links, a wordmark and the search control do not fit on one phone
+  // line: `.site-nav-links` is `white-space: nowrap` and will not shrink, so it
+  // ran straight out of its own box and sat 18px underneath the search icon at
+  // 390px. Giving the links a full-width basis drops them to a second line, so
+  // the bar holds at any width instead of at one width and wider.
+  .site-nav {
+    gap: 0.9rem;
+    flex-wrap: wrap;
+    row-gap: 0.6rem;
+  }
+
+  .site-nav-links {
+    flex: 1 0 100%;
+    gap: 1.1rem;
+  }
+
+  // With the nav two rows tall, centring pushed the search icon to the middle
+  // of both; it belongs on the wordmark's line.
+  header:has(.site-nav) {
+    align-items: flex-start;
+
+    & > .search {
+      padding-top: 0.35rem;
+    }
+  }
+
+  // The card's inset comes in at phone width: 24px on each side of a 335px
+  // column is 14% of the measure.
+  .hs-featured {
+    padding: 18px 18px 16px;
+  }
+
+  // Same reason on the tabs — a 12px inset on each side of a 156px column costs
+  // a character of the blurb.
+  .hs-layer {
+    padding: 11px 10px 12px;
+  }
+
+  .post-row-link {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .post-row-date {
+    padding-top: 0;
+  }
+}
+
+// ── Read Next (foot of every post) ────────────────────────
+// The same row the home index and the archive use — literally the same
+// renderer now (components/PostRow.tsx), not a second one that claimed to
+// match. It used to be three bordered cards on a lifted surface: three cards
+// where the page needed one.
+//
+// It is one card now, and it is the post page's bookend. The home page opens
+// with a card and the post closes with a card and everything in between is
+// flat — that symmetry is what reads as designed, rather than as a stylesheet
+// that ran out of ideas at the bottom of the page.
+//
+// **It does not lift**, because unlike the featured card it is not a link; the
+// rows inside it are, and they carry the tint they carry everywhere else.
+.read-next {
+  max-width: 68ch;
+  margin: 56px 0 8px;
+  padding: 20px 24px 18px;
+  border: 1px solid var(--lightgray);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.rn-label {
+  margin: 0 0 6px;
+}
+
+@media all and ($mobile) {
+  .read-next {
+    padding: 18px 18px 16px;
+  }
+}
+
+// ── Post end-matter ───────────────────────────────────────
+// Backlinks and the visitor count used to be rail widgets. Reading pages have
+// no rail now, so they close the post under `ReadNext`, at the same measure and
+// in the same metadata vocabulary as the rest of the page.
+.page-footer {
+  .backlinks {
+    max-width: 68ch;
+    margin-top: 34px;
+
+    & > h3 {
+      margin: 0 0 10px;
+    }
+
+    & > ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 20px;
+      max-height: none;
+      margin: 0;
+      padding: 0;
+      overflow: visible;
+      list-style: none;
+    }
+
+    // An empty sentinel the OverflowList script uses to measure; in a flex row
+    // it is a gap at the end of the line.
+    & li.overflow-end {
+      display: none;
+    }
+
+    & li a {
+      display: inline;
+      padding: 0;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--tertiary);
+      border-bottom: 1px solid color-mix(in srgb, var(--tertiary) 35%, transparent);
+
+      &:hover {
+        color: var(--dark);
+        border-bottom-color: var(--dark);
+      }
+    }
+  }
+
+  .visitor-count {
+    max-width: 68ch;
+    margin-top: 28px;
+  }
+}
+
+// ── Compact table of contents (below desktop) ─────────────
+// Sits under the tag list, above the first heading. Closed, it is one mono line
+// that reports how many chapters are coming; open, it is the same jump list the
+// desktop rail carries. Desktop hides it — the rail is already there.
+.compact-toc {
+  // The article's first heading carries no top margin against `.page-header`,
+  // so the bar has to hold the gap itself or the two collide.
+  margin: 18px 0 26px;
+  border: 1px solid var(--lightgray);
+  border-radius: 4px;
+  background: var(--light);
+
+  @media all and ($desktop) {
+    display: none;
+  }
+
+  & > summary {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 44px; // touch target
+    padding: 0 14px;
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--codeFont);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gray);
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+  }
+
+  &[open] > summary {
+    border-bottom: 1px solid var(--lightgray);
+    color: var(--tertiary);
+  }
+}
+
+.ctoc-label {
+  color: var(--darkgray);
+}
+
+// `14` alone is a number with no unit; the summary has to say what it counts.
+.ctoc-count {
+  font-variant-numeric: tabular-nums;
+
+  &::after {
+    content: " chapters";
+  }
+}
+
+// Marks the row as a disclosure without spending a second glyph on it.
+.compact-toc > summary::after {
+  content: "+";
+  margin-left: auto;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.compact-toc[open] > summary::after {
+  content: "−";
+}
+
+.ctoc-list {
+  margin: 0;
+  padding: 10px 14px 12px;
+  list-style: none;
+
+  & > li {
+    margin: 0;
+    padding: 0;
+  }
+
+  & a {
+    display: block;
+    padding: 7px 0;
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--darkgray);
+    text-decoration: none;
+    word-break: keep-all;
+
+    &:hover {
+      color: var(--tertiary);
+    }
+  }
+}
+
+.ctoc-depth-1 > a {
+  padding-left: 14px;
+  color: var(--gray);
+}
+
+.ctoc-depth-2 > a {
+  padding-left: 28px;
+  color: var(--gray);
 }
 
 // ============================================================
 // Article Readability + Sidebar Type Vocabulary — 2026-05-27
 // ============================================================
 
+// `.toc-header h3` used to be in this group. The outline rail labels itself in
+// mono at 11px — see readability-experiment.scss — because an 18px heading at
+// the top of the rail competed with the post title beside it.
 .section-label,
 .section-header .section-title,
 .explorer-toggle h2,
-.toc-header h3,
 .graph > h3,
 .backlinks > h3 {
   font-family: var(--headerFont);
@@ -1702,84 +2476,34 @@ a.internal.tag-link {
   color: var(--gray);
   letter-spacing: 0;
 
+  // 11.5px mono is a 20px target; the same padding/negative-margin pair opens
+  // it without moving the trail.
   a {
     color: var(--tertiary);
-  }
-}
-
-// ── Home Tag Filter Interaction ────────────────────────────
-
-.active-filter {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-
-  &[hidden] {
-    display: none;
+    padding: 5px 2px;
+    margin: -5px -2px;
   }
 
-  .active-filter-label {
-    font-family: var(--codeFont);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--gray);
-  }
-
-  .active-filter-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 4px 4px 10px;
-    background: var(--highlight);
-    border: 1px solid var(--lightgray);
-    border-radius: 20px;
-  }
-
-  .active-filter-tag {
-    font-family: var(--codeFont);
-    font-size: 12px;
-    color: var(--tertiary);
-    font-weight: 500;
-  }
-  .active-filter-clear {
-    appearance: none;
-    border: none;
-    background: transparent;
-    color: var(--gray);
-    cursor: pointer;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    line-height: 1;
-    transition:
-      background 0.12s,
-      color 0.12s;
-
-    &:hover {
-      background: rgba(0, 0, 0, 0.08);
-      color: var(--dark);
-    }
-  }
-}
-
-.post-card.is-hidden {
-  display: none;
-}
-
-.recent-empty {
-  padding: 40px 0;
-  text-align: center;
-
-  p {
-    font-size: 13.5px;
-    color: var(--gray);
-    margin-bottom: 0;
+  // The post page's one borrowed mark: the short accent rule the portfolio puts
+  // above a section key (`.pf-sec-k`). A reading page gets no cards and no
+  // shadows in its body, so this is the whole of its mood alignment — it opens
+  // with the same gesture the other half of the site opens its sections with.
+  //
+  // `flex-basis: 100%` because `breadcrumbs.scss` makes this container a
+  // wrapping flex row: without it the pseudo-element is simply the row's first
+  // item and the rule sits *beside* `Home`, half a line up, instead of above
+  // the trail.
+  //
+  // The element takes the whole row and paints only its first 26px. A
+  // `max-width` would have been the obvious way to size it, and it is the wrong
+  // one: it caps the *used* width, so the item no longer fills the line and the
+  // rule ended up sitting beside `Home` rather than above the trail.
+  &::before {
+    content: "";
+    flex: 0 0 100%;
+    height: 2px;
+    margin-bottom: 2px;
+    background: linear-gradient(to right, var(--tertiary) 26px, transparent 26px);
   }
 }
 
@@ -1808,18 +2532,28 @@ html.mobile-no-scroll {
 // ── 콘텐츠 좌우 패딩 ─────────────────────────────────────────
 // box-sizing: border-box 없이 padding 추가 시 100% + padding 만큼
 // 오버플로우해 우측 사이드바와 겹침 → border-box로 총 폭 고정
-.center {
-  box-sizing: border-box;
-  padding-left: 48px;
-  padding-right: 48px;
+//
+// The gutter is a token rather than a declaration because two elements need it:
+// `.center` and the `footer` below it. `footer` is a *sibling* of `.center` in
+// the `#quartz-body` grid, not a child, so it never inherited the column's
+// padding — its rule and its links ran 48px wider than the text above them on
+// every reading page. Set the token once per breakpoint; both read it.
+.page {
+  --gutter-start: 48px;
+  --gutter-end: 48px;
 }
 
 @media all and (max-width: 1100px) {
-  .center {
-    box-sizing: border-box;
-    padding-left: 32px;
-    padding-right: 32px;
+  .page {
+    --gutter-start: 32px;
+    --gutter-end: 32px;
   }
+}
+
+.center,
+footer {
+  box-sizing: border-box;
+  padding-inline: var(--gutter-start) var(--gutter-end);
 }
 
 @media all and ($mobile) {
@@ -1828,12 +2562,14 @@ html.mobile-no-scroll {
     padding-right: var(--mobile-edge-gutter);
   }
 
+  .page {
+    --gutter-start: max(20px, env(safe-area-inset-left));
+    --gutter-end: max(20px, env(safe-area-inset-right));
+  }
+
   .center {
-    box-sizing: border-box;
     min-width: 0 !important;
     width: 100%;
-    padding-left: max(20px, env(safe-area-inset-left));
-    padding-right: max(20px, env(safe-area-inset-right));
   }
 
   /* 네비게이션 바(.sidebar.left)와 본문(.center) 좌우 시작점을 동일하게 맞춤
@@ -1861,17 +2597,47 @@ html.mobile-no-scroll {
       margin-top: 2em;
     }
 
-    pre {
+    pre,
+    figure[data-rehype-pretty-code-figure] > pre {
       margin-left: -20px;
       margin-right: -20px;
       border-radius: 0;
       border-left: 0;
       border-right: 0;
       padding: 14px 20px;
+    }
 
-      code {
-        font-size: 12px;
-        line-height: 1.6;
+    figure[data-rehype-pretty-code-figure]:has(> pre[data-language="c"]) > pre,
+    figure[data-rehype-pretty-code-figure]:has(> pre[data-language="bash"]) > pre,
+    figure[data-rehype-pretty-code-figure]:has(> pre[data-language="sql"]) > pre {
+      padding-top: 28px;
+    }
+
+    pre code {
+      font-size: 12.5px;
+      line-height: 1.7;
+    }
+
+    // These tables are state grids — two transactions against six steps, lock
+    // matrices — read cell by cell. Squeezed into a 302px column they gave
+    // each cell about 100px, which wrapped Korean to four or five syllables a
+    // line and ran one cell 181px tall. A floor on the cell width lets the
+    // table scroll as one object instead, at the same full-bleed the code
+    // blocks above already take, so the scroll gets the whole viewport.
+    .table-container {
+      margin-left: -20px;
+      margin-right: -20px;
+      padding-left: 20px;
+      padding-right: 20px;
+
+      & > table {
+        width: max-content;
+        min-width: 100%;
+
+        th,
+        td {
+          min-width: 11ch;
+        }
       }
     }
   }
@@ -1886,19 +2652,43 @@ html.mobile-no-scroll {
   }
 }
 
-// ── Home page intro (index.md article) ───────────────────
-// 기존 학과·학교 문구의 mono 스타일을 단일 소개문에 적용
+// ── Home masthead ─────────────────────────────────────────
+// `content/index.md` is the masthead, not a config dump: the mono treatment it
+// once had made the first thing a visitor read look like machine output. It is
+// an `h1` tagline and one line under it, in the body face at reading size.
+// The tagline is always English, so the title takes the Latin display face; the
+// sub-line stays on the body face because the copy can change.
 [data-slug="index"] .center > article {
-  font-family: var(--codeFont);
-  font-size: 0.875rem; // 14px: Pinned title보다 작고 preview보다 큼
-  line-height: 1.75;
-  letter-spacing: 0;
+  font-family: var(--bodyFont);
+  letter-spacing: -0.005em;
   color: var(--gray);
-  max-width: 620px;
-  margin-bottom: 32px;
+  max-width: 54ch;
+  margin-bottom: 26px;
+  word-break: keep-all;
+  text-wrap: pretty;
+
+  h1 {
+    margin: 0;
+    font-family: var(--displayFont);
+    font-size: clamp(27px, 3.4vw, 36px);
+    font-weight: 600;
+    line-height: 1.16;
+    letter-spacing: -0.032em;
+    color: var(--dark);
+    text-wrap: balance;
+  }
+
+  // rehype-autolink-headings appends an anchor to every heading, which base.scss
+  // reveals on hover. On an article that is useful; on the masthead it offers a
+  // link from the site's one statement to itself.
+  h1 > a[role="anchor"] {
+    display: none;
+  }
 
   p {
-    margin-bottom: 0.6em;
+    margin: 14px 0 0;
+    font-size: 16px;
+    line-height: 1.7;
   }
 
   strong {
@@ -1923,7 +2713,10 @@ html.mobile-no-scroll {
   [data-slug="index"] .center > article {
     width: 100%;
     max-width: 100%;
-    font-size: 12px;
+
+    p {
+      font-size: 15px;
+    }
   }
 }
 

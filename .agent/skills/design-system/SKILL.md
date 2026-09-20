@@ -18,11 +18,15 @@ the relevant files first:
 - `quartz.layout.ts`: page component placement
 - `quartz/styles/custom.scss`: project-specific CSS patterns
 - `quartz/styles/variables.scss`: breakpoints and layout constants
-- `quartz/components/Hero.tsx`: home hero
-- `quartz/components/TagCloud.tsx`: home tag chips and tag data
-- `quartz/components/RecentNotesWithPreview.tsx`: home recent-post cards
-- `quartz/components/scripts/homeFilter.inline.ts`: home tag filtering
-- `content/index.md`: home page content shell
+- `quartz/components/SiteNav.tsx`: the site's one navigation bar
+- `quartz/components/HomeStack.tsx`: the whole home page — featured, layers, index
+- `quartz/components/PostRow.tsx`: the one post row, used by every listing
+- `quartz/components/postMeta.ts`: layers, editorial rank, the date/length
+  contract
+- `quartz/styles/fonts.scss`: the type stack plus `--surface`, `--shadow`,
+  `--shadow-lift`, `--lift-ease`
+- `quartz/components/scripts/homeStack.inline.ts`: home layer filtering
+- `content/index.md`: the home masthead copy
 
 For detailed current tokens and component specs, read
 `references/design-system.md`.
@@ -40,7 +44,17 @@ For detailed current tokens and component specs, read
 5. Mobile text must never touch viewport edges. Preserve the `.center` padding
    floor of 20px on mobile.
 6. Prefer small, restrained changes that match the existing Quartz structure.
-   Do not introduce landing-page, marketing, card-heavy, or decorative styling.
+   Do not introduce landing-page or marketing styling.
+7. **Elevation is rationed, and the ration is two.** The site has exactly two
+   resting cards — the home page's featured post and the foot-of-post
+   `ReadNext` — and they are deliberately the first and last things a reader
+   sees. Everything between them is flat: rows, article body, code blocks,
+   tables, callouts. Lift on hover is cheap and allowed on controls; a new
+   _resting_ card is a design change that needs a reason and a log entry.
+8. **Motion belongs to lists and controls, never to prose.** Entrances and
+   reveals run on the home page and on lists; nothing in an article body ever
+   moves. All of it sits behind `prefers-reduced-motion: no-preference`, and no
+   animation may be the only thing that makes content visible.
 
 ## Deterministic Workflow
 
@@ -56,7 +70,10 @@ When handling a design request:
    only near the related section in `custom.scss`.
 5. For any token or pattern change, add a one-line entry to the Design Decisions
    Log in `references/design-system.md`.
-6. Validate the behavior that changed. For CSS-only changes at minimum run
+6. If the change adds or reorders posts, judge `rank` for every post in the
+   affected layer — see **Editorial Rank** in the reference. Appending is not
+   ranking.
+7. Validate the behavior that changed. For CSS-only changes at minimum run
    `git diff --check`; for build-impacting changes also run the project check or
    build command available in `package.json`.
 
@@ -67,13 +84,22 @@ When handling a design request:
   `textHighlight` cannot express the need.
 - Keep article styling under the existing `article { ... }` block in
   `custom.scss` unless the behavior is page-specific.
-- Keep home-page styles under the "Home Page Redesign" section.
-- Keep mobile drawer and content padding styles under the "Mobile Drawer Layout
-  + Content Padding" section.
-- For home interactions, preserve data attributes:
-  `data-home-tagcloud`, `data-tag`, `data-home-recent`, `data-tags`,
-  `data-recent-count`, `data-active-filter`, and `data-recent-empty`.
+- Never hardcode a shadow. `--shadow` / `--shadow-lift` in `fonts.scss` are the
+  only two, they are the portfolio's values verbatim, and anything that travels
+  uses `--lift-ease`. Travel distances are fixed: cards -3px, tabs -2px, pills
+  -1px, arrows +3px on X.
+- `custom.scss` is sectioned by banner comments. Keep home-page styles under
+  `── Home ──` / `── Featured post ──` / `── Layers ──`, the row under
+  `── Shared post row ──`, navigation under `── Top bar ──` and
+  `── Site shell ──`, and content padding under `── 콘텐츠 좌우 패딩 ──`.
+  Add new selectors beside the related section, not at the end of the file.
+- For home interactions, preserve `data-home-stack`, `data-hs-featured`,
+  `data-layer` on both the layer tabs and the post rows, and `aria-pressed` as
+  the open-tab marker. On Topics, preserve `data-topic-switcher`,
+  `data-topic-strip`, `data-topic` on chips and panels, and `aria-current`.
 - Preserve Cmd/Ctrl/Shift/middle-click default navigation on tag chips.
+- A listing that needs a post row calls `PostRow`. Do not write the row markup
+  again — it was written three times and two copies drifted.
 
 ## Output Standard
 
@@ -82,4 +108,3 @@ When reporting a design-system change, include:
 - Files changed
 - The design-system decision made
 - Validation run, or why it was not run
-

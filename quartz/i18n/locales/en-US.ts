@@ -54,7 +54,7 @@ export default {
       searchBarPlaceholder: "Search for something",
     },
     tableOfContents: {
-      title: "Table of Contents",
+      title: "Outline",
     },
     contentMeta: {
       readingTime: ({ minutes }) => `${minutes} min read`,
@@ -77,7 +77,7 @@ export default {
     },
     tagContent: {
       tag: "Tag",
-      tagIndex: "Archive",
+      tagIndex: "Posts",
       itemsUnderTag: ({ count }) =>
         count === 1 ? "1 item with this tag." : `${count} items with this tag.`,
       showingFirst: ({ count }) => `Showing first ${count} tags.`,

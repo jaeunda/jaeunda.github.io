@@ -6,10 +6,15 @@ tags:
 Date: 2026-03-01
 featured: true
 pinOrder: 5
+description: "외부에서 온 패킷 하나는 어떤 변환을 거쳐 목적지 Pod까지 도달하는가."
+layer: orchestration
+rank: 1
 ---
+
 ## 쿠버네티스에서 패킷은 어떻게 흐르는가
 
 하나의 패킷이 외부 클라이언트에서 출발해 목적지 Pod에 도달하기까지의 과정
+
 ```
 외부 클라이언트
     ↓
@@ -23,6 +28,7 @@ Service: iptables DNAT로 Pod IP로 변환
     ↓
 ( CNI 플러그인 비교: Flannel → Calico → Cilium )
 ```
+
 ## 목차
 
 1. 쿠버네티스 아키텍처
@@ -35,25 +41,34 @@ Service: iptables DNAT로 Pod IP로 변환
 ---
 
 ## 1. 쿠버네티스 아키텍처
+
 [Kubernetes - Cluster Architecture](https://kubernetes.io/docs/concepts/architecture/)
 ![[k8s-cluster-architecture.png]]
+
 - Pod
-	- 쿠버네티스에서 배포/실행의 최소 단위.
-	- 하나 이상의 컨테이너 묶음.
-	- 고유한 IP를 할당받는다.
+  - 쿠버네티스에서 배포/실행의 최소 단위.
+  - 하나 이상의 컨테이너 묶음.
+  - 고유한 IP를 할당받는다.
+
 ### Control Plane
+
 - 클러스터 전체의 상태를 관리하는 두뇌.
 - Pod 스케줄링, 상태 감시, Endpoints 갱신 등을 담당한다.
 - 직접 패킷을 처리하지는 않는다.
+
 ### Worker Node
+
 - 실제로 Pod가 실행되는 노드.
 - 각 노드에는 다음 컴포넌트가 항상 실행된다.
-	- kubelet: Control Plane의 지시를 받아 Pod를 생성/삭제하고 CNI 플러그인을 호출
-	- **kube-proxy**: iptables 룰을 관리해 Service → Pod 트래픽을 처리
-	- **CNI Plugin**: Pod 생성 시 네트워크 인터페이스(veth)를 구성하고 라우팅을 설정
+  - kubelet: Control Plane의 지시를 받아 Pod를 생성/삭제하고 CNI 플러그인을 호출
+  - **kube-proxy**: iptables 룰을 관리해 Service → Pod 트래픽을 처리
+  - **CNI Plugin**: Pod 생성 시 네트워크 인터페이스(veth)를 구성하고 라우팅을 설정
+
 ### Storage Node
+
 - 퍼시스턴트 볼륨을 제공하는 노드.
 - 네트워크 흐름과는 직접 관련이 없으므로 다루지 않는다.
+
 ## 2. 클러스터 진입 — Exposing Service
 
 - source: [Kubernetes NodePort vs LoadBalancer vs Ingress](https://medium.com/google-cloud/kubernetes-nodeport-vs-loadbalancer-vs-ingress-when-should-i-use-what-922f010849e0)
@@ -61,9 +76,9 @@ Service: iptables DNAT로 Pod IP로 변환
 ![[k8s-exposing-service.png]]
 
 - 외부 클라이언트가 클러스터 내 Service에 접근하는 방법:
-	1. **NodePort**: Service is accessed via `NodeIP:port`
-	2. **LoadBalancer**: Service is accessed via LoadBalncer
-	3. **Ingress**
+  1.  **NodePort**: Service is accessed via `NodeIP:port`
+  2.  **LoadBalancer**: Service is accessed via LoadBalncer
+  3.  **Ingress**
 
 ### 2.1. NodePort
 
@@ -78,6 +93,7 @@ Service: iptables DNAT로 Pod IP로 변환
 
 클라우드 환경에서 외부 로드 밸런서를 생성하고 고정 IP(VIP)를 부여한다. 외부 클라이언트는 이 VIP로 접근한다.
 ![[k8s-service-loadbalancer.png]]
+
 - 퍼블릭 클라우드(AWS, GCP, Azure)에서 주로 사용
 - 베어메탈 환경에서는 **MetalLB** 같은 별도 솔루션이 필요
 - Service마다 외부 IP가 하나씩 생성됨
@@ -86,6 +102,7 @@ Service: iptables DNAT로 Pod IP로 변환
 
 여러 Service 앞에 하나의 진입점을 두고, 도메인/경로 기반으로 트래픽을 라우팅한다.
 ![[k8s-service-ingress.png]]
+
 - 여러 Service를 하나의 외부 IP로 노출 가능 → LoadBalancer 대비 비용 절감
 - L7(HTTP/HTTPS) 수준의 라우팅 제공
 - Ingress는 쿠버네티스 오브젝트이고, 실제 구현은 Ingress Controller가 담당
@@ -97,15 +114,18 @@ Service를 거치면 동일하게 iptables DNAT가 동작한다.
 
 source: [Demystifying Kubernetes Service Packet Path](https://medium.com/@abhishek.amjeet/demystifying-kubernetes-services-packet-path-98297874e5f5)
 ![[k8s-iptable-chains.png]]
+
 ### 3.1. ClusterIP
 
 Service에는 **ClusterIP**라는 고정 IP가 부여된다.
 하지만 이 IP는 어떤 인터페이스에도 할당되어 있지 않은 **가상 IP**다.
+
 ```bash
 ip addr  # 어떤 노드에서 실행해도 ClusterIP는 보이지 않음
 ```
+
 - **DNAT(Destination NAT)**
-	- ClusterIP로 향하는 패킷은 커널의 **iptables**가 중간에서 가로채 목적지 IP를 실제 Pod IP로 교체한다.
+  - ClusterIP로 향하는 패킷은 커널의 **iptables**가 중간에서 가로채 목적지 IP를 실제 Pod IP로 교체한다.
 
 ### 3.2. kube-proxy
 
@@ -120,6 +140,7 @@ iptables PREROUTING (DNAT)
 ```
 
 iptables rule 구조:
+
 ```bash
 # ClusterIP로 오는 패킷을 서비스 체인으로
 -A KUBE-SERVICES -d 10.96.0.1/32 -p tcp --dport 80 -j KUBE-SVC-XXXX
@@ -132,8 +153,10 @@ iptables rule 구조:
 -A KUBE-SEP-AAAA -p tcp -j DNAT --to-destination 10.244.1.5:8080
 -A KUBE-SEP-BBBB -p tcp -j DNAT --to-destination 10.244.1.6:8080
 ```
+
 예시: [Demystifying Kubernetes Services Packet Path](https://medium.com/@abhishek.amjeet/demystifying-kubernetes-services-packet-path-98297874e5f5)
 ![[k8s-nat-table-ex.png]]
+
 ### 3.3. Pod가 교체되어도 연결이 유지되는 이유
 
 **Endpoints Controller**가 Service selector와 일치하는 살아있는 Pod 목록을 **Endpoints** 오브젝트로 관리한다. Pod가 죽거나 새로 뜨면 자동으로 갱신된다.
@@ -225,8 +248,11 @@ Node 1 (192.168.1.10)                Node 2 (192.168.1.11)
 ```
 
 ### 5.2. CNI 플러그인
+
 CNI 플러그인이 이 문제를 해결한다.
+
 #### 오버레이(Overlay)
+
 Pod 패킷을 물리 네트워크가 이해할 수 있는 패킷으로 한 번 더 감싸서(encapsulation) 전달한다.
 
 ```
@@ -238,6 +264,7 @@ Pod 패킷을 물리 네트워크가 이해할 수 있는 패킷으로 한 번 �
 ```
 
 #### 언더레이(Underlay)
+
 물리 네트워크 장비에 Pod 라우트를 직접 알려준다. encapsulation 없이 패킷이 직접 라우팅된다.
 
 ```
@@ -269,6 +296,7 @@ Pod (목적지)
 ```
 
 ---
+
 ## 6. CNI 플러그인 비교 (Flannel → Calico → Cilium)
 
 ### 6.1. Flannel: 단순한 오버레이
@@ -282,8 +310,8 @@ pod1 → veth → cni0 (bridge) → flannel.1 (VXLAN encap)
 
 - **언제 쓰는가**: 네트워크 정책이 필요 없는 소규모 클러스터, 빠르게 구성해야 하는 개발/테스트 환경
 - **한계**:
-	- 모든 노드 간 패킷에 VXLAN encap/decap 오버헤드
-	- 네트워크 정책 기능 없음
+  - 모든 노드 간 패킷에 VXLAN encap/decap 오버헤드
+  - 네트워크 정책 기능 없음
 
 ### 6.2. Calico: 라우팅 기반으로의 전환
 
@@ -315,11 +343,11 @@ Cilium:          NIC → eBPF 해시맵 조회 (O(1)) → Pod
 
 ### 6.4. 세 플러그인 비교
 
-| |Flannel|Calico|Cilium|
-|---|---|---|---|
-|노드 간 방식|VXLAN 오버레이|IP-IP 또는 BGP|VXLAN 또는 BGP|
-|핵심 기술|VXLAN|iptables + BGP|eBPF|
-|네트워크 정책|없음|있음 (Felix)|있음 (eBPF, L7까지)|
-|성능 (Pod 증가 시)|오버레이 오버헤드|iptables O(N)|eBPF O(1)|
-|kube-proxy 대체|불가|불가|가능|
-|선택 기준|소규모/단순|정책 필요|대규모/고성능|
+|                    | Flannel           | Calico         | Cilium              |
+| ------------------ | ----------------- | -------------- | ------------------- |
+| 노드 간 방식       | VXLAN 오버레이    | IP-IP 또는 BGP | VXLAN 또는 BGP      |
+| 핵심 기술          | VXLAN             | iptables + BGP | eBPF                |
+| 네트워크 정책      | 없음              | 있음 (Felix)   | 있음 (eBPF, L7까지) |
+| 성능 (Pod 증가 시) | 오버레이 오버헤드 | iptables O(N)  | eBPF O(1)           |
+| kube-proxy 대체    | 불가              | 불가           | 가능                |
+| 선택 기준          | 소규모/단순       | 정책 필요      | 대규모/고성능       |

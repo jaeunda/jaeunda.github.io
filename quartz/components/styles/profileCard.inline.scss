@@ -1,83 +1,157 @@
+@use "../../styles/variables.scss" as *;
+
+// The home masthead byline, and the only profile on the site. Reading pages
+// carry the outline in their rail instead, and the footer carries the same
+// destinations.
+//
+// Three versions of this link row have now been wrong, each for its own reason:
+//
+//   1. A label and a value per row — `github` / `github.com/jaeunda` — which,
+//      once the card became a horizontal byline, ran together as six items with
+//      no way to tell which three were clickable.
+//   2. One token per destination — `GitHub`, `Email`, `Daeun Jang` — readable,
+//      but nothing a reader could type, and one row named a person where the
+//      other two named places.
+//   3. A two-column `10ch` mono table. Three rows do not earn a table: it
+//      opened a dead gutter across the column, `code` / `work` / `mail` was a
+//      private taxonomy a reader had to decode, and three stacked underlined
+//      URLs made a link-farm texture directly under the tagline — a block
+//      physically taller than the byline it is subordinate to, spending ~130px
+//      of the first screen and pushing the writing down.
+//
+// Pills, then: the portfolio page's `.pf-caps` vocabulary, which is where this
+// site already keeps "a short row of equal things". One line instead of three,
+// every address still typable in full, and a tap target that clears 44px on a
+// phone — the mono rows were ~20px, under the accessibility floor.
+//
+// The 999px radius cannot be confused with the site's 3px tag chips, and that
+// separation is the point: a tag is a filter, these are destinations.
 .profile-card {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  padding: 0 0 24px;
-  margin-bottom: 10px;
+  gap: 10px;
+}
 
-  .profile-eyebrow {
-    font-family: var(--codeFont);
-    font-size: 0.72rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--gray);
-    margin-bottom: 4px;
+.profile-byline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 3px 10px;
+  margin: 0;
+}
+
+.profile-name {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--dark);
+}
+
+// The role sat 12px to the right of the name with nothing between them: two
+// different faces, two different sizes and two different colours, touching
+// only by adjacency, so it read as a caption that had drifted onto the wrong
+// line rather than as an apposition to the name.
+//
+// Three changes tie it down. A drawn rule connects it — the same 4×1px device
+// `.hs-featured-layer` uses for exactly this job, so the site has one way of
+// saying "and this belongs to that". It rises to 12.5px, which is the size the
+// rest of the site's mono metadata is set at. And it takes `--darkgray` rather
+// than `--gray`: it is the second half of the byline, not a footnote to it.
+.profile-role {
+  font-family: var(--codeFont);
+  font-size: 12.5px;
+  letter-spacing: 0.01em;
+  color: var(--darkgray);
+
+  // `vertical-align: middle` puts the rule at the baseline plus half the
+  // x-height, which is the optical centre of the line it is connecting. An
+  // absolutely positioned bar had to guess that offset against a span whose box
+  // is taller than its text, and landed above the cap height — it read as a
+  // macron sitting on top of the name.
+  &::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 1px;
+    margin-right: 8px;
+    vertical-align: middle;
+    background: var(--gray);
+  }
+}
+
+.profile-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+// No shadow. `.pf-caps` has none either, and a row of floating pills directly
+// above the featured card would compete with the one thing on this page that is
+// meant to be lifted.
+//
+// And one step down in the type hierarchy: `--gray` on a 70%-strength border.
+// These are not what the page is about — a reader came for the writing, and the
+// three addresses are there for the one visitor in fifty who wants them. At
+// `--darkgray` on a full border they were the second-loudest thing on the first
+// screen, competing with the masthead directly above. `--gray` is 6.26:1 on the
+// page ground, so quieter here costs no legibility, and hover still takes the
+// accent.
+.profile-link {
+  display: inline-flex;
+  align-items: center;
+  // Only `body` carries `box-sizing: border-box` in base.scss and it does not
+  // inherit, so a `min-height` here would otherwise measure the content box —
+  // the same fault that produced 64px topic chips.
+  box-sizing: border-box;
+  min-height: 34px;
+  padding: 7px 14px;
+  border: 1px solid color-mix(in srgb, var(--surface-line) 70%, transparent);
+  border-radius: 999px;
+  background: var(--surface);
+  font-family: var(--codeFont);
+  font-size: 12.5px;
+  color: var(--gray);
+  text-decoration: none;
+  transition:
+    transform 0.15s ease-out,
+    border-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--tertiary) 45%, var(--surface-line));
+    color: var(--tertiary);
   }
 
-  .profile-name {
-    font-size: 1.05rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    color: var(--dark);
-    margin-bottom: 4px;
+  &:focus-visible {
+    outline: 2px solid var(--tertiary);
+    outline-offset: 3px;
   }
+}
 
-  .profile-interest {
-    font-family: var(--codeFont);
-    font-size: 0.78rem;
-    color: var(--gray);
-    line-height: 1.7;
-    margin-bottom: 30px;
+@media (prefers-reduced-motion: reduce) {
+  .profile-link:hover {
+    transform: none;
   }
+}
 
+@media all and ($mobile) {
   .profile-links {
-    display: flex;
-    flex-direction: column;
-    margin-top: 0;
+    gap: 6px;
   }
 
-  .profile-link-row {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 7px 0;
-    border-bottom: 1px solid var(--lightgray);
-    font-family: var(--codeFont);
-    font-size: 0.78rem;
-    color: var(--gray);
-    text-decoration: none;
-    transition: color 0.12s;
-
-    &:last-child {
-      border-bottom: none;
-    }
-
-    .profile-link-value {
-      color: var(--darkgray);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    &:hover {
-      color: var(--tertiary);
-
-      .profile-link-value {
-        color: var(--tertiary);
-      }
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .profile-card:not(.explorer-profile) {
-    display: none;
-  }
-}
-
-@media (min-width: 769px) {
-  .profile-card.explorer-profile {
-    display: none;
+  // The 44px floor a thumb needs. At phone width the three pills stack, and
+  // they are meant to: `linkedin.com/in/jaeunda` is 23 monospace characters and
+  // the pair only fits a 326px column if the type drops to 11px, which is
+  // trading legibility for a wrap that one font metric would undo anyway. A
+  // stacked list of three full labels is the honest shape at this width; the
+  // row still re-forms on anything wider, including landscape.
+  .profile-link {
+    min-height: 44px;
+    padding: 7px 12px;
+    font-size: 12px;
   }
 }

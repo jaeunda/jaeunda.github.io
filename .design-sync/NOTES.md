@@ -59,7 +59,7 @@ Then: `package-build.mjs --entry .design-sync/.cache/dist/index.mjs`.
 ## Known render warns (expected — do not re-chase)
 
 - `[TOKENS_MISSING] --shiki-light, --shiki-light-bg, --shiki-dark,
-  --shiki-dark-bg` — set inline per code block by the shiki syntax highlighter
+--shiki-dark-bg` — set inline per code block by the shiki syntax highlighter
   at runtime. Correctly absent from static CSS.
 - `[RENDER_BLANK] MobileOnly`, `[RENDER_BLANK] VisitorCount` — both declare a
   `viewport` in `cfg.overrides`, and the `@dsCard` marker carries it, so the
@@ -71,11 +71,13 @@ Then: `package-build.mjs --entry .design-sync/.cache/dist/index.mjs`.
 
 ## Findings about the site itself (not sync problems)
 
-- **`PinnedPosts` renders nothing on the live site.** It is the mounted home
-  component (`quartz.layout.ts:12`) but only renders posts with
-  `featured: true` in frontmatter, and no post in `content/` sets that. The
-  preview fixture marks the four most recent featured so the card shows the
-  real 2-column grid.
+Re-checked 2026-09-20. Several earlier findings are obsolete because the
+components they described have been deleted.
+
+- **`Hero`, `TagCloud`, `RecentNotesWithPreview`, `PinnedPosts` and
+  `homeFilter.inline.ts` no longer exist.** `HomeStack` replaced all of them:
+  one featured post, the layer filter, the index. `Darkmode` is gone too — the
+  site is light only.
 - **No note-to-note links exist**, so `Backlinks` renders nothing live
   (`hideWhenEmpty` defaults true). All `[[...]]` in `content/` are image
   embeds. The fixture points two real posts at the article for the card.
@@ -84,13 +86,15 @@ Then: `package-build.mjs --entry .design-sync/.cache/dist/index.mjs`.
 - **`Comments` is not mounted** in `quartz.layout.ts` and renders an empty
   `<div class="giscus">`; the thread is a runtime iframe. Graded `needs-work`
   and deferred — no preview can fix it.
-- **`.agent/skills/design-system/references/design-system.md` is stale.** It
-  lists `light: #f6f7f5`, `secondary: #9aa888`; `quartz.config.ts` actually
-  ships `light: #fafaf8`, `secondary: #4f5e3c` (an accessibility contrast fix).
-  Tokens are generated from the config, so the sync is correct — but that doc
-  is shipped as `guidelines/` and should be refreshed.
-- **`Footer` links still point at upstream Quartz** (jackyzha0's GitHub and
-  Discord), not this site.
+- **`Explorer` is not mounted either.** The left rail is the table of contents
+  and nothing else on a reading page, and the home and list pages have no rail.
+- **Fonts are self-hosted**, not loaded from Google Fonts: `theme.fontOrigin` is
+  `"local"` and `quartz/styles/fonts.scss` carries four `@font-face` blocks
+  (Pretendard, Space Grotesk, Fraunces, IBM Plex Mono). Cards no longer need
+  network access for correct typography, but `runtimeFontPrefixes` in
+  `config.json` still lists `Noto Sans KR` and should be refreshed.
+- **`.agent/skills/design-system/references/design-system.md` was refreshed**
+  in the same pass and now matches the code.
 
 ## Re-sync risks — what can silently go stale
 
@@ -98,18 +102,14 @@ Then: `package-build.mjs --entry .design-sync/.cache/dist/index.mjs`.
   to `quartz/components/index.ts` will NOT appear until it is bound here. The
   `.d.ts` is generated from this file's `export const X = bind(` lines, so the
   two cannot drift from each other — but both can drift from the repo.
-- **Component options are copied from `quartz.layout.ts`** (Footer links,
-  TagCloud limit/variant, Flex pairing). If the layout changes, update the
-  bindings or the cards will show stale configuration.
+- **Component options are copied from `quartz.layout.ts`** (Footer links, Flex
+  pairing). If the layout changes, update the bindings or the cards will show
+  stale configuration. The Footer bindings pointed at upstream Quartz's GitHub
+  and Discord until 2026-09-20.
 - **Fixture data is rebuilt from `content/`** each run, so new posts flow
   through automatically — but the hardcoded slugs in `entry.tsx`
   (`"Deadlocks"`, `"Lock-based-Protocol"`, `"Transaction-Isolation-in-SQL"`)
   will silently fall back if those notes are renamed or deleted.
-- **`Hero` options are invented.** Hero is not mounted in `quartz.layout.ts`;
-  the greeting/accent used in the card came from `content/index.md`'s copy.
-- **Fonts load from the Google Fonts CDN** via `@import` in the shipped CSS
-  (matching `theme.fontOrigin: "googleFonts"`). Nothing is vendored, so cards
-  need network access for correct typography.
 - **Chromium**: the render check ran against system
   `/usr/bin/google-chrome` via `DS_CHROMIUM_PATH`; playwright's own browser was
   never downloaded. Re-syncs need that env var or a playwright chromium.

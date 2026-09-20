@@ -7,6 +7,9 @@ tags:
   - project/co-op-cloud
 featured: true
 pinOrder: 4
+description: "이미 커밋된 다른 서비스의 변경을, 롤백도 없이 어떻게 되돌리는가."
+layer: application
+rank: 1
 ---
 
 Microservice Architecture에서는 각 서비스가 자신의 데이터베이스를 소유하고, 다른 서비스의 데이터베이스에 직접 접근하지 않는다. 서비스의 독립성과 데이터 캡슐화를 지킬 수 있는 구조지만, 하나의 비즈니스 작업이 여러 서비스의 데이터를 함께 변경해야 할 때는 트랜잭션을 처리하기 어려워진다.

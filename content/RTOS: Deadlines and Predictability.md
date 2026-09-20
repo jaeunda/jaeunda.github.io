@@ -6,6 +6,9 @@ tags:
 Date: 2025-11-11
 featured: true
 pinOrder: 6
+description: "GDG 세미나에서 발표한 내용으로, 실시간의 기준이 속도가 아니라 데드라인인 이유를 정리했다."
+layer: kernel
+rank: 2
 ---
 
 2025년 11월 11일 GDG 슈몰세미나 요약입니다.

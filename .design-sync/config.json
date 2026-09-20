@@ -5,14 +5,8 @@
   "globalName": "QuartzDS",
   "buildCmd": "node .design-sync/run-gen-tokens.mjs ./.design-sync/.cache/dist/tokens && node .design-sync/build-fixtures.mjs && node .design-sync/build-css.mjs && node .design-sync/build-dist.mjs",
   "cssEntry": "ds-styles.css",
-  "guidelinesGlob": [
-    "../../../.agent/skills/design-system/references/design-system.md"
-  ],
-  "runtimeFontPrefixes": [
-    "Fraunces",
-    "Noto Sans KR",
-    "IBM Plex Mono"
-  ],
+  "guidelinesGlob": ["../../../.agent/skills/design-system/references/design-system.md"],
+  "runtimeFontPrefixes": ["Pretendard", "Space Grotesk", "Fraunces", "IBM Plex Mono"],
   "overrides": {
     "MobileOnly": {
       "cardMode": "single",

@@ -16,24 +16,7 @@
 // - list values render as chips instead of dot-separated runs, so a group can
 //   be scanned instead of read
 @mixin styles() {
-  // Self-hosted so the page renders identically on networks that block font
-  // CDNs, and so there is no swap on first paint. See scripts/fonts/README.md
-  // for the subset and how to regenerate it.
-  @font-face {
-    font-family: "Pretendard Portfolio";
-    src: url("/static/fonts/pretendard-variable-subset.woff2") format("woff2-variations");
-    font-weight: 100 900;
-    font-style: normal;
-    font-display: swap;
-  }
-
-  @font-face {
-    font-family: "Space Grotesk Portfolio";
-    src: url("/static/fonts/space-grotesk-variable.woff2") format("woff2-variations");
-    font-weight: 300 700;
-    font-style: normal;
-    font-display: swap;
-  }
+  // Both faces are declared once in styles/fonts.scss and shared with the blog.
 
   @media (prefers-reduced-motion: no-preference) {
     html:has(> body[data-slug="portfolio-it"]) {
@@ -76,9 +59,9 @@
       //   Pretendard    — Korean and Latin UI, body copy. Variable 100–900.
       //   Space Grotesk — Latin display: product names and metric figures.
       // Both fall back to the site's Noto Sans KR stack.
-      --pf-sans: "Pretendard Portfolio", var(--bodyFont);
+      --pf-sans: "Pretendard", var(--bodyFont);
       --pf-display: var(--pf-sans);
-      --pf-latin: "Space Grotesk Portfolio", var(--pf-sans);
+      --pf-latin: "Space Grotesk", var(--pf-sans);
       --pf-mono: "IBM Plex Mono", var(--pf-sans);
 
       max-width: none;
@@ -928,8 +911,9 @@
         margin-top: 3rem;
       }
 
-      .pf-group-k,
-      .pf-found-k {
+      // `.pf-found-k` sat here too and matched nothing in `portfolio-it.md`;
+      // removed in the 2026-09-20 sweep.
+      .pf-group-k {
         margin-bottom: 1.1rem;
         padding-bottom: 0.6rem;
         border-bottom: 1px solid var(--pf-line);

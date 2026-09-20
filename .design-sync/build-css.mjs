@@ -32,7 +32,10 @@ parts.push(`/* ===== design tokens (generated from quartz.config.ts) ===== */\n$
 
 function add(file, label) {
   try {
-    const res = compile(file, { loadPaths: ["quartz/styles", "node_modules"], silenceDeprecations: ["import", "global-builtin", "color-functions"] })
+    const res = compile(file, {
+      loadPaths: ["quartz/styles", "node_modules"],
+      silenceDeprecations: ["import", "global-builtin", "color-functions"],
+    })
     parts.push(`/* ===== ${label} ===== */\n${res.css}`)
     return res.css.length
   } catch (e) {

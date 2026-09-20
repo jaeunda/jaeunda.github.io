@@ -1,7 +1,7 @@
 ## Building with jaeunda.log
 
-This is the component set behind **jaeunda.log**, a Korean-language engineering
-blog built on Quartz. It is a *site* design system: page chrome, note listings
+This is the component set behind **jaeunda.log**, an engineering blog
+built on Quartz — English chrome, Korean prose. It is a _site_ design system: page chrome, note listings
 and article furniture — not a generic widget kit.
 
 ### No provider, no wrapper — just render
@@ -10,8 +10,8 @@ Every export is already bound to a realistic page context, so a component
 renders correctly with **no props at all**:
 
 ```jsx
-<Hero />
-<PinnedPosts />
+<HomeStack />
+<SiteNav />
 <TableOfContents />
 ```
 
@@ -22,7 +22,7 @@ Override props only when you want different data. All props are optional:
 
 ```jsx
 // Drive a listing with your own posts
-<RecentNotesWithPreview allFiles={myPages} />
+<HomeStack allFiles={myPages} />
 // Render article chrome for a different note
 <ArticleTitle fileData={{ frontmatter: { title: "New Post" } }} />
 ```
@@ -38,22 +38,28 @@ breakpoint. Page data uses `slug`, `frontmatter.title`, `frontmatter.tags`,
 There are **no utility classes**. Colour and type come from CSS variables
 defined on `:root`, and every component carries its own semantic class name.
 
-| Token | Role |
-|---|---|
-| `--light` / `--dark` | page background / strongest text |
-| `--darkgray` / `--gray` | body text / secondary and metadata text |
-| `--lightgray` | borders and faint surfaces |
-| `--secondary` / `--tertiary` | olive accent; links and active states |
-| `--highlight` / `--textHighlight` | tinted surfaces / marked text |
-| `--titleFont` / `--headerFont` | Fraunces — wordmark and headings |
-| `--bodyFont` | Noto Sans KR — body copy, incl. Korean |
-| `--codeFont` | IBM Plex Mono — code, tag chips, metadata labels |
+| Token                             | Role                                             |
+| --------------------------------- | ------------------------------------------------ |
+| `--light` / `--dark`              | page background / strongest text                 |
+| `--darkgray` / `--gray`           | body text / secondary and metadata text          |
+| `--lightgray`                     | borders and faint surfaces                       |
+| `--secondary` / `--tertiary`      | olive accent; links and active states            |
+| `--highlight` / `--textHighlight` | tinted surfaces / marked text                    |
+| `--titleFont` / `--headerFont`    | Fraunces — wordmark and headings                 |
+| `--bodyFont`                      | Noto Sans KR — body copy, incl. Korean           |
+| `--codeFont`                      | IBM Plex Mono — code, tag chips, metadata labels |
 
 Write your own layout glue the same way:
 
 ```jsx
-<section style={{ background: "var(--light)", color: "var(--darkgray)",
-                  fontFamily: "var(--bodyFont)", borderTop: "1px solid var(--lightgray)" }}>
+<section
+  style={{
+    background: "var(--light)",
+    color: "var(--darkgray)",
+    fontFamily: "var(--bodyFont)",
+    borderTop: "1px solid var(--lightgray)",
+  }}
+>
   <h2 style={{ fontFamily: "var(--headerFont)", color: "var(--dark)" }}>Notes</h2>
   <RecentNotes />
 </section>

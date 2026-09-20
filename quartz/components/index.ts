@@ -3,7 +3,6 @@ import TagContent from "./pages/TagContent"
 import FolderContent from "./pages/FolderContent"
 import NotFound from "./pages/404"
 import ArticleTitle from "./ArticleTitle"
-import Darkmode from "./Darkmode"
 import ReaderMode from "./ReaderMode"
 import Head from "./Head"
 import PageTitle from "./PageTitle"
@@ -23,17 +22,16 @@ import Breadcrumbs from "./Breadcrumbs"
 import Comments from "./Comments"
 import Flex from "./Flex"
 import ConditionalRender from "./ConditionalRender"
-import Hero from "./Hero"
-import TagCloud from "./TagCloud"
-import RecentNotesWithPreview from "./RecentNotesWithPreview"
-import PinnedPosts from "./PinnedPosts"
+import HomeStack from "./HomeStack"
+import ReadNext from "./ReadNext"
+import SiteNav from "./SiteNav"
+import CompactToc from "./CompactToc"
 
 export {
   ArticleTitle,
   Content,
   TagContent,
   FolderContent,
-  Darkmode,
   ReaderMode,
   Head,
   PageTitle,
@@ -54,10 +52,10 @@ export {
   Comments,
   Flex,
   ConditionalRender,
-  Hero,
-  TagCloud,
-  RecentNotesWithPreview,
-  PinnedPosts,
+  HomeStack,
+  ReadNext,
+  SiteNav,
+  CompactToc,
 }
 export { default as ProfileCard } from "./ProfileCard"
 export { default as VisitorCount } from "./VisitorCount"

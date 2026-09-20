@@ -1,0 +1,97 @@
+// Self-hosted type system for the whole site.
+//
+// Every face is served from `quartz/static/fonts/` rather than a CDN, so the
+// site renders identically on networks that block fonts.gstatic.com and there
+// is no swap on first paint. `quartz.config.ts` therefore sets
+// `fontOrigin: "local"`; see `scripts/fonts/README.md` for the subset and how
+// to regenerate it after adding Korean copy.
+//
+// Roles:
+//   Pretendard    — Korean and Latin body copy, headings, UI. Variable 100–900.
+//   Space Grotesk — Latin-only display: the wordmark and post titles, which are
+//                   always English. Never used where Korean can appear, so a
+//                   line never mixes two faces.
+//   IBM Plex Mono — code, dates, counts and labels.
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("/static/fonts/pretendard-variable-subset.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("/static/fonts/space-grotesk-variable.woff2") format("woff2-variations");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+// The wordmark keeps Fraunces: it is the site's identity mark and the one place
+// a display serif belongs. Subset to basic latin, since it only ever sets
+// "jaeunda.log".
+@font-face {
+  font-family: "Fraunces";
+  src: url("/static/fonts/fraunces-wordmark.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/static/fonts/ibm-plex-mono-latin-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/static/fonts/ibm-plex-mono-latin-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+// `joinStyles` in quartz/util/theme.ts appends its own `:root` block AFTER every
+// stylesheet, so a plain `:root` here would lose. `html:root` outranks it at
+// equal cascade order without `!important`.
+html:root {
+  // Korean fallback for the faces that have no Hangul, so a missing glyph lands
+  // on Pretendard instead of whatever the OS picks.
+  --codeFont: "IBM Plex Mono", "Pretendard", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  // Latin display face. Applied per-component, never to a surface that can hold
+  // Korean text.
+  --displayFont: "Space Grotesk", "Pretendard", system-ui, sans-serif;
+
+  // Identity mark only.
+  --wordmarkFont: "Fraunces", "Pretendard", Georgia, serif;
+
+  // The site is light only — there is no theme toggle and no dark palette.
+  color-scheme: light;
+
+  // Lifted surface, a step above the page ground. Not a theme token because
+  // quartz.config.ts only carries the nine named colours.
+  --surface: #ffffff;
+  --surface-line: #eceee6;
+
+  // Elevation, shared with the portfolio page, which is where both values were
+  // designed (`--pf-shadow` / `--pf-shadow-lift` in styles/portfolio.scss).
+  // Two layers each: a 1-2px contact shadow that seats the card on the page,
+  // and a wide negative-spread one that reads as height. Kept here rather than
+  // duplicated so the two halves of the site lift by the same amount.
+  //
+  // The blog uses these on exactly one resting surface — the featured post —
+  // and on hover elsewhere. A reading page has no cards; see the design system.
+  --shadow: 0 1px 2px rgb(0 0 0 / 4%), 0 8px 24px -12px rgb(0 0 0 / 10%);
+  --shadow-lift: 0 1px 2px rgb(0 0 0 / 5%), 0 18px 40px -18px rgb(0 0 0 / 16%);
+
+  // One timing for every interactive transition on the site, and one easing.
+  // The portfolio settled on 0.18s ease-out for lift and travel; matching it is
+  // most of what makes the two pages feel like one hand.
+  --lift-ease: cubic-bezier(0.16, 0.84, 0.44, 1);
+}

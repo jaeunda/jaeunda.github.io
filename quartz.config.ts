@@ -21,37 +21,46 @@ const config: QuartzConfig = {
     ignorePatterns: ["private", "templates", ".obsidian"],
     defaultDateType: "published",
     theme: {
-      fontOrigin: "googleFonts",
+      fontOrigin: "local",
       cdnCaching: true,
+      // Self-hosted in quartz/styles/fonts.scss. Pretendard carries Korean and
+      // Latin together, so a heading never mixes two faces mid-line; the Latin
+      // display face is applied per-component through --displayFont.
       typography: {
-        header: "Fraunces",
-        body: "Noto Sans KR",
+        header: "Pretendard",
+        body: "Pretendard",
         code: "IBM Plex Mono",
       },
       colors: {
-        // Turn 3 확정 시안 — 올리브를 "링크·활성 상태"로만 집중시키고
-        // 대비 실패였던 secondary(2.35:1)/gray(3.91:1)를 접근성 기준(4.5:1+)으로 교체.
+        // Olive stays the single accent, reserved for links and active state.
+        // Grounds sit close to white so headings can carry near-black and the
+        // page reads crisp; every pair clears 6:1 on both ground and surface.
         lightMode: {
-          light: "#fafaf8",
-          lightgray: "#e3e4df",
-          gray: "#5f6259",
-          darkgray: "#33362f",
-          dark: "#1a1d17",
+          light: "#fcfcfa",
+          lightgray: "#e4e5de",
+          gray: "#5c6057",
+          darkgray: "#2f322c",
+          dark: "#14170f",
           secondary: "#4f5e3c",
           tertiary: "#4f5e3c",
-          highlight: "rgba(79, 94, 60, 0.12)",
+          highlight: "rgba(79, 94, 60, 0.10)",
           textHighlight: "#dde3d4",
         },
+        // The site is light only: there is no dark palette, no toggle, and no
+        // `prefers-color-scheme` block, so `saved-theme` is never set and this
+        // never matches. `QuartzConfig` requires the key, so it mirrors
+        // lightMode — a stale attribute from a returning visitor still renders
+        // the real design. Do not reintroduce a dark palette.
         darkMode: {
-          light: "#1a1c16",
-          lightgray: "#2e3229",
-          gray: "#9b9f94",
-          darkgray: "#c7ccc3",
-          dark: "#f0f2ee",
-          secondary: "#a9ba8e",
-          tertiary: "#a9ba8e",
-          highlight: "rgba(169, 186, 142, 0.16)",
-          textHighlight: "#2a3123",
+          light: "#fcfcfa",
+          lightgray: "#e4e5de",
+          gray: "#5c6057",
+          darkgray: "#2f322c",
+          dark: "#14170f",
+          secondary: "#4f5e3c",
+          tertiary: "#4f5e3c",
+          highlight: "rgba(79, 94, 60, 0.10)",
+          textHighlight: "#dde3d4",
         },
       },
     },
@@ -63,9 +72,11 @@ const config: QuartzConfig = {
         priority: ["frontmatter", "git", "filesystem"],
       }),
       Plugin.SyntaxHighlighting({
+        // Both keys are required, and both are the light theme: the site has no
+        // dark palette, so a second token set on every span is dead weight.
         theme: {
           light: "github-light",
-          dark: "github-dark",
+          dark: "github-light",
         },
         keepBackground: false,
       }),

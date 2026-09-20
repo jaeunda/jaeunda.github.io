@@ -3,7 +3,11 @@ tags:
   - topic/database
   - project/database-system
 Date: 2026-04-20
+description: "있는 행마다 락을 걸어도 아직 없는 행이 나타난다면, 무엇에 락을 걸어야 하는가."
+layer: storage
+rank: 4
 ---
+
 ## Insert and Delete Operations
 
 - A **delete** operation may be performed only if the transaction has an **X-mode lock** on the tuple
@@ -17,33 +21,35 @@ Delete와 Insert Operation은 X-mode lock을 획득해야만 수행 가능하다
 이렇게 한 Transaction 안에서 동일한 조건을 두 번 읽었는데 결과가 달라지는 현상을 Phantom Phenomenon이라고 한다.
 
 ### **Phantom Phenomenon**
+
 - 한 트랜잭션 안에서 insert 전과 후의 스냅샷을 각각 읽게 되어, (없었던 tuple이 나중에 나타남)
 - 또는 delete 전과 후의 스냅샷을 각각 읽게 되어 (있었던 tuple이 나중에 사라짐)
 - non-serializable한 결과가 나오는 현상
-	- 어떤 serial order로도 재현할 수 없는 모순된 결과가 나오는 현상.
+  - 어떤 serial order로도 재현할 수 없는 모순된 결과가 나오는 현상.
 - insert나 delete 연산이 포함된 경우에만 발생한다.
 
 > A transaction that scans a relation to find sum of balances of all accounts in Busan, and another transaction that inserts a new Busan account, are **conceptually in conflict despite not accessing any tuple in common**. If only tuple locks are used, non-serializable schedules can result.
 
 예를 들어 한 Transaction은 Busan의 모든 계좌의 합을 계산하고, 다른 Transaction은 새로운 Busan account tuple을 추가한다고 하자. 이러한 경우 **물리적으로는 lock conflict가 발생하지 않는다**. Busan account는 기존 Table에 없던 새로운 tuple이기 때문이다. 하지만 둘 다 동일한 Busan account 집합을 다루고 있으므로 논리적으로 semantic conflict가 발생한다.
+
 ## Phantom Phenomenon Example
 
 **Bank databases:**
 
 `Account(number, location, balance)`
 
-|number|location|balance|
-|---|---|---|
-|100|Seoul|1700|
-|200|Busan|1000|
-|300|Busan|500|
+| number | location | balance |
+| ------ | -------- | ------- |
+| 100    | Seoul    | 1700    |
+| 200    | Busan    | 1000    |
+| 300    | Busan    | 500     |
 
 `Assets(location, total)`
 
-|location|total|
-|---|---|
-|Seoul|1700|
-|Busan|1500|
+| location | total |
+| -------- | ----- |
+| Seoul    | 1700  |
+| Busan    | 1500  |
 
 - **T1**: Reads all accounts in Busan from `Account` and compares with `Assets`
 - **T2**: Add tuple `<400, Busan, 700>` to `Account` and update `Assets` accordingly
@@ -67,8 +73,8 @@ T2가 Tuple을 추가하기 전에 T1이 Account Table을 읽는다. T1은 Busan
 
 - Not serializable — `<T1, T2>`나 `<T2, T1>` 어느 Serial Schedule과도 동일하지 않다.
 - Possible with tuple locking
-	- T1이 기존 tuple에 대한 lock-S를 보유하고 있으므로 T2이 요청한 새로운 tuple의 lock-X와 충돌하지 않는다.
-	- T2가 Assets에서 Busan에 해당하는 tuple에 대해 lock-X를 얻어 update한 후, T1이 동일한 tuple에 대해 lock-S를 요청했다. 동시에 접근하지 않으므로 lock 충돌이 발생하지 않는다.
+  - T1이 기존 tuple에 대한 lock-S를 보유하고 있으므로 T2이 요청한 새로운 tuple의 lock-X와 충돌하지 않는다.
+  - T2가 Assets에서 Busan에 해당하는 tuple에 대해 lock-X를 얻어 update한 후, T1이 동일한 tuple에 대해 lock-S를 요청했다. 동시에 접근하지 않으므로 lock 충돌이 발생하지 않는다.
 
 ### Table Locking Only
 
@@ -85,6 +91,7 @@ Tuple locking이 아닌 Table locking을 사용하는 방식으로 Phantom Pheno
 
 Phantom Problem을 방지하기 위해 Table Locking 대신 실질적으로 Index Locking을 사용할 수 있다.
 집합 조건을 Index로 표현하여 Tuple이 아니라 Index entry에 lock을 건다.
+
 ### Index Locking
 
 > - Every relation is likely to have at least one index
@@ -99,12 +106,14 @@ T1이 Index 자체에 S-lock을 얻으면, T2는 새로운 Tuple을 insert하기
 - T1이 Busan account 전체를 읽으려면
 - Root $\to$ Internal nodes $\to$ Leaf nodes 순서대로 타고 내려가면서 데이터를 찾아야 한다.
 - 이 경로의 Internal nodes와 Leaf Nodes에 S-lock을 건다. (lookup)
+
 ```
 			  [Busan | Seoul]          ← Internal node
              /               \
     [Busan,1000]          [Seoul,1700]  ← Leaf nodes
     [Busan,500]                         (실제 데이터 위치 저장)
 ```
+
 - T2가 새 Busan tuple `<400, Busan, 700>`을 삽입하려면 Busan Index의 leaf node를 수정해야 한다.
 - 해당 leaf node에 X-lock을 요청하면 T1의 S-lock과 incompatible하므로 대기한다.
 - 따라서 Phantom Phenomenon을 방지할 수 있다.
@@ -130,9 +139,9 @@ Index 기반에서는 lookup을 수행하기 위해 internal nodes와 leaf nodes
 >
 > Goal: **release locks on internal nodes early** (not in a two-phase fashion).
 
- Index는 모든 Transaction이 데이터를 찾을 때마다 반드시 거쳐가는 구조이다. Index는 일반 tuple보다 훨씬 자주 접근된다.
+Index는 모든 Transaction이 데이터를 찾을 때마다 반드시 거쳐가는 구조이다. Index는 일반 tuple보다 훨씬 자주 접근된다.
 
- 앞서 보았듯이 Index Locking에 2PL을 그대로 적용하면 병목이 발생할 수 있다. 예를 들어 Root는 모든 Transaction의 공통 진입점인데 2PL에 따라 Shrinking Phase 이전에는 Lock을 해제할 수 없으므로 뒤따르는 Transaction이 모두 Wait해야할 수 있다. 이러한 경우 Concurrency가 현저히 떨어진다.
+앞서 보았듯이 Index Locking에 2PL을 그대로 적용하면 병목이 발생할 수 있다. 예를 들어 Root는 모든 Transaction의 공통 진입점인데 2PL에 따라 Shrinking Phase 이전에는 Lock을 해제할 수 없으므로 뒤따르는 Transaction이 모두 Wait해야할 수 있다. 이러한 경우 Concurrency가 현저히 떨어진다.
 
 ### Crabbing for B⁺-tree:
 
@@ -146,22 +155,26 @@ Crab이 옆으로 걷는 것과 유사하여 Crabbing이라고 한다.
 #### Search
 
 데이터를 읽을 때 자식 lock을 잡는 순간 부모 lock을 해제한다면 위와 같은 문제를 해결할 수 있다.
+
 - Root node에 Shared lock을 걸고, 자식 node에 접근한다. 이때 자식 node의 S-mode lock을 획득하고 나면 Root node의 S-mode lock을 즉시 해제한다.
 - 또한 Leaf node의 S-mode lock을 획득하면 Internal node의 S-mode lock을 즉시 해제한다.
-이처럼 상대적으로 Transaction이 더 많이 거쳐가는 상위 노드의 lock을 미리 해제한다면 병목 발생을 줄일 수 있다.
+  이처럼 상대적으로 Transaction이 더 많이 거쳐가는 상위 노드의 lock을 미리 해제한다면 병목 발생을 줄일 수 있다.
 
 #### Insert/Delete
 
 데이터를 insert/delete할 때에는 leaf node의 lock을 X-mode로 upgrade한다.
+
 - Root node부터 Leaf node에 도달할 때까지 Crabbing 방식으로 S-mode lock을 획득한다.
 - Leaf node에 도달하면 X-mode lock으로 upgrade하고 데이터를 insert/delete한다.
 
 만약 Split/Merge가 발생하면?
+
 - Leaf node의 X-lock을 보유한 상태로 부모인 Internal node의 X-lock을 요청해야 한다.
 
 #### Excessive Deadlock 발생 가능성
 
 T1에서 Split 또는 Merge가 발생하여 부모인 Internal node의 X-lock을 요청할 때, T2에서 search하며 Internal node가 S-lock을 보유하고 있다면 Deadlock이 발생할 수 있다.
+
 - T2: Internal node는 S-lock을 보유한 상태로 Leaf node의 S-lock을 기다리고,
 - T1: Leaf node는 X-lock을 보유한 상태로 Internal node의 X-lock을 기다리게 된다.
 
@@ -179,10 +192,11 @@ Internal node를 읽는 순간 다른 Transaction이 그 값을 바꿔 정확하
 Crabbing 방식과 달리 **자식의 lock을 획득하기 전**에 부모의 lock을 해제한다. 부모 lock을 해제하고 자식이 lock을 획득하는 사이 다른 Transaction이 Internal node의 값을 바꿀 수 있다. 하지만 Internal node의 값은 상관 없고 올바른 Leaf node에 도착하기만 하면 된다.
 
 이때 node에 대한 split/merge가 필요하면 lock을 해제하고 구조 연산을 수행한다. 이때 운영체제의 semaphore로 구현한 **latch**를 활용하여 배타적인 수행을 보장한다.
+
 - 부모 lock을 먼저 해제하고 자식 lock을 획득한다.
 - 그 사이 다른 transaction이 split/merge를 수행할 수 있다. (structural modification)
 - 이때 짧은 시간 동안 노드를 배타적으로 점유해야 하므로 transaction lock 대신 latch를 사용한다.
 - latch를 걸어 해당 노드를 잠시 잠그고, split/merge가 끝나면 즉시 해제한다.
-	- Semaphore가 한 시점에 하나의 thread만 critical section에 진입하도록 보장한다.
+  - Semaphore가 한 시점에 하나의 thread만 critical section에 진입하도록 보장한다.
 
 참고: C. Mohan and F. Levine, "ARIES/IM: An Efficient and High-Concurrency Index Management Method Using Write-Ahead Logging", ACM SIGMOD 1992.

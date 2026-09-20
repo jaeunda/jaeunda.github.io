@@ -3,44 +3,45 @@ import { socialLinks } from "./socialLinks"
 import style from "./styles/profileCard.inline.scss"
 import { classNames } from "../util/lang"
 
-function linkLabel(name: string): string {
-  return name === "Email" ? "e-mail" : name.toLowerCase()
-}
-
-const ProfileCard: QuartzComponent = (
-  props: QuartzComponentProps & { explorerProfile?: boolean },
-) => {
+// The home masthead byline, and the only place the site states who writes it.
+// Reading pages carry no profile at all — the left rail there is the outline.
+//
+// The three destinations are pills carrying the whole address, which is the
+// `.pf-caps` vocabulary from the portfolio page. See the stylesheet for the
+// three earlier versions of this row and what each of them got wrong.
+//
+// The portfolio is deliberately not one of the rows. `content/portfolio-it.md`
+// is `unlisted: true` and stays that way: it is a link the author attaches to a
+// job application, not a page this site sends readers to. Nothing on the blog
+// links to it — not the nav, not this byline, not the footer.
+const ProfileCard: QuartzComponent = ({ displayClass }: QuartzComponentProps) => {
   return (
-    <div
-      class={classNames(
-        props.displayClass,
-        "profile-card",
-        ...(props.explorerProfile ? ["explorer-profile"] : []),
-      )}
-    >
-      <div class="profile-eyebrow">Profile</div>
-      <div class="profile-name">Daeun Jang</div>
-      <div class="profile-interest">
-        Systems & Infrastructure
-        <br />
-        Linux · Databases · Runtimes
-      </div>
-      <div class="profile-links">
+    <div class={classNames(displayClass, "profile-card")}>
+      <p class="profile-byline">
+        <span class="profile-name">장다은</span>
+        <span class="profile-role">Systems &amp; Infrastructure</span>
+      </p>
+      <ul class="profile-links">
         {socialLinks.map(({ name, url, text }) => {
           const isMailto = url.startsWith("mailto:")
           return (
-            <a
-              href={url}
-              target={isMailto ? undefined : "_blank"}
-              rel={isMailto ? undefined : "noopener noreferrer"}
-              class="profile-link-row"
-            >
-              <span class="profile-link-label">{linkLabel(name)}</span>
-              <span class="profile-link-value">{text}</span>
-            </a>
+            <li>
+              <a
+                href={url}
+                target={isMailto ? undefined : "_blank"}
+                rel={isMailto ? undefined : "noopener noreferrer"}
+                class="profile-link"
+                // The visible label is an address; the accessible name says
+                // what it is, so a screen reader does not read a URL aloud
+                // character by character to say "GitHub".
+                aria-label={name}
+              >
+                {text}
+              </a>
+            </li>
           )
         })}
-      </div>
+      </ul>
     </div>
   )
 }

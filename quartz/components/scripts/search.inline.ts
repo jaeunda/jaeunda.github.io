@@ -196,6 +196,14 @@ async function setupSearch(searchElement: Element, currentSlug: FullSlug, data: 
   const searchButton = searchElement.querySelector(".search-button") as HTMLButtonElement
   if (!searchButton) return
 
+  // The hint is rendered as ⌘K because the server cannot know the platform.
+  // The handler below already accepts Ctrl, so say so on the machines that use
+  // it — a Windows reader was being shown a key their keyboard does not have.
+  const shortcutHint = searchElement.querySelector(".search-shortcut")
+  if (shortcutHint && !/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
+    shortcutHint.textContent = "Ctrl K"
+  }
+
   const searchBar = searchElement.querySelector(".search-bar") as HTMLInputElement
   if (!searchBar) return
 

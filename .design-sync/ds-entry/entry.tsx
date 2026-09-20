@@ -5,7 +5,7 @@
 // QuartzComponentConstructor factory whose product reads the entire static-site
 // build context as props (ctx, cfg, fileData, allFiles, tree). A design agent
 // cannot synthesize that, and several components return null unless the page
-// slug matches (Hero, PinnedPosts, RecentNotesWithPreview).
+// slug matches (HomeStack renders only on index, ReadNext only off it).
 //
 // So each export below is the REAL component, constructed with the REAL options
 // from quartz.layout.ts, with a realistic build context pre-bound as default
@@ -44,8 +44,7 @@ function revive(p: RawPage): QuartzPluginData {
 
 export const allFiles: QuartzPluginData[] = fixtureData.pages.map(revive)
 
-const articlePage =
-  allFiles.find((p) => (p.slug as string) === "Deadlocks") ?? allFiles[0]
+const articlePage = allFiles.find((p) => (p.slug as string) === "Deadlocks") ?? allFiles[0]
 
 const indexPage = {
   slug: "index" as FullSlug,
@@ -185,49 +184,22 @@ function bind(
 
 /* ------------------------------------------------------- home page (index/) */
 
-export const Hero = bind(
-  "Hero",
-  Q.Hero({
-    greeting: "Hi, I'm {accent}.",
-    accent: "jaeunda",
-    subtitle: "공부하면서 이해한 것들을 제 언어로 기록합니다.",
-  }),
-  indexPage,
-)
-
-// PinnedPosts renders only pages with `featured: true` in frontmatter, and no
-// post in content/ carries that flag today — so it renders nothing on the live
-// site too, despite being the mounted home component (quartz.layout.ts:12).
-// The card marks the four most recent posts featured so the component's real
-// 2-column layout is visible.
-const featuredFiles = allFiles.map((p, i) =>
-  i < 4
-    ? ({ ...p, frontmatter: { ...p.frontmatter, featured: true, pinOrder: i } } as QuartzPluginData)
-    : p,
-)
-
-export const PinnedPosts = bind("PinnedPosts", Q.PinnedPosts(), indexPage, {
-  allFiles: featuredFiles,
-} as Partial<QuartzComponentProps>)
-
-export const RecentNotesWithPreview = bind(
-  "RecentNotesWithPreview",
-  Q.RecentNotesWithPreview({ limit: 5, showTags: true, showReadTime: true, mode: "featured" }),
-  indexPage,
-)
-
-// quartz.layout.ts mounts TagCloud twice: bare on mobile home, and as a
-// sidebar variant on every page.
-export const TagCloud = bind("TagCloud", Q.TagCloud({ limit: 8 }), indexPage)
-export const TagCloudSidebar = bind(
-  "TagCloudSidebar",
-  Q.TagCloud({ limit: 8, showOnAllPages: true, variant: "sidebar" }),
-  articlePage,
-)
+// The home page is one component now. `Hero`, `TagCloud`, `PinnedPosts` and
+// `RecentNotesWithPreview` were the previous six-block home and have been
+// deleted from the repo; `HomeStack` replaced all of them with a featured post,
+// the layer filter and the index.
+export const HomeStack = bind("HomeStack", Q.HomeStack(), indexPage)
 
 /* ------------------------------------------------------------ article chrome */
 
+export const SiteNav = bind("SiteNav", Q.SiteNav(), articlePage)
 export const ArticleTitle = bind("ArticleTitle", Q.ArticleTitle(), articlePage)
+// Below the desktop breakpoint the outline rail is gone and this carries the
+// chapter list into the column, as a closed `<details>`.
+export const CompactToc = bind("CompactToc", Q.CompactToc(), articlePage)
+// Drawn from the same `layer` the home page is organised on, then topped up
+// with posts sharing a `topic/` tag.
+export const ReadNext = bind("ReadNext", Q.ReadNext(), articlePage)
 export const ContentMeta = bind("ContentMeta", Q.ContentMeta(), articlePage)
 export const TagList = bind("TagList", Q.TagList(), articlePage)
 export const Breadcrumbs = bind("Breadcrumbs", Q.Breadcrumbs(), articlePage)
@@ -261,7 +233,6 @@ export const VisitorCount = bind(
 export const PageTitle = bind("PageTitle", Q.PageTitle(), articlePage)
 export const ProfileCard = bind("ProfileCard", Q.ProfileCard(), articlePage)
 export const Search = bind("Search", Q.Search(), articlePage)
-export const Darkmode = bind("Darkmode", Q.Darkmode(), articlePage)
 export const Explorer = bind("Explorer", Q.Explorer(), articlePage)
 export const RecentNotes = bind("RecentNotes", Q.RecentNotes(), articlePage)
 export const Spacer = bind("Spacer", Q.Spacer(), articlePage)
@@ -269,15 +240,19 @@ export const Footer = bind(
   "Footer",
   Q.Footer({
     links: {
-      GitHub: "https://github.com/jackyzha0/quartz",
-      "Discord Community": "https://discord.gg/cRFFHYye7t",
+      GitHub: "https://github.com/jaeunda",
+      LinkedIn: "https://www.linkedin.com/in/jaeunda/",
+      RSS: "https://jaeunda.github.io/index.xml",
     },
   }),
   articlePage,
 )
 export const Comments = bind(
   "Comments",
-  Q.Comments({ provider: "giscus", options: { repo: "jaeunda/jaeunda.github.io", repoId: "", category: "General", categoryId: "" } } as never),
+  Q.Comments({
+    provider: "giscus",
+    options: { repo: "jaeunda/jaeunda.github.io", repoId: "", category: "General", categoryId: "" },
+  } as never),
   articlePage,
 )
 
@@ -313,12 +288,12 @@ export const NotFound = bind("NotFound", Q.NotFound(), articlePage)
 export const Flex = bind(
   "Flex",
   Q.Flex({
-    components: [{ Component: Q.Search(), grow: true }, { Component: Q.Darkmode() }],
+    components: [{ Component: Q.SiteNav() }, { Component: Q.Search(), grow: true }],
   }),
   articlePage,
 )
 export const DesktopOnly = bind("DesktopOnly", Q.DesktopOnly(Q.ProfileCard()), articlePage)
-export const MobileOnly = bind("MobileOnly", Q.MobileOnly(Q.TagCloud({ limit: 8 })), indexPage)
+export const MobileOnly = bind("MobileOnly", Q.MobileOnly(Q.CompactToc()), articlePage)
 export const ConditionalRender = bind(
   "ConditionalRender",
   Q.ConditionalRender({

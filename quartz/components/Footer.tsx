@@ -12,11 +12,10 @@ export default ((opts?: Options) => {
     const year = new Date().getFullYear()
     const links = opts?.links ?? []
     return (
+      // The last thing every page said used to be "Created with Quartz v4.5.2",
+      // above the links — the site signed off with its build tool. The
+      // destinations come first now and the colophon is a single quiet line.
       <footer class={`${displayClass ?? ""}`}>
-        <p>
-          {i18n(cfg.locale).components.footer.createdWith}{" "}
-          <a href="https://quartz.jzhao.xyz/">Quartz v{version}</a> © {year}
-        </p>
         <ul>
           {Object.entries(links).map(([text, link]) => (
             <li>
@@ -24,6 +23,10 @@ export default ((opts?: Options) => {
             </li>
           ))}
         </ul>
+        <p class="footer-colophon">
+          © {year} {cfg.pageTitle} · {i18n(cfg.locale).components.footer.createdWith}{" "}
+          <a href="https://quartz.jzhao.xyz/">Quartz v{version}</a>
+        </p>
       </footer>
     )
   }

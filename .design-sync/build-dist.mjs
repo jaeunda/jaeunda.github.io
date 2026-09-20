@@ -102,7 +102,15 @@ const result = await build({
   },
   external: ["react", "react-dom", "react/jsx-runtime"],
   loader: { ".json": "json" },
-  plugins: [browserShims, inlineScriptAsText, sassPlugin({ type: "css-text", cssImports: true, silenceDeprecations: ["import", "global-builtin", "color-functions"] })],
+  plugins: [
+    browserShims,
+    inlineScriptAsText,
+    sassPlugin({
+      type: "css-text",
+      cssImports: true,
+      silenceDeprecations: ["import", "global-builtin", "color-functions"],
+    }),
+  ],
   metafile: true,
   logLevel: "warning",
   logLimit: 40,

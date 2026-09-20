@@ -160,17 +160,11 @@ ${stylesheet.join("\n\n")}
   --bodyFont: "${getFontSpecificationName(theme.typography.body)}", ${DEFAULT_SANS_SERIF};
   --codeFont: "${getFontSpecificationName(theme.typography.code)}", ${DEFAULT_MONO};
 }
-
-:root[saved-theme="dark"] {
-  --light: ${theme.colors.darkMode.light};
-  --lightgray: ${theme.colors.darkMode.lightgray};
-  --gray: ${theme.colors.darkMode.gray};
-  --darkgray: ${theme.colors.darkMode.darkgray};
-  --dark: ${theme.colors.darkMode.dark};
-  --secondary: ${theme.colors.darkMode.secondary};
-  --tertiary: ${theme.colors.darkMode.tertiary};
-  --highlight: ${theme.colors.darkMode.highlight};
-  --textHighlight: ${theme.colors.darkMode.textHighlight};
-}
 `
 }
+
+// Upstream also emits a `:root[saved-theme="dark"]` block from
+// `theme.colors.darkMode`. This site is light only — no palette, no toggle, no
+// `prefers-color-scheme` — so that block is not emitted. `QuartzConfig` still
+// requires the `darkMode` key; quartz.config.ts mirrors `lightMode` into it and
+// nothing reads it.

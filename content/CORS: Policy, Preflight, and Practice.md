@@ -4,6 +4,9 @@ tags:
   - topic/network
   - topic/http
   - project/team-po
+description: "브라우저는 왜 진짜 요청을 보내기 전에 서버에게 한 번 더 물어보는가."
+layer: application
+rank: 2
 ---
 
 ## What is Cross-Origin Resource Sharing?
@@ -157,7 +160,7 @@ Access-Control-Allow-Headers: Content-Type
 
 `https://www.team-po.cloud`로 접속 자체는 가능하지만, 해당 Origin에서 발생하는 REST API 호출은 **CORS 허용 목록에 없기 때문에** Preflight 요청과 인증이 포함된 요청이 컨트롤러에 도달하기 전인 브라우저/보안 필터 단계에서 차단된다. 서버 API 자체는 정상이어도 프론트엔드에서는 로그인, 회원가입, 데이터 조회 같은 요청이 CORS 에러로 실패한다.
 
-<img src="img/Pasted-image-20260503231235.png" width="400">
+<img src="img/Pasted-image-20260503231235.png" width="400" alt="">
 
 ### Changes
 

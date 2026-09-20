@@ -42,6 +42,40 @@ function formatCrumb(displayName: string, baseSlug: FullSlug, currentSlug: Simpl
   }
 }
 
+// Tag pages are emitted by the `TagPage` plugin rather than read from
+// `content/`, so they are absent from the trie this component normally walks
+// and it returned null on every one of them. The result was two ways to go up:
+// posts got this breadcrumb, while `/tags/…` got a bordered `←` icon button
+// floating above the title — the only bordered icon button on the site, in a
+// different idiom, at a different position, and pointing a leaf topic at Posts
+// rather than at Topics. The trail is derivable from the slug, so it is built
+// here and every page navigates up the same way.
+//
+// `tags/index` is Posts, `tags/topic` is Topics, `tags/topic/<name>` is one
+// subject beneath it.
+function tagCrumbs(slug: FullSlug, rootName: string): CrumbData[] {
+  const rest = slug.slice("tags/".length).replace(/\/?index$/, "")
+  const crumbs: CrumbData[] = [
+    { displayName: rootName, path: resolveRelative(slug, "/" as SimpleSlug) },
+  ]
+
+  if (rest === "") {
+    crumbs.push({ displayName: "Posts", path: "" })
+    return crumbs
+  }
+
+  const segments = rest.split("/")
+  segments.forEach((segment, idx) => {
+    const isLast = idx === segments.length - 1
+    const target = `tags/${segments.slice(0, idx + 1).join("/")}` as FullSlug
+    crumbs.push({
+      displayName: segment === "topic" ? "Topics" : segment.replaceAll("-", " "),
+      path: isLast ? "" : resolveRelative(slug, simplifySlug(target)),
+    })
+  })
+  return crumbs
+}
+
 export default ((opts?: Partial<BreadcrumbOptions>) => {
   const options: BreadcrumbOptions = { ...defaultOptions, ...opts }
   const Breadcrumbs: QuartzComponent = ({
@@ -50,27 +84,33 @@ export default ((opts?: Partial<BreadcrumbOptions>) => {
     displayClass,
     ctx,
   }: QuartzComponentProps) => {
-    const trie = (ctx.trie ??= trieFromAllFiles(allFiles))
-    const slugParts = fileData.slug!.split("/")
-    const pathNodes = trie.ancestryChain(slugParts)
+    const slug = fileData.slug!
+    let crumbs: CrumbData[]
 
-    if (!pathNodes) {
-      return null
+    if (slug.startsWith("tags/")) {
+      crumbs = tagCrumbs(slug, options.rootName)
+    } else {
+      const trie = (ctx.trie ??= trieFromAllFiles(allFiles))
+      const pathNodes = trie.ancestryChain(slug.split("/"))
+
+      if (!pathNodes) {
+        return null
+      }
+
+      crumbs = pathNodes.map((node, idx) => {
+        const crumb = formatCrumb(node.displayName, slug, simplifySlug(node.slug))
+        if (idx === 0) {
+          crumb.displayName = options.rootName
+        }
+
+        // For last node (current page), set empty path
+        if (idx === pathNodes.length - 1) {
+          crumb.path = ""
+        }
+
+        return crumb
+      })
     }
-
-    const crumbs: CrumbData[] = pathNodes.map((node, idx) => {
-      const crumb = formatCrumb(node.displayName, fileData.slug!, simplifySlug(node.slug))
-      if (idx === 0) {
-        crumb.displayName = options.rootName
-      }
-
-      // For last node (current page), set empty path
-      if (idx === pathNodes.length - 1) {
-        crumb.path = ""
-      }
-
-      return crumb
-    })
 
     if (!options.showCurrentPage) {
       crumbs.pop()

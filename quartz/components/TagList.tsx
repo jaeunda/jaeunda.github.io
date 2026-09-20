@@ -2,17 +2,32 @@ import { FullSlug, resolveRelative } from "../util/path"
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
 import { classNames } from "../util/lang"
 
+// Only `topic/` tags are shown to readers, here and everywhere else. `project/`
+// records which body of work a post came out of — useful to the author, noise
+// to someone deciding whether to read it — and it was the reason the archive
+// needed a Topic/Project tab strip at the top of the page.
+const TOPIC_PREFIX = "topic/"
+
 const TagList: QuartzComponent = ({ fileData, displayClass }: QuartzComponentProps) => {
-  const tags = fileData.frontmatter?.tags
-  if (tags && tags.length > 0) {
+  const tags = ((fileData.frontmatter?.tags ?? []) as string[]).filter((t) =>
+    t.startsWith(TOPIC_PREFIX),
+  )
+  if (tags.length > 0) {
     return (
       <ul class={classNames(displayClass, "tags", "content-tags")}>
         {tags.map((tag) => {
           const linkDest = resolveRelative(fileData.slug!, `tags/${tag}` as FullSlug)
+          // Now that only one namespace is ever shown, printing it on every
+          // chip is a prefix that never varies. `#database`, as the topic index
+          // and the archive print it.
+          //
+          // The `#` itself is drawn by `a.tag-link::before` in base.scss, which
+          // every tag chip in Quartz already gets. Printing it here as well is
+          // what rendered `##database` on every post.
           return (
             <li>
               <a href={linkDest} class="internal tag-link">
-                {tag}
+                {tag.slice(TOPIC_PREFIX.length)}
               </a>
             </li>
           )

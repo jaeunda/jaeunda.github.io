@@ -1,10 +1,10 @@
+// End-matter at the foot of a post, not a rail widget: reading pages have no
+// right rail any more, and the `max-width: 1200px` hide below meant the count
+// simply did not exist on a phone.
 .visitor-count {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding-top: 10px;
-  margin-top: 6px;
-  border-top: 1px solid var(--lightgray);
 
   svg {
     color: var(--gray);
@@ -24,11 +24,5 @@
 
   .visitor-count-value {
     color: var(--darkgray);
-  }
-}
-
-@media (max-width: 1200px) {
-  .visitor-count {
-    display: none;
   }
 }

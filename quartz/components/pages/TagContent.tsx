@@ -1,16 +1,16 @@
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "../types"
 import style from "../styles/listPage.scss"
 import { byDateAndAlphabetical, SortFn } from "../PageList"
+import { PostRow } from "../PostRow"
 import { FullSlug, getAllSegmentPrefixes, resolveRelative, simplifySlug } from "../../util/path"
 import { QuartzPluginData } from "../../plugins/vfile"
 import { Root } from "hast"
 import { htmlToJsx } from "../../util/jsx"
-import { i18n } from "../../i18n"
 import { ComponentChildren } from "preact"
-import { getDate } from "../Date"
-import readingTime from "reading-time"
-// @ts-ignore
-import tagIndexFilterScript from "../scripts/tagIndexFilter.inline"
+// @ts-ignore: .inline.ts files are loaded as text by the esbuild inline-script-loader
+import topicSwitcherScript from "../scripts/topicSwitcher.inline"
+
+const TOPIC_TAG = "topic"
 
 interface TagContentOptions {
   sort?: SortFn
@@ -19,15 +19,6 @@ interface TagContentOptions {
 
 const defaultOptions: TagContentOptions = {
   numPages: 10,
-}
-
-function splitTag(tag: string) {
-  const [prefix, ...rest] = tag.split("/")
-  return rest.length === 0 ? { prefix: "other", label: tag } : { prefix, label: rest.join("/") }
-}
-
-function tagGroupLabel(prefix: string) {
-  return prefix.charAt(0).toUpperCase() + prefix.slice(1)
 }
 
 function ArchivePostList({
@@ -39,55 +30,14 @@ function ArchivePostList({
   const sorter = sort ?? byDateAndAlphabetical(cfg)
   const list = pages.filter((page) => page.slug !== "index").sort(sorter)
 
+  // Same row vocabulary as the home index, from the same helpers, so a post
+  // reports the same length and date wherever it is listed.
   return (
-    <div class="recent-posts">
-      {list.map((page) => {
-        const title = page.frontmatter?.title ?? i18n(cfg.locale).propertyDefaults.title
-        const preview = page.description ?? ""
-        const tags: string[] = page.frontmatter?.tags ?? []
-        const date = getDate(cfg, page)
-        const day = date ? String(date.getDate()).padStart(2, "0") : ""
-        const monthYear = date
-          ? date.toLocaleDateString("en-US", { month: "short", year: "numeric" }).toUpperCase()
-          : ""
-        const readTime = page.text
-          ? i18n(cfg.locale).components.contentMeta.readingTime({
-              minutes: Math.ceil(readingTime(page.text).minutes),
-            })
-          : ""
-
-        return (
-          <article class="post-card" data-tags={tags.join(",")}>
-            <a
-              href={resolveRelative(fileData.slug!, page.slug!)}
-              class="post-card-link"
-              aria-label={title}
-            />
-            <div class="post-date-col">
-              <span class="day">{day}</span>
-              <span class="month-year">{monthYear}</span>
-            </div>
-            <div class="post-content-col">
-              <a href={resolveRelative(fileData.slug!, page.slug!)} class="post-title">
-                {title}
-              </a>
-              {preview && <p class="post-preview">{preview}</p>}
-              <div class="post-meta-row">
-                {tags.slice(0, 3).map((tag) => (
-                  <a
-                    href={resolveRelative(fileData.slug!, `tags/${tag}` as FullSlug)}
-                    class="post-tag"
-                  >
-                    #{tag}
-                  </a>
-                ))}
-                {readTime && <span class="post-readtime">{readTime}</span>}
-              </div>
-            </div>
-          </article>
-        )
-      })}
-    </div>
+    <ul class="post-rows">
+      {list.map((page) => (
+        <PostRow page={page} here={fileData.slug!} cfg={cfg} />
+      ))}
+    </ul>
   )
 }
 
@@ -115,144 +65,108 @@ export default ((opts?: Partial<TagContentOptions>) => {
     ) as ComponentChildren
     const cssClasses: string[] = fileData.frontmatter?.cssclasses ?? []
     const classes = cssClasses.join(" ")
+    const archivePages = allFiles.filter((page) => page.slug !== "index")
+
+    // Posts — every post, newest first, in the home page's row design and
+    // nothing else. It used to open with a Topic/Project tab strip above a
+    // chip cloud above the list: three navigation devices stacked on the one
+    // page whose whole job is "here is everything, in order".
     if (tag === "/") {
-      const allTags = [
-        ...new Set(
-          allFiles.flatMap((data) => data.frontmatter?.tags ?? []).flatMap(getAllSegmentPrefixes),
-        ),
-      ].sort((a, b) => a.localeCompare(b))
-      const tags = allTags.filter((tag) => !allTags.some((other) => other.startsWith(`${tag}/`)))
-      const tagItemMap: Map<string, QuartzPluginData[]> = new Map()
-      for (const tag of tags) {
-        tagItemMap.set(tag, allPagesWithTag(tag))
-      }
-      const tagsByPostCount = tags.toSorted((a, b) => {
-        const countDiff = tagItemMap.get(b)!.length - tagItemMap.get(a)!.length
-        return countDiff === 0 ? a.localeCompare(b) : countDiff
-      })
-      const tagGroups = tagsByPostCount.reduce<Array<{ prefix: string; tags: string[] }>>(
-        (groups, tag) => {
-          const { prefix } = splitTag(tag)
-          const existing = groups.find((group) => group.prefix === prefix)
-          if (existing) existing.tags.push(tag)
-          else groups.push({ prefix, tags: [tag] })
-          return groups
-        },
-        [],
-      )
-      const primaryGroups = tagGroups.filter(
-        ({ prefix }) => prefix === "topic" || prefix === "project",
-      )
-      const fallbackGroups = tagGroups.filter(
-        ({ prefix }) => prefix !== "topic" && prefix !== "project",
-      )
-      const defaultPrefix = primaryGroups.some(({ prefix }) => prefix === "topic")
-        ? "topic"
-        : primaryGroups.at(0)?.prefix
-      const archivePages = allFiles.filter((page) => page.slug !== "index")
       return (
         <div class="popover-hint">
-          <article class={classes}>
-            <p>{content}</p>
-          </article>
-          <section class="tag-index-filter top-tags" data-tag-index-filter>
-            {primaryGroups.length > 0 && (
-              <div class="tag-index-tabs" role="tablist" aria-label="Tag groups">
-                {primaryGroups.map(({ prefix }) => (
-                  <button
-                    type="button"
-                    class={`tag-index-tab ${prefix === defaultPrefix ? "active" : ""}`}
-                    data-tag-index-tab={prefix}
-                    aria-selected={prefix === defaultPrefix ? "true" : "false"}
-                  >
-                    {tagGroupLabel(prefix)}
-                  </button>
-                ))}
-              </div>
-            )}
-            <div class="tag-index-filter-groups">
-              {[...primaryGroups, ...fallbackGroups].map(({ prefix, tags }) => (
-                <div
-                  class="tag-index-filter-group"
-                  data-tag-index-chip-group={prefix}
-                  hidden={prefix !== defaultPrefix}
-                >
-                  <div class="top-tags-list">
-                    {tags.map((tag) => {
-                      const pages = tagItemMap.get(tag)!
-                      const { label } = splitTag(tag)
-                      const tagListingPage = `/tags/${tag}` as FullSlug
-                      const href = resolveRelative(fileData.slug!, tagListingPage)
-
-                      return (
-                        <a href={href} class="top-tag" data-tag-index-chip data-tag={tag}>
-                          #{label}
-                          <span class="top-tag-count">{pages.length}</span>
-                        </a>
-                      )
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-          <section class="recent-posts-section archive-posts-section" data-tag-index-all-posts>
-            <div class="section-header">
-              <div class="section-title">
-                All Posts
-                <span class="section-title-count">{archivePages.length}</span>
-              </div>
-            </div>
+          {content && (
+            <article class={classes}>
+              <p>{content}</p>
+            </article>
+          )}
+          <section class="archive-posts-section">
             <ArchivePostList {...props} pages={archivePages} sort={options?.sort} />
-          </section>
-          <div class="tag-index-sections">
-            {tagsByPostCount.map((tag) => {
-              const pages = tagItemMap.get(tag)!
-
-              const contentPage = allFiles.filter((file) => file.slug === `tags/${tag}`).at(0)
-
-              const root = contentPage?.htmlAst
-              const content =
-                !root || root?.children.length === 0
-                  ? contentPage?.description
-                  : htmlToJsx(contentPage.filePath!, root)
-
-              const tagListingPage = `/tags/${tag}` as FullSlug
-              const href = resolveRelative(fileData.slug!, tagListingPage)
-              const { prefix, label } = splitTag(tag)
-
-              return (
-                <div data-tag-index-section data-tag={tag} data-tag-prefix={prefix} hidden>
-                  <h2 class="tag-index-heading">
-                    <a href={href}>
-                      <span class="tag-index-heading-prefix">{prefix}</span>
-                      <span class="tag-index-heading-label">{label}</span>
-                    </a>
-                    <span class="tag-index-heading-count">{pages.length}</span>
-                  </h2>
-                  {content && <p>{content}</p>}
-                  <ArchivePostList {...props} pages={pages} sort={options?.sort} />
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )
-    } else {
-      const pages = allPagesWithTag(tag)
-
-      return (
-        <div class="popover-hint">
-          <article class={classes}>{content}</article>
-          <section class="archive-posts-section tag-posts-section">
-            <ArchivePostList {...props} pages={pages} sort={options?.sort} />
           </section>
         </div>
       )
     }
+
+    // Topics — the same posts, grouped by subject, as **one** switcher rather
+    // than a vertical stack of every group. `tags/topic` used to render a flat
+    // list of every post that carried any `topic/` tag, which is the same
+    // twelve rows Posts already showed; the stack that replaced it was correct
+    // but ran nine sections deep, so the page was a scroll, not a chooser.
+    //
+    // A strip of subjects that scrolls sideways and one open panel keeps the
+    // page on one screen at nine subjects and at ninety: nothing here is sized
+    // to the current count.
+    if (tag === TOPIC_TAG) {
+      const topics = [
+        ...new Set(
+          allFiles
+            .flatMap((page) => (page.frontmatter?.tags ?? []) as string[])
+            .filter((t) => t.startsWith(`${TOPIC_TAG}/`)),
+        ),
+      ]
+        .map((t) => ({ tag: t, label: t.slice(TOPIC_TAG.length + 1), pages: allPagesWithTag(t) }))
+        .sort((a, b) => {
+          const diff = b.pages.length - a.pages.length
+          return diff === 0 ? a.label.localeCompare(b.label) : diff
+        })
+
+      const open = topics.at(0)?.tag
+
+      return (
+        <div class="popover-hint">
+          {content && (
+            <article class={classes}>
+              <p>{content}</p>
+            </article>
+          )}
+          <div class="topic-switcher" data-topic-switcher>
+            <nav class="topic-bar" aria-label="Topics">
+              {/* Links, not buttons: the script intercepts a plain left click
+                  to switch in place, and everything else — no JavaScript, a
+                  Cmd-click, a middle click — opens the subject's own page.
+                  They wrap, so there are no step buttons and no scroller. */}
+              <div class="topic-strip" data-topic-strip>
+                {topics.map(({ tag: topicTag, label, pages }) => (
+                  <a
+                    id={`topic-${label}`}
+                    class="topic-chip"
+                    href={resolveRelative(fileData.slug!, `/tags/${topicTag}` as FullSlug)}
+                    data-topic={topicTag}
+                    aria-current={topicTag === open ? "true" : undefined}
+                  >
+                    <span class="topic-chip-name">#{label}</span>
+                    <span class="topic-chip-count">{pages.length}</span>
+                  </a>
+                ))}
+              </div>
+            </nav>
+
+            {topics.map(({ tag: topicTag, label, pages }) => (
+              <section
+                class="topic-panel"
+                data-topic={topicTag}
+                aria-labelledby={`topic-${label}`}
+                hidden={topicTag !== open}
+              >
+                <ArchivePostList {...props} pages={pages} sort={options?.sort} />
+              </section>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    const pages = allPagesWithTag(tag)
+    return (
+      <div class="popover-hint">
+        <article class={classes}>{content}</article>
+        <section class="archive-posts-section tag-posts-section">
+          <ArchivePostList {...props} pages={pages} sort={options?.sort} />
+        </section>
+      </div>
+    )
   }
 
   TagContent.css = style
-  TagContent.afterDOMLoaded = tagIndexFilterScript
+  TagContent.afterDOMLoaded = topicSwitcherScript
   return TagContent
 }) satisfies QuartzComponentConstructor

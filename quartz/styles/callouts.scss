@@ -1,11 +1,18 @@
 @use "./variables.scss" as *;
 @use "sass:color";
 
+// A callout is the same kind of interruption as a blockquote, so it takes the
+// same shape: the reading surface, a 2px accent edge, square on that edge and
+// rounded away from it. It was a tinted box with a 1px border in its own hue on
+// every side, which made it a third kind of container in an article that
+// already has code blocks and quotations.
 .callout {
-  border: 1px solid var(--border);
-  background-color: var(--bg);
-  border-radius: 5px;
-  padding: 0 1rem;
+  border: 0;
+  border-left: 2px solid var(--color);
+  border-radius: 0 4px 4px 0;
+  background-color: var(--reading-surface, #f2f3ed);
+  padding: 0 1.1rem;
+  margin: 0 0 1.65em;
   overflow-y: hidden;
   box-sizing: border-box;
 
@@ -34,25 +41,26 @@
   --callout-icon-quote: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"></path><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"></path></svg>');
   --callout-icon-fold: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Cpolyline points="6 9 12 15 18 9"%3E%3C/polyline%3E%3C/svg%3E');
 
+  // ── Accents ─────────────────────────────────────────────
+  // Upstream ships Obsidian's palette: #448aff blue, #00b0ff, #00bfa5 teal,
+  // #7a43b5 purple. None of it exists anywhere else on this site, so the first
+  // callout anyone wrote would have dropped a bright blue box into a page whose
+  // entire palette is one olive and four greys.
+  //
+  // Four accents carry all thirteen types, because a callout has four things it
+  // can mean: here is something, this worked, be careful, this is broken.
+  // Every one clears 6:1 on the reading surface the block sits on:
+  //   olive 6.28 · green 6.47 · amber 6.35 · brick 6.55
   &[data-callout] {
-    --color: #448aff;
-    --border: #448aff44;
-    --bg: #448aff10;
+    --color: var(--tertiary);
     --callout-icon: var(--callout-icon-note);
   }
 
   &[data-callout="abstract"] {
-    --color: #00b0ff;
-    --border: #00b0ff44;
-    --bg: #00b0ff10;
     --callout-icon: var(--callout-icon-abstract);
   }
 
-  &[data-callout="info"],
-  &[data-callout="todo"] {
-    --color: #00b8d4;
-    --border: #00b8d444;
-    --bg: #00b8d410;
+  &[data-callout="info"] {
     --callout-icon: var(--callout-icon-info);
   }
 
@@ -60,62 +68,47 @@
     --callout-icon: var(--callout-icon-todo);
   }
 
-  &[data-callout="tip"] {
-    --color: #00bfa5;
-    --border: #00bfa544;
-    --bg: #00bfa510;
-    --callout-icon: var(--callout-icon-tip);
-  }
-
-  &[data-callout="success"] {
-    --color: #09ad7a;
-    --border: #09ad7144;
-    --bg: #09ad7110;
-    --callout-icon: var(--callout-icon-success);
-  }
-
-  &[data-callout="question"] {
-    --color: #dba642;
-    --border: #dba64244;
-    --bg: #dba64210;
-    --callout-icon: var(--callout-icon-question);
-  }
-
-  &[data-callout="warning"] {
-    --color: #db8942;
-    --border: #db894244;
-    --bg: #db894210;
-    --callout-icon: var(--callout-icon-warning);
-  }
-
-  &[data-callout="failure"],
-  &[data-callout="danger"],
-  &[data-callout="bug"] {
-    --color: #db4242;
-    --border: #db424244;
-    --bg: #db424210;
-    --callout-icon: var(--callout-icon-failure);
-  }
-
-  &[data-callout="bug"] {
-    --callout-icon: var(--callout-icon-bug);
-  }
-
-  &[data-callout="danger"] {
-    --callout-icon: var(--callout-icon-danger);
-  }
-
   &[data-callout="example"] {
-    --color: #7a43b5;
-    --border: #7a43b544;
-    --bg: #7a43b510;
     --callout-icon: var(--callout-icon-example);
   }
 
   &[data-callout="quote"] {
-    --color: var(--secondary);
-    --border: var(--lightgray);
     --callout-icon: var(--callout-icon-quote);
+  }
+
+  &[data-callout="tip"] {
+    --color: #356044;
+    --callout-icon: var(--callout-icon-tip);
+  }
+
+  &[data-callout="success"] {
+    --color: #356044;
+    --callout-icon: var(--callout-icon-success);
+  }
+
+  &[data-callout="question"] {
+    --color: #6f5420;
+    --callout-icon: var(--callout-icon-question);
+  }
+
+  &[data-callout="warning"] {
+    --color: #6f5420;
+    --callout-icon: var(--callout-icon-warning);
+  }
+
+  &[data-callout="failure"] {
+    --color: #8c3f33;
+    --callout-icon: var(--callout-icon-failure);
+  }
+
+  &[data-callout="danger"] {
+    --color: #8c3f33;
+    --callout-icon: var(--callout-icon-danger);
+  }
+
+  &[data-callout="bug"] {
+    --color: #8c3f33;
+    --callout-icon: var(--callout-icon-bug);
   }
 
   &.is-collapsed {
@@ -145,12 +138,14 @@
 
 .callout-title {
   display: flex;
-  align-items: flex-start;
-  gap: 5px;
-  padding: 1rem 0;
+  align-items: center;
+  gap: 7px;
+  padding: 0.85rem 0 0.5rem;
   color: var(--color);
 
-  --icon-size: 18px;
+  // 18px put the icon at the size of a heading. A callout's label is metadata,
+  // and metadata on this site is 11.5px mono uppercase.
+  --icon-size: 14px;
 
   & .fold-callout-icon {
     transition: transform 0.15s ease;
@@ -182,6 +177,36 @@
   }
 
   .callout-title-inner {
-    font-weight: $semiBoldWeight;
+    font-family: var(--codeFont);
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1.3;
+  }
+
+  & > .callout-title-inner > p {
+    font-family: inherit;
+    font-size: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+  }
+}
+
+// The body is body copy: the accent is the edge and the label, not the prose.
+.callout > .callout-content {
+  padding-bottom: 0.9rem;
+
+  // Folded, the padding would hold the block open on an empty row.
+  .callout.is-collapsed > & {
+    padding-bottom: 0;
+  }
+
+  & > * {
+    color: var(--darkgray);
+  }
+
+  & > :last-child {
+    margin-bottom: 0;
   }
 }

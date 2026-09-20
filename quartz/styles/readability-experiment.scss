@@ -5,41 +5,103 @@
 @mixin styles($enabled: true) {
   @if $enabled {
     :root {
-      --reading-surface: #eceee5;
-    }
-
-    :root[saved-theme="dark"] {
-      --reading-surface: #292d24;
+      --reading-surface: #f2f3ed;
     }
 
     // Apply long-form rhythm only to content articles. Home and list pages keep
     // their compact, component-specific type scales.
     body:not([data-slug="index"]) .center > article:not(:has(.page-listing)):not(:has(.tag-index)) {
+      // Tuned for Pretendard setting Korean.
+      //
+      // Measure: 68ch is about 632px at this size, roughly 37 Hangul syllables
+      // to the line — the top of the 30–40 band Korean sets comfortably in.
+      // Only prose takes it; the box stays wider so tables, code blocks and
+      // figures are not squeezed into the reading column, because a four-column
+      // table at 68ch was wrapping one word per cell.
+      //
+      // Leading: Hangul is a run of full-width squares with none of the
+      // ascender/descender rhythm that lets Latin breathe at 1.6, so it wants
+      // more. 1.85 against a 37-character measure.
+      //
+      // Tracking: none. Pretendard already spaces Hangul correctly; the -0.01em
+      // this file started with crowded it, and the -0.003em that replaced it was
+      // 0.05px — a number that did nothing but look like a decision.
       width: 100%;
-      max-width: 68ch;
-      font-size: 16px;
-      line-height: 1.72;
-      letter-spacing: -0.01em;
+      max-width: 900px;
+      font-size: 17px;
+      line-height: 1.85;
+      letter-spacing: 0;
       word-break: keep-all;
-      overflow-wrap: anywhere;
+      // `anywhere` also broke ordinary English words mid-word; `break-word`
+      // only breaks a token that cannot fit on a line of its own.
+      overflow-wrap: break-word;
 
+      > * {
+        max-width: 68ch;
+      }
+
+      > :is(.table-container, table, pre, figure, .expand, blockquote) {
+        max-width: 100%;
+      }
+
+      // A paragraph break has to be visible against 31px of leading. 1.4em was
+      // 24px — under one line, so paragraphs ran together. 1.65em is 28px.
       p {
-        margin: 0 0 1.25em;
+        margin: 0 0 1.65em;
         line-height: inherit;
         text-wrap: pretty;
       }
 
+      // These margins are in the heading's own em, so a bigger heading already
+      // gets a bigger gap. The multipliers step down as well, so the distance
+      // above a chapter and above a section inside it are not nearly equal —
+      // h2 and h3 used one 2.5em rule and landed 62px and 51px apart.
       h1,
       h2,
       h3,
       h4,
       h5,
       h6 {
-        margin: 2.5em 0 0.6em;
+        letter-spacing: -0.02em;
+        text-wrap: balance;
+      }
+
+      h1,
+      h2 {
+        margin: 2.7em 0 0.62em;
+      }
+
+      h3 {
+        margin: 2em 0 0.55em;
+      }
+
+      h4,
+      h5,
+      h6 {
+        margin: 1.7em 0 0.45em;
       }
 
       > :is(h1, h2, h3, h4, h5, h6):first-child {
         margin-top: 0;
+      }
+
+      // Lists ran at 1.72 while the paragraphs around them ran at 1.85, so a
+      // bulleted passage was visibly tighter than the prose it belonged to.
+      ul,
+      ol {
+        margin: 0 0 1.65em;
+      }
+
+      li {
+        line-height: inherit;
+        margin-bottom: 0.45em;
+      }
+
+      // A nested item is not less important than its parent; the indent already
+      // says what it is, so it does not also need to be 3% smaller.
+      li > ul > li,
+      li > ol > li {
+        font-size: 1em;
       }
 
       a:not(.tag-link):not(:has(> img)) {
@@ -59,31 +121,65 @@
         }
       }
 
+      // 0.86em put inline code at 14.6px inside 17px Hangul — a visible drop
+      // every time a function name appeared mid-sentence.
       p code,
       li code,
       td code {
         border: 0;
         background: var(--reading-surface);
+        font-size: 0.9em;
       }
 
       pre {
         border: 0;
         background: var(--reading-surface);
+        // The C in these posts is kernel source, which is written for 8-wide
+        // tabs; at that width a third-level block starts past the middle of the
+        // line. 4 keeps the nesting readable inside a 772px column.
+        tab-size: 4;
       }
 
-      blockquote {
-        margin: 0 0 1.4em;
+      // Quotes here are textbook citations, so they stay a block rather than a
+      // tinted line of prose — but the fill alone left them reading as a second
+      // kind of code block. The accent edge says "someone else's words".
+      // A callout is a `<blockquote class="callout">`, and this selector is far
+      // more specific than `.callout`, so without the exclusion every callout
+      // took the quotation's `--secondary` edge and lost its accent.
+      blockquote:not(.callout) {
+        margin: 0 0 1.65em;
         padding: 0.85em 1.1em;
         border: 0;
-        border-radius: 4px;
+        border-left: 2px solid color-mix(in srgb, var(--secondary) 45%, transparent);
+        border-radius: 0 4px 4px 0;
         background: var(--reading-surface);
+      }
+
+      // Nine of the twelve posts embed diagrams. They were flush left at their
+      // natural size against a 900px box, so a narrow diagram sat off-centre in
+      // the middle of a centred column.
+      img {
+        display: block;
+        margin: 1.6em auto;
+      }
+
+      // Obsidian writes a caption as the emphasised line after an image.
+      p > img + em {
+        display: block;
+        transform: none;
+        margin-top: -0.6em;
+        font-size: 0.82em;
+        font-style: normal;
+        line-height: 1.5;
+        text-align: center;
+        color: var(--gray);
       }
     }
 
-    // The right rail already mounts only at the 1200px desktop breakpoint.
-    // Within that rail, keep one type size and use indentation only below the
+    // The outline is the left rail on reading pages, mounted only at the 1200px
+    // desktop breakpoint. Keep one type size and use indentation only below the
     // top heading level.
-    .sidebar.right .toc {
+    .sidebar.left .toc {
       top: 4rem;
       width: 100%;
       min-width: 0;
@@ -96,6 +192,31 @@
         gap: 2px;
         max-height: none;
         overflow: visible;
+      }
+
+      // The header is a rail label, not a heading: the document already has
+      // one and it is the post title in the column beside this.
+      button.toc-header {
+        width: 100%;
+        margin-bottom: 10px;
+        padding-bottom: 9px;
+        border-bottom: 1px solid var(--lightgray);
+
+        & h3 {
+          font-family: var(--codeFont);
+          font-size: 11px;
+          font-weight: 500;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: var(--gray);
+        }
+
+        & .fold {
+          margin-left: auto;
+          width: 12px;
+          height: 12px;
+          color: var(--gray);
+        }
       }
 
       .toc-content > li {
@@ -174,7 +295,7 @@
         .center
         > article:not(:has(.page-listing)):not(:has(.tag-index)) {
         max-width: 100%;
-        font-size: 16px;
+        font-size: 16.5px;
       }
     }
   }
