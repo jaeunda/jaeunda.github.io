@@ -45,10 +45,10 @@ cssclasses:
       <li class="pf-ev-card">
         <p class="pf-ev-tag"><span>Project 02</span>2026 오픈소스 개발자대회</p>
         <p class="pf-ev-title">DB 동시성 오류 검증 자동화 도구</p>
-        <p class="pf-ev-one">재현하기 어려운 DB 동시성 오류를 실행 순서로 고정해 CI에서 같은 조건으로 다시 검증하는&nbsp;도구</p>
-        <ol class="ps-mini" aria-label="구조"><li>PR</li><li>MySQL 컨테이너</li><li>순서 고정</li><li>SQL 판정</li></ol>
+        <p class="pf-ev-one">DB 워크플로의 실행 순서를 고정해, 수정 전후를 같은 순서로 CI에서 다시 검증하는 replay&nbsp;gate</p>
+        <ol class="ps-mini" aria-label="구조"><li>Sync-point</li><li>순서 탐색</li><li>SQL oracle</li><li>Replay</li></ol>
         <div class="pf-ev-nums">
-          <div><b>20/20 → 0/20</b><span>레퍼런스 시나리오: 수정 전 20회 모두 재현, 수정 후 0회</span></div>
+          <div><b>20/20 → 0/20</b><span>같은 순서에서 수정 전 20회 위반, 수정 후 0회</span></div>
           <div><b>8.78s</b><span>40회 반복 검증에 걸린 시간</span></div>
         </div>
         <p class="pf-ev-foot"><span class="pf-ev-stack">Go <i>|</i> MySQL <i>|</i> Testcontainers</span><a class="pf-ev-go" href="/portfolio-systems/weavegate">구조와 설계 판단</a></p>
