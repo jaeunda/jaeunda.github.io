@@ -3,7 +3,7 @@
 Every face on the site is self-hosted, declared once in
 `quartz/styles/fonts.scss` and served from `quartz/static/fonts/`.
 `quartz.config.ts` sets `fontOrigin: "local"`, so no page requests
-fonts.googleapis.com. The blog and `content/portfolio-it.md` share these faces:
+fonts.googleapis.com. The blog and the `content/portfolio-*.md` pages share these faces:
 
 | File                               | Face                                        | Source                                                                                                           |
 | ---------------------------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |

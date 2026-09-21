@@ -1188,6 +1188,37 @@ A portfolio is also domain-specific, so a second field means a second
 unlinked. Do not add an entry point for them — not the nav, not the byline, not
 the footer.
 
+### Systems Portfolio
+
+`content/portfolio-systems/` is the second portfolio, and the first with more
+than one page. It is not written for one employer: no company, role or
+application document is named anywhere in it.
+
+- `index.md` (`/portfolio-systems/`) is the overview: hero with the three
+  project cards, then Foundation (major projects and courses) directly below
+  the fold, then stack and profile. Nothing on it goes deeper than a card.
+- One detail page per project, in this order: `teampo`, `weavegate`, `ongi`.
+  A fourth page, `foundation`, covers the Linux system programming, kernel
+  and education work. The order puts service and AI↔backend integration
+  first, verification second and device integration third. The cards, the
+  top bar and the `.ps-pager` all follow it.
+- Detail pages lead with the result's architecture, then 문제, then `.ps-why`
+  design-judgment cards (condition → decision → effect, with the PR or source
+  as evidence), then verification and open items. The overview surfaces only
+  each project's four-stop architecture (`.ps-mini`) and two proof lines;
+  everything else lives on the detail page, and nothing is dropped there.
+- Titles lead with what the project is (`DB 동시성 오류 검증 자동화 도구`); the
+  proper name (`weavegate`) sits in the smaller `.ps-name` line.
+- Pages add the `portfolio-systems` cssclass next to `portfolio-shell` and
+  reuse the `.pf-*` components. Tokens are overridden in
+  `quartz/styles/portfolio-systems.scss`, scoped to `.portfolio-systems`:
+  white page, navy accent `#1d3a6e` and ink `#111418`. Cards use the IT
+  portfolio's soft edges: `--ps-card-line` borders, `--pf-shadow` and 10–12px
+  radii. Black `--ps-rule` is kept for section rules only. Titles are set in
+  Pretendard. `.ps-*` components exist only here.
+- An unlisted folder has no folder page (FolderPage only sees listed files),
+  so `contentPage.tsx` renders an unlisted `index.md` itself.
+
 ## Design Decisions Log
 
 ### 2026-05-27
@@ -1919,3 +1950,18 @@ carries the 2px olive ring, in a sensible order; `scrollWidth === clientWidth`
 at 375 / 500 / 820 / 1280; the entrance plays once across a home → post → back
 round trip; the layer switch holds editorial order with the pressed tab flat;
 and the masthead breaks two lines at every width with no orphan.
+
+### 2026-09-21
+
+- Added the systems portfolio as an overview plus four detail pages under
+  `content/portfolio-systems/`. The overview stays short enough to take in at
+  once and every card routes to a page that opens on the design reasoning, so
+  depth costs a click instead of a long scroll. See **Systems Portfolio**.
+- `contentPage.tsx` now emits an unlisted folder `index.md`, which previously
+  had no emitter at all.
+- Added the new copy's characters to the Pretendard subset.
+- Softened cards to the IT portfolio's radius, border and shadow; black now
+  marks section rules only.
+- Reordered the projects to collaboration platform → verification tool →
+  IoT service, so a reader meets application and backend work first and
+  embedded integration second. Detail pages now open on architecture.

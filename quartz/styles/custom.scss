@@ -5,6 +5,7 @@
 @use "./base.scss";
 @use "./readability-experiment.scss" as readability;
 @use "./portfolio.scss" as portfolio;
+@use "./portfolio-systems.scss" as portfolio-systems;
 
 /* Global UI scale — keep one reversible control for desktop and mobile.
    Held at 0.95 until 2026-09-20, which shrank every declared size by 5%: the
@@ -2768,3 +2769,7 @@ footer {
 
 // Portfolio page components; the page itself is content/portfolio-it.md.
 @include portfolio.styles();
+
+// Systems portfolio theme and components, layered on the ones above; the page
+// is content/portfolio-systems.md.
+@include portfolio-systems.styles();

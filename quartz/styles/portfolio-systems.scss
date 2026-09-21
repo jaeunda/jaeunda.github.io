@@ -1,0 +1,944 @@
+@use "./variables.scss" as *;
+
+// Systems portfolio: `content/portfolio-systems/`.
+//
+// One overview page (`index.md`) and one detail page per project. The
+// overview keeps only what a reader needs in a first pass — the three
+// projects, the foundation work, stack and profile — and every card routes to
+// a detail page that opens directly on the design reasoning.
+//
+// Two layers:
+// 1. a token and shape override on `.pf-*` (portfolio.scss), scoped to
+//    `.portfolio-systems`: white paper, navy accent, black rules, square
+//    boxes, mono labels
+// 2. `.ps-*` components used only here: project tag and name line,
+//    architecture boxes with a return path, step rows, build modes, judgment
+//    cards (condition → decision → effect), implementation scope, the
+//    integration test log, open items, and detail-page navigation.
+
+// Arrow between boxes in a row; the gap is `--ps-gap`.
+@mixin row-arrow() {
+  position: relative;
+
+  &:not(:last-child)::after {
+    content: "→";
+    position: absolute;
+    top: 50%;
+    right: calc(var(--ps-gap) / -2);
+    transform: translate(50%, -50%);
+    font-size: 0.8rem;
+    line-height: 1;
+    color: var(--pf-ink);
+  }
+}
+
+@mixin styles() {
+  $root: ".page > #quartz-body[data-unlisted='true']";
+
+  @media (prefers-reduced-motion: no-preference) {
+    html:has(article.portfolio-systems) {
+      scroll-behavior: smooth;
+    }
+  }
+
+  #{$root}:has(article.portfolio-systems) {
+    background: #ffffff;
+
+    .center {
+      background: #ffffff;
+    }
+  }
+
+  #{$root} article.portfolio-shell.portfolio-systems {
+    // Literal values like the IT page: light only, whatever the blog is doing.
+    --pf-page: #ffffff;
+    --pf-ink: #111418;
+    --pf-body: #2c3038;
+    --pf-mute: #5b616c;
+    --pf-line: #dcdfe4;
+    --pf-accent: #1d3a6e;
+    --pf-tint: rgb(29 58 110 / 9%);
+    --pf-card: #ffffff;
+    --pf-surface: #f3f4f6;
+    // Soft card edges, the IT portfolio's values: a pale line, a low shadow
+    // and rounded corners. Black is kept for section rules only.
+    --pf-shadow: 0 1px 2px rgb(0 0 0 / 4%), 0 8px 24px -12px rgb(0 0 0 / 10%);
+    --pf-shadow-lift: 0 1px 2px rgb(0 0 0 / 5%), 0 18px 40px -18px rgb(0 0 0 / 16%);
+    --ps-card-line: #d9dde3;
+    // The PDF sets titles in Pretendard, not a Latin display face.
+    --pf-latin: var(--pf-sans);
+    --ps-rule: #111418;
+    --ps-gap: 1.6rem;
+
+    .pf-hero {
+      background: none;
+    }
+
+    // The hero ends at the container, not the viewport edge, like every other
+    // section rule.
+    .pf-hero + .pf-main > .pf-block:first-child {
+      border-top: 2px solid var(--ps-rule);
+    }
+
+    h1.pf-display {
+      letter-spacing: -0.035em;
+    }
+
+    // Second headline line in navy, as in the PDF, instead of a marker.
+    .ps-em {
+      padding: 0;
+      border-radius: 0;
+      background: none;
+      color: var(--pf-accent);
+      font-style: normal;
+      font-weight: inherit;
+    }
+
+    .pf-caps li {
+      font-weight: 600;
+    }
+
+    .pf-ev--3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .pf-ev-card {
+      display: flex;
+      flex-direction: column;
+      border-color: var(--ps-card-line);
+
+      .pf-ev-nums {
+        margin-top: auto;
+      }
+
+      &:hover,
+      &:focus-within {
+        border-color: var(--pf-accent);
+      }
+    }
+
+    .pf-ev-tag span {
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      background: var(--pf-accent);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .pf-ev-title {
+      font-size: clamp(1.3rem, 1.9vw, 1.55rem);
+      line-height: 1.25;
+      letter-spacing: -0.035em;
+      color: var(--pf-accent);
+    }
+
+    // Four-stop architecture line inside a hero card: the shape of the system
+    // before the numbers.
+    .ps-mini {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem 0;
+      margin: 0.9rem 0 1.15rem;
+
+      li {
+        padding: 0.18rem 0.5rem;
+        border: 1px solid var(--pf-line);
+        border-radius: 6px;
+        background: var(--pf-surface);
+        font-family: var(--pf-mono);
+        font-size: 0.66rem;
+        font-weight: 600;
+        color: var(--pf-accent);
+        white-space: nowrap;
+      }
+
+      li {
+        position: relative;
+      }
+
+      // Arrow sits in the gap, outside the chip border.
+      li + li {
+        margin-left: 1.1rem;
+
+        &::before {
+          content: "→";
+          position: absolute;
+          left: -0.9rem;
+          color: var(--pf-mute);
+          font-weight: 400;
+        }
+      }
+    }
+
+    .pf-ev-nums b {
+      font-size: clamp(1.2rem, 1.7vw, 1.45rem);
+    }
+
+    // Section rules are black, like the rules between projects in the PDF.
+    .pf-case + .pf-case,
+    .pf-case + .pf-block,
+    .pf-block + .pf-block {
+      border-top: 2px solid var(--ps-rule);
+    }
+
+    h2.pf-case-h {
+      margin-top: 1rem;
+      font-size: clamp(1.9rem, 3.8vw, 2.7rem);
+      line-height: 1.2;
+      letter-spacing: -0.04em;
+      color: var(--pf-accent);
+      text-wrap: balance;
+    }
+
+    .pf-dec > li {
+      background: var(--pf-card);
+      border-color: var(--pf-line);
+    }
+
+    .pf-met > li {
+      border-color: var(--ps-card-line);
+    }
+
+    .pf-flow > li > b {
+      color: var(--pf-accent);
+      font-weight: 600;
+    }
+
+    // Every section ends on a rule, so give the last row room above it.
+    .pf-case,
+    .pf-block {
+      padding-bottom: clamp(3rem, 6vh, 4.5rem);
+    }
+
+    // The PDF's black closing bar. The footer keeps the page's content width
+    // so its text aligns with the sections; the bar is painted full-bleed
+    // around it.
+    .pf-foot {
+      max-width: none;
+      padding: 1.4rem max(var(--pf-gut), calc((100% - var(--pf-max)) / 2));
+      border-top: 0;
+      background: var(--ps-rule);
+      box-shadow: 0 0 0 100vmax var(--ps-rule);
+      clip-path: inset(0 -100vmax);
+    }
+
+    .pf-foot-l a {
+      color: #ffffff;
+      font-family: var(--pf-mono);
+      font-size: 0.8rem;
+      border-bottom-color: rgb(255 255 255 / 45%);
+
+      &:hover {
+        color: #c9d4ea;
+      }
+    }
+
+    .pf-foot-r {
+      color: #b8bdc6;
+    }
+
+    a:focus-visible,
+    [tabindex]:focus-visible {
+      outline-color: var(--pf-accent);
+    }
+
+    .pf-foot a:focus-visible {
+      outline-color: #ffffff;
+    }
+
+    // ------------------------------------------------------------ tag + label
+    .ps-tag {
+      display: inline-block;
+      padding: 0.3rem 0.65rem;
+      border-radius: 4px;
+      background: var(--pf-accent);
+      color: #ffffff;
+      font-family: var(--pf-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .ps-lab {
+      margin-bottom: 0.7rem;
+      font-family: var(--pf-mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--pf-mute);
+    }
+
+    * + .ps-lab {
+      margin-top: 2rem;
+    }
+
+    // ------------------------------------------------------- box vocabulary
+    .ps-box-k {
+      font-family: var(--pf-mono);
+      font-size: 0.64rem;
+      font-weight: 600;
+      line-height: 1.5;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--pf-accent);
+    }
+
+    .ps-box-t {
+      margin-top: 0.2rem;
+      font-size: 0.92rem;
+      font-weight: 700;
+      line-height: 1.45;
+      letter-spacing: -0.02em;
+      color: var(--pf-ink);
+
+      b {
+        margin-right: 0.45rem;
+        font-family: var(--pf-mono);
+        font-weight: 600;
+        color: var(--pf-accent);
+      }
+    }
+
+    .ps-box-d {
+      margin-top: 0.15rem;
+      font-size: 0.78rem;
+      line-height: 1.55;
+      color: var(--pf-mute);
+    }
+
+    // ----------------------------------------------------------- architecture
+    .ps-arch {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--ps-gap);
+
+      > li {
+        @include row-arrow();
+        padding: 0.85rem 0.95rem 0.95rem;
+        border: 1px solid var(--ps-card-line);
+        border-radius: 10px;
+        background: var(--pf-card);
+        box-shadow: var(--pf-shadow);
+      }
+    }
+
+    // Return path from hardware back to the server, drawn as a bracket from
+    // the centre of column 4 to the centre of column 2.
+    .ps-return {
+      --ps-col: calc((100% - 3 * var(--ps-gap)) / 4);
+
+      position: relative;
+      height: 1.2rem;
+      margin: 0.35rem calc(var(--ps-col) / 2) 0 calc(var(--ps-col) * 1.5 + var(--ps-gap));
+      border: 1.5px solid var(--pf-accent);
+      border-top: 0;
+
+      // Arrowhead into the server box.
+      &::before {
+        content: "";
+        position: absolute;
+        top: -0.3rem;
+        left: -0.36rem;
+        border: 0.3rem solid transparent;
+        border-top: 0;
+        border-bottom: 0.42rem solid var(--pf-accent);
+      }
+
+      span {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        padding: 0 0.6rem;
+        transform: translate(-50%, 50%);
+        background: var(--pf-page);
+        font-size: 0.74rem;
+        font-weight: 600;
+        white-space: nowrap;
+        color: var(--pf-accent);
+
+        &::before {
+          content: "← ";
+        }
+      }
+    }
+
+    .ps-return + .ps-lab {
+      margin-top: 2.4rem;
+    }
+
+    // ------------------------------------------------------------- step rows
+    .ps-steps {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--ps-gap);
+
+      > li {
+        @include row-arrow();
+        padding: 0.8rem 0.95rem 0.85rem;
+        border: 1px solid var(--pf-line);
+        border-radius: 10px;
+        background: var(--pf-surface);
+      }
+
+      // The goal step stands out as the one white, accent-edged box.
+      > li[data-final] {
+        border-color: color-mix(in oklab, var(--pf-accent) 55%, var(--pf-line));
+        background: var(--pf-card);
+        box-shadow: var(--pf-shadow);
+      }
+    }
+
+    .ps-steps--5 {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    // White boxes with black borders, for rows that are a flow, not a ladder.
+    .ps-steps--line > li {
+      border-color: var(--ps-card-line);
+      background: var(--pf-card);
+      box-shadow: var(--pf-shadow);
+    }
+
+    // ------------------------------------------------------------ build modes
+    .ps-modes {
+      display: grid;
+      border-top: 1px solid var(--pf-line);
+
+      > li {
+        display: grid;
+        grid-template-columns: 8.5rem minmax(0, 1fr);
+        gap: 0 1.2rem;
+        align-items: baseline;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid var(--pf-line);
+      }
+
+      code {
+        padding: 0;
+        border: 0;
+        background: none;
+        font-family: var(--pf-mono);
+        font-size: 0.74rem;
+        font-weight: 600;
+        color: var(--pf-accent);
+      }
+
+      span {
+        font-size: 0.85rem;
+        line-height: 1.6;
+        color: var(--pf-body);
+      }
+    }
+
+    // ----------------------------------------------------- integration log
+    .ps-log-intro {
+      max-width: 40em;
+      margin-bottom: 1.4rem;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--pf-body);
+    }
+
+    .ps-log {
+      display: grid;
+      border-top: 1px solid var(--ps-card-line);
+
+      > li:not(.ps-log-g) {
+        display: grid;
+        grid-template-columns: 4rem minmax(0, 1fr);
+        gap: 0 1.2rem;
+        padding: 0.85rem 0;
+        border-bottom: 1px solid var(--pf-line);
+      }
+
+      code {
+        padding: 0 0.2rem;
+        border: 0;
+        border-radius: 2px;
+        background: var(--pf-surface);
+        font-size: 0.86em;
+      }
+    }
+
+    // Stage header: the same four steps as the row above the log.
+    .ps-log-g {
+      padding: 1.3rem 0 0.5rem;
+      border-bottom: 1px solid var(--pf-line);
+      font-family: var(--pf-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--pf-accent);
+
+      &:first-child {
+        padding-top: 0.8rem;
+      }
+
+      i {
+        color: var(--pf-mute);
+      }
+    }
+
+    .ps-log-w {
+      padding-top: 0.12rem;
+      font-family: var(--pf-mono);
+      font-size: 0.72rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--pf-mute);
+    }
+
+    .ps-log-t {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0.2rem 0.6rem;
+      font-size: 0.92rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--pf-ink);
+
+      a {
+        font-family: var(--pf-mono);
+        font-size: 0.7rem;
+        font-weight: 400;
+        letter-spacing: 0;
+        color: var(--pf-accent);
+        border-bottom: 1px solid color-mix(in oklab, var(--pf-accent) 35%, transparent);
+
+        &:hover {
+          color: var(--pf-ink);
+        }
+      }
+    }
+
+    .ps-log-d {
+      max-width: 44em;
+      margin-top: 0.25rem;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: var(--pf-body);
+      text-wrap: pretty;
+    }
+
+    // ------------------------------------------------------------ open items
+    .ps-gap {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+
+      > li {
+        padding: 1rem 1.1rem 1.1rem;
+        border: 1px dashed color-mix(in oklab, var(--pf-mute) 55%, var(--ps-card-line));
+        border-radius: 12px;
+      }
+
+      b {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--pf-ink);
+      }
+
+      span {
+        display: block;
+        margin-top: 0.35rem;
+        font-size: 0.82rem;
+        line-height: 1.7;
+        color: var(--pf-body);
+      }
+    }
+
+    // The left-rail section label is how a skimming reader finds the order
+    // 구조 → 문제 → 설계 판단 → 검증, so it reads at label size, not caption size.
+    .pf-sec-k {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--pf-accent);
+    }
+
+    // One-sentence summary in an overview card; the full bullets live on the
+    // detail page.
+    .ps-card-one {
+      margin-top: 0.6rem;
+      font-size: 0.86rem;
+      line-height: 1.7;
+      color: var(--pf-body);
+      text-wrap: pretty;
+    }
+
+    // ------------------------------------------------------ project header
+    h1.pf-case-h {
+      margin-top: 1rem;
+      font-family: var(--pf-display);
+      font-size: clamp(1.9rem, 3.8vw, 2.7rem);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.04em;
+      color: var(--pf-accent);
+      text-wrap: balance;
+    }
+
+    .ps-tag i {
+      margin: 0 0.35em;
+      font-style: normal;
+      opacity: 0.6;
+    }
+
+    // The project's proper name sits under the descriptive title.
+    .ps-name {
+      margin-top: 0.45rem;
+      font-family: var(--pf-mono);
+      font-size: 0.74rem;
+      color: var(--pf-mute);
+
+      i {
+        color: var(--pf-line);
+      }
+    }
+
+    // Detail pages open straight onto the reasoning, so the header needs no
+    // hero height.
+    .ps-detail {
+      padding-top: clamp(2.5rem, 6vh, 4rem);
+    }
+
+    .pf-bar-nav a[aria-current="page"] {
+      color: var(--pf-accent);
+      font-weight: 600;
+    }
+
+    // Link from an overview card or group to its detail page.
+    .ps-go {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--pf-accent);
+
+      &::after {
+        content: "→";
+        display: inline-block;
+        margin-left: 0.3em;
+        transition: transform 0.18s ease-out;
+      }
+
+      &:hover::after {
+        transform: translateX(3px);
+      }
+    }
+
+    .pf-group-k .ps-go {
+      float: right;
+      font-size: 0.76rem;
+
+      &::after {
+        margin-left: 0.3em;
+      }
+    }
+
+    // Previous / next project at the foot of a detail page.
+    .ps-pager {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: clamp(3rem, 6vh, 4.5rem);
+
+      a {
+        display: block;
+        padding: 1rem 1.2rem;
+        border: 1px solid var(--ps-card-line);
+        border-radius: 12px;
+        background: var(--pf-card);
+        box-shadow: var(--pf-shadow);
+        color: var(--pf-ink);
+        transition:
+          transform 0.18s ease-out,
+          box-shadow 0.18s ease-out,
+          border-color 0.18s ease-out;
+
+        &:hover,
+        &:focus-visible {
+          transform: translateY(-3px);
+          border-color: color-mix(in oklab, var(--pf-accent) 45%, var(--pf-line));
+          box-shadow: var(--pf-shadow-lift);
+        }
+
+        span {
+          display: block;
+          font-family: var(--pf-mono);
+          font-size: 0.64rem;
+          letter-spacing: 0.08em;
+          color: var(--pf-mute);
+        }
+
+        b {
+          display: block;
+          margin-top: 0.3rem;
+          font-size: 0.98rem;
+          font-weight: 700;
+          letter-spacing: -0.02em;
+          color: var(--pf-accent);
+        }
+      }
+
+      [data-dir="next"] {
+        grid-column: 2;
+        text-align: right;
+      }
+    }
+
+    // ----------------------------------------------------- judgment cards
+    // One design question per card, answered as condition → decision →
+    // effect, with the PR that holds the evidence.
+    .ps-why {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+
+      > li {
+        display: flex;
+        flex-direction: column;
+        padding: 1.15rem 1.3rem 1.15rem;
+        border: 1px solid var(--pf-line);
+        border-radius: 12px;
+        background: var(--pf-card);
+        box-shadow: var(--pf-shadow);
+      }
+    }
+
+    .ps-why--3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-bottom: 1.8rem;
+    }
+
+    .ps-why-q {
+      margin-bottom: 0.7rem;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.45;
+      letter-spacing: -0.03em;
+      color: var(--pf-ink);
+    }
+
+    // Label in a fixed gutter; the sentence stays one inline flow so bold
+    // phrases and plain text wrap together.
+    .ps-why-s {
+      position: relative;
+      padding: 0.35rem 0 0.35rem 3.2rem;
+      font-size: 0.84rem;
+      line-height: 1.65;
+      color: var(--pf-body);
+      text-wrap: pretty;
+
+      & + & {
+        border-top: 1px dashed var(--pf-line);
+      }
+
+      &::before {
+        content: attr(data-k);
+        position: absolute;
+        top: 0.52rem;
+        left: 0;
+        font-family: var(--pf-mono);
+        font-size: 0.64rem;
+        font-weight: 600;
+        color: var(--pf-mute);
+      }
+
+      &[data-k="결정"]::before {
+        color: var(--pf-accent);
+      }
+
+      b {
+        font-weight: 700;
+        color: var(--pf-ink);
+      }
+
+      a {
+        font-weight: 600;
+        color: var(--pf-accent);
+        border-bottom: 1px solid color-mix(in oklab, var(--pf-accent) 35%, transparent);
+
+        &:hover {
+          color: var(--pf-ink);
+        }
+      }
+    }
+
+    .ps-why-e {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: auto;
+      padding-top: 0.6rem;
+
+      a {
+        font-family: var(--pf-mono);
+        font-size: 0.68rem;
+        color: var(--pf-accent);
+        border-bottom: 1px solid color-mix(in oklab, var(--pf-accent) 35%, transparent);
+
+        &:hover {
+          color: var(--pf-ink);
+        }
+      }
+    }
+
+    // --------------------------------------------------------------- scope
+    .ps-scope {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 2rem;
+      border-top: 1px solid var(--ps-card-line);
+
+      > li {
+        display: grid;
+        grid-template-columns: 8.5rem minmax(0, 1fr) auto;
+        gap: 0 0.9rem;
+        align-items: baseline;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid var(--pf-line);
+      }
+
+      b {
+        font-size: 0.88rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--pf-ink);
+      }
+
+      span {
+        font-size: 0.8rem;
+        line-height: 1.55;
+        color: var(--pf-body);
+      }
+
+      a {
+        font-family: var(--pf-mono);
+        font-size: 0.66rem;
+        color: var(--pf-accent);
+
+        &:hover {
+          color: var(--pf-ink);
+        }
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------- motion
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      #{$root} article.portfolio-systems {
+        .ps-why > li,
+        .ps-scope {
+          animation: pf-slide linear both;
+          animation-timeline: view();
+          animation-range: entry 5% entry 60%;
+        }
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------- tablet
+  @media all and ($tablet) {
+    #{$root} article.portfolio-shell.portfolio-systems {
+      .ps-gap,
+      .ps-why--3 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .ps-scope {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  }
+
+  // Four boxes plus arrows need about 820px of track; below that they stack.
+  @media (max-width: 1000px) {
+    #{$root} article.portfolio-shell.portfolio-systems {
+      .pf-ev--3 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .ps-arch,
+      .ps-steps,
+      .ps-steps--5 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+
+        > li:nth-child(2n)::after {
+          content: none;
+        }
+      }
+
+      .ps-return {
+        display: none;
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------- mobile
+  @media all and ($mobile) {
+    #{$root} article.portfolio-shell.portfolio-systems {
+      .ps-arch,
+      .ps-steps,
+      .ps-steps--5 {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1.4rem;
+
+        > li:not(:last-child)::after {
+          content: "↓";
+          top: auto;
+          right: auto;
+          bottom: -0.7rem;
+          left: 1rem;
+          transform: translateY(50%);
+        }
+      }
+
+      .pf-ev--3,
+      .ps-gap,
+      .ps-scope,
+      .ps-why,
+      .ps-why--3,
+      .ps-pager {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .ps-pager [data-dir="next"] {
+        grid-column: auto;
+      }
+
+      .ps-scope > li {
+        grid-template-columns: minmax(0, 1fr) auto;
+
+        span {
+          grid-column: 1 / -1;
+        }
+      }
+
+      .ps-modes > li,
+      .ps-log > li:not(.ps-log-g) {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.2rem;
+      }
+    }
+  }
+
+  // ----------------------------------------------------------------- print
+  @media print {
+    #{$root} article.portfolio-shell.portfolio-systems {
+      .pf-foot {
+        background: none;
+        border-top: 2px solid var(--ps-rule);
+      }
+
+      .pf-foot-l a,
+      .pf-foot-r {
+        color: var(--pf-ink);
+      }
+    }
+  }
+}
