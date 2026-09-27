@@ -5,13 +5,13 @@
 @mixin styles($enabled: true) {
   @if $enabled {
     :root {
-      --reading-surface: #f2f3ed;
+      --reading-surface: #f1f2ef;
     }
 
     // Apply long-form rhythm only to content articles. Home and list pages keep
     // their compact, component-specific type scales.
     body:not([data-slug="index"]) .center > article:not(:has(.page-listing)):not(:has(.tag-index)) {
-      // Tuned for Pretendard setting Korean.
+      // Tuned for the reading face setting Korean.
       //
       // Measure: 68ch is about 632px at this size, roughly 37 Hangul syllables
       // to the line — the top of the 30–40 band Korean sets comfortably in.
@@ -23,9 +23,10 @@
       // ascender/descender rhythm that lets Latin breathe at 1.6, so it wants
       // more. 1.85 against a 37-character measure.
       //
-      // Tracking: none. Pretendard already spaces Hangul correctly; the -0.01em
-      // this file started with crowded it, and the -0.003em that replaced it was
-      // 0.05px — a number that did nothing but look like a decision.
+      // Tracking: none. The reading face already spaces Hangul correctly; the
+      // -0.01em this file started with crowded it, and the -0.003em that
+      // replaced it was 0.05px — a number that did nothing but look like a
+      // decision.
       width: 100%;
       max-width: 900px;
       font-size: 17px;

@@ -4,9 +4,9 @@ tags:
   - topic/kubernetes
   - topic/network
 Date: 2026-03-01
-featured: true
+pinned: true
 pinOrder: 5
-description: "외부에서 온 패킷 하나는 어떤 변환을 거쳐 목적지 Pod까지 도달하는가."
+description: "밖에서 들어온 패킷 하나는 어떤 변환을 거쳐 목적지 Pod에 닿는가."
 layer: orchestration
 rank: 1
 ---

@@ -4,7 +4,7 @@ tags:
   - topic/network
   - topic/http
   - project/team-po
-description: "브라우저는 왜 진짜 요청을 보내기 전에 서버에게 한 번 더 물어보는가."
+description: "브라우저는 왜 진짜 요청을 보내기 전에 한 번 더 묻는가."
 layer: application
 rank: 2
 ---

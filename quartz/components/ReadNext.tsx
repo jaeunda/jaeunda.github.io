@@ -8,9 +8,16 @@ import { PostRow } from "./PostRow"
 //
 // Before this, a finished post ended in an empty `.page-footer` and the reader
 // had nowhere to go. Related posts are drawn from the same `layer` first — the
-// same axis the home page is organised on — then topped up with posts that
-// share a `topic/` tag, so the suggestion is always about the same part of the
-// system rather than merely the same date.
+// same axis the home page is organised on — then from posts that share a
+// `topic/` tag, so the suggestion is about the same part of the system rather
+// than merely the same date.
+//
+// **And then it is filled to `LIMIT` from the rest of the archive.** Relevance
+// decides the order, not the length: four of twelve posts matched fewer than
+// three on layer and topic and two matched exactly one, so a heading that says
+// `Read next` stood over a single row and read as something that had failed to
+// load. A less related third suggestion is worth more to a reader who has just
+// finished a post than an empty half-block.
 
 const LIMIT = 3
 const TOPIC_PREFIX = "topic/"
@@ -27,7 +34,10 @@ export default (() => {
     displayClass,
     cfg,
   }: QuartzComponentProps) => {
+    // `quartz.layout.ts` mounts this on posts only; these two are the belt to
+    // that brace, for anything that mounts it without the condition.
     if (fileData.slug === "index") return null
+    if ((fileData.slug ?? "").startsWith("tags")) return null
     if (fileData.frontmatter?.unlisted === true) return null
 
     const here = fileData.slug!
@@ -49,7 +59,11 @@ export default (() => {
       (p) => !sameLayer.includes(p) && [...topicsOf(p)].some((t) => topics.has(t)),
     )
 
-    const picked: QuartzPluginData[] = [...sameLayer, ...sameTopic].slice(0, LIMIT)
+    // Newest first for the filler: with no layer or topic in common, recency
+    // is the only honest ordering left.
+    const related = new Set([...sameLayer, ...sameTopic])
+    const rest = candidates.filter((p) => !related.has(p))
+    const picked: QuartzPluginData[] = [...sameLayer, ...sameTopic, ...rest].slice(0, LIMIT)
     if (picked.length === 0) return null
 
     return (

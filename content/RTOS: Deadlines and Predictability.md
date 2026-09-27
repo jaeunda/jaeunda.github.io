@@ -4,9 +4,9 @@ tags:
   - topic/operating-systems
   - topic/rtos
 Date: 2025-11-11
-featured: true
+pinned: true
 pinOrder: 6
-description: "GDG 세미나에서 발표한 내용으로, 실시간의 기준이 속도가 아니라 데드라인인 이유를 정리했다."
+description: "실시간 시스템을 가르는 기준은 실행 속도가 아니라 데드라인이다."
 layer: kernel
 rank: 2
 ---

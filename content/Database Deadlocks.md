@@ -3,7 +3,7 @@ tags:
   - topic/database
   - project/database-system
 Date: 2026-04-19
-description: "서로를 기다리는 트랜잭션 중 누구를 죽일지, 데이터베이스는 어떤 기준으로 고르는가."
+description: "트랜잭션이 서로를 기다려 멈췄을 때 데이터베이스는 무엇을 하는가."
 layer: storage
 rank: 6
 ---

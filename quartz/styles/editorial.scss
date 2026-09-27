@@ -1,0 +1,2414 @@
+@use "./variables.scss" as *;
+
+// The blog's visual layer.
+//
+// Drawn from `.agent/skills/design-system/references/blueprint-2026-09.md`
+// before any of it was written, and included last by custom.scss so it is the
+// one place the look is decided. Unlisted portfolio pages are excluded
+// throughout — they keep their own shell.
+//
+// A 1080px frame, used rather than left empty: the home page is two columns
+// (the writing, and the stack it is organised by), a post has its outline
+// beside it, and lists carry a metadata column. A post's column is its 680px
+// measure. Colour is one olive scale.
+//
+// Ruled, not raised: structure is hairlines, never shadows or pills, and the
+// radius is 0 for structure and 3px for small frames.
+//
+// Type speaks in three voices. Fraunces, the display serif, sets the wordmark,
+// the masthead, every post title and the article's own h2/h3 — the writing
+// announcing itself. Noto Sans KR sets everything read as prose, and picks up
+// the Hangul inside a Fraunces heading, since Fraunces has no Korean. IBM Plex
+// Mono is the machine: dates, counts, tags, paths, nav, labels, layer and
+// outline numbers. Prose and mono never share a run of text; a heading and its
+// Korean fallback do, deliberately.
+
+$shell: '.page > #quartz-body:not([data-unlisted="true"])';
+// Higher than every earlier article rule, including the old reading pass.
+// Portfolio pages are articles too, and keep their own styling.
+$post: 'html body:not([data-slug="index"]):not([data-slug^="tags"]) #quartz-body:not([data-unlisted="true"]) .center > article';
+$is-post: 'body:not([data-slug="index"]):not([data-slug^="tags"])';
+$wide: "(min-width: 1100px)";
+$narrow: "(max-width: 1099.98px)";
+$rail-up: "(min-width: 1200px)";
+$rail-down: "(max-width: 1199.98px)";
+
+@mixin styles() {
+  // ── Tokens ──────────────────────────────────────────────
+  html:root {
+    --frame: 1080px;
+    --aside: 340px;
+    --col-gap: 64px;
+    --rail: 240px;
+    // ~40 Hangul syllables at 17px: the comfortable line for Korean prose
+    // sits between 35 and 45. Everything in a post ends here.
+    --measure: 680px;
+    --gut: clamp(20px, 4vw, 48px);
+
+    // Olive scale, built around the site's original accent. 600 is that
+    // accent exactly — `secondary`/`tertiary` in quartz.config.ts and
+    // `--pf-accent` on the portfolio pages — at 6.7:1 on the ground. 100 is
+    // the original `textHighlight`. The deeper, yellower scale that replaced
+    // it for one pass is gone: it left the blog and the portfolio printed in
+    // two different greens.
+    --olive-50: #f2f4ec;
+    --olive-100: #dde3d4;
+    --olive-200: #c3ccb0;
+    --olive-300: #9fab85;
+    --olive-400: #7a8a60;
+    --olive-600: #4f5e3c;
+    --olive-700: #414e31;
+    --olive-800: #333e26;
+    --olive-900: #232b1a;
+
+    // Neutrals: hue-free, and set for reading rather than for mood. The
+    // ground is a shade off pure white — enough to take the glare out of a
+    // 60-minute post, not enough to cost contrast — and the ink is near-black
+    // at 16.9:1 on it. Nothing here is tinted: olive is the only colour on the
+    // page, and a grey that leans green competes with it. These are the nine
+    // theme colours from quartz.config.ts under the names this file uses.
+    //
+    // Contrast on the ground: ink 16.9:1 · body 13.4:1 · mute 6.3:1 ·
+    // faint 5.3:1 · accent 6.8:1.
+    --ground: #fbfbfa;
+    --card: #ffffff;
+    // The reading surface: a step down from the ground for code and quotes.
+    --plate: #f1f2ef;
+    --line: #e5e6e2;
+    --line-strong: #cbccc7;
+    --ink: #191a18;
+    --body: #2b2d2a;
+    --mute: #5c5f5a;
+    // 5.3:1 on the ground and 5.0:1 on olive-50: it carries 12px mono.
+    --faint: #676a64;
+    --accent: var(--olive-600);
+
+    // Kept for the search overlay, the one floating layer on the site.
+    --card-shadow-lift: 0 2px 4px rgb(20 22 20 / 5%), 0 22px 44px -20px rgb(20 22 20 / 22%);
+    // The display face — the wordmark, the masthead, every title and the
+    // article's h2/h3. It carries no Hangul, so the fallback is the reading
+    // face and not Georgia: a Korean heading has to land on Noto Sans KR or it
+    // lands on whatever the OS picked.
+    --serif: var(--displayFont);
+    // The machine's voice. Plex falls back to the reading face, so a stray
+    // Hangul glyph still lands on Noto Sans KR.
+    --mono: var(--codeFont);
+    --r: 3px;
+    --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  // Layers share one tone. They were five hues, which read as a legend of
+  // colours rather than as one stack; the number and the name say which
+  // layer it is.
+  [data-layer] {
+    --layer: var(--olive-700);
+    --layer-soft: var(--olive-50);
+  }
+
+  // ── Ground ──────────────────────────────────────────────
+  // One flat ground everywhere, including the pages custom.scss washes.
+  html,
+  body,
+  body[data-slug="index"],
+  body[data-slug^="tags"] {
+    background: var(--ground);
+    background-image: none;
+  }
+
+  body {
+    overflow-x: clip;
+  }
+
+  // Hover lifts are decoration; a reader who asked for less motion gets the
+  // colour change without the travel.
+  @media (prefers-reduced-motion: reduce) {
+    #{$shell} :is(.hs-cell-link, .post-row-link, .footer-links a, a) {
+      transition: none;
+      transform: none !important;
+    }
+  }
+
+  // Keyboard focus is always visible: one olive ring, offset from the edge.
+  #{$shell} :is(a, button, summary, input, [tabindex]):focus-visible {
+    outline: 2px solid var(--olive-600);
+    outline-offset: 3px;
+    border-radius: var(--r);
+  }
+
+  ::selection {
+    background: var(--olive-200);
+    color: var(--ink);
+  }
+
+  // ── UI type ─────────────────────────────────────────────
+  // The machine's voice. Every string here is ASCII a program could have
+  // printed — a date, a count, a tag, a path, a label — so it is set in mono,
+  // a step smaller than the reading face beside it (Plex's x-height is lower
+  // than Noto Sans KR's), with no negative tracking. Anything that can hold
+  // Hangul (titles, descriptions, blurbs, outline entries) is not on this list.
+  html
+    body
+    :is(
+      .content-meta,
+      .footer-colophon,
+      .footer-note,
+      .post-row-date,
+      .post-row-meta,
+      .post-row-layer,
+      .post-row-pin,
+      .page-footer .backlinks > h3,
+      .hs-cell-layer,
+      .hs-cell-meta,
+      .compact-toc > summary,
+      .toc-count,
+      .toc-prefix,
+      .toc-header h3,
+      .breadcrumb-container,
+      .rn-kicker,
+      .visitor-count-text,
+      .tag-page-ns,
+      .topic-chip,
+      .footer-links a,
+      .site-nav-links a,
+      .meta
+    ) {
+    font-family: var(--mono);
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  // ── Frame ───────────────────────────────────────────────
+  // Margin | main | aside | margin. `.center`, `.page-header` and
+  // `.page-footer` are `display: contents`, so every part of the page is an
+  // item of the one `#quartz-body` grid. Items span main and aside unless a
+  // page places them; `html body` outranks the areas templates custom.scss
+  // sets per breakpoint.
+  .page:has(> #quartz-body:not([data-unlisted="true"])) {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    --gutter-start: 0px;
+    --gutter-end: 0px;
+  }
+
+  html body #{$shell} {
+    box-sizing: border-box;
+    display: grid;
+    padding: 0;
+    grid-template-columns:
+      [full-start] minmax(var(--gut), 1fr)
+      [main-start] minmax(0, calc(var(--frame) - var(--aside)))
+      [aside-start] minmax(0, var(--aside))
+      [main-end] minmax(var(--gut), 1fr)
+      [full-end];
+    grid-template-rows: none;
+    grid-template-areas: none;
+    column-gap: 0;
+    row-gap: 0;
+
+    & > .center,
+    & .page-header,
+    & .page-footer {
+      display: contents;
+    }
+
+    & > *,
+    & > .center > *,
+    & .page-header > *,
+    & .page-footer > *,
+    & .center > article {
+      grid-area: auto;
+      grid-column: main-start / main-end;
+      min-width: 0;
+      max-width: none;
+      margin-inline: 0;
+    }
+
+    & > .sidebar.right,
+    & > .center > hr,
+    & > .sidebar.left {
+      display: none;
+    }
+  }
+
+  // A post: the post, a gap, then the outline on the right — where readers
+  // expect "on this page", and out of the way of the line the eye returns to.
+  // The post's left edge is the logo's. Its column is the measure itself, so
+  // the header rule, the prose, code, tables and Read next all stop at one
+  // right edge; the column used to be 796px with prose at 680, which left two
+  // right edges 116px apart (2026-09-22 design review). The gap takes the rest.
+  // Below 1200px there is no rail and the whole page — bar included — narrows
+  // to the post's own width, so the edges still agree.
+  @media all and #{$rail-up} {
+    html #{$is-post} #{$shell} {
+      grid-template-columns:
+        [full-start] minmax(var(--gut), 1fr)
+        [main-start body-start] minmax(0, var(--measure))
+        [body-end] minmax(var(--col-gap), calc(var(--frame) - var(--rail) - var(--measure)))
+        [rail-start] var(--rail)
+        [main-end rail-end] minmax(var(--gut), 1fr)
+        [full-end];
+
+      & .page-header > .popover-hint,
+      & > .center > article,
+      & .page-footer > * {
+        grid-column: body-start / body-end;
+      }
+
+      // The footer is the site's, not the post's: it spans the frame, which
+      // also keeps its full-bleed band centred on the viewport.
+      & > footer {
+        grid-column: main-start / main-end;
+      }
+
+      & > .sidebar.left {
+        display: block;
+        grid-column: rail-start / rail-end;
+        grid-row: 2 / span 30;
+        height: auto;
+        margin: 0;
+        padding: 0;
+        position: static;
+      }
+    }
+
+    .compact-toc {
+      display: none;
+    }
+  }
+
+  @media all and #{$rail-down} {
+    #{$is-post} {
+      --frame: var(--measure);
+      --aside: 0px;
+    }
+
+    .compact-toc {
+      display: block;
+    }
+
+    // The outline is the header's last line, and its own bottom rule is the
+    // header's closing edge — a second one on the wrapper would double it.
+    #{$is-post} .page-header > .popover-hint:has(> .compact-toc) {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+  }
+
+  // The 404 page is a "post" with no header and no outline: its message
+  // takes the frame, and the header's rule goes.
+  //
+  // It is the one page a reader arrives at by accident, so it says what
+  // happened and offers the one way out, in the site's own voice. It used to
+  // print Quartz's default sentence and `Return to Homepage` as a large
+  // underlined body link — the only link on the site drawn that way.
+  html #{$is-post}[data-slug="404"] #{$shell} {
+    & > .center > article {
+      grid-column: main-start / main-end;
+      padding: 48px 0 24px;
+
+      // An error code is machine output: mono.
+      h1 {
+        margin: 0;
+        font-family: var(--mono);
+        font-size: clamp(3rem, 2rem + 4vw, 5rem);
+        font-weight: 500;
+        letter-spacing: -0.04em;
+        color: var(--olive-600);
+      }
+
+      p {
+        max-width: 34em;
+        margin: 20px 0 0;
+        font-size: 16px;
+        line-height: 1.7;
+        color: var(--mute);
+      }
+
+      // The way out, in the vocabulary the chooser's `all posts →` uses: mono,
+      // lowercase, and an underline that colours in on hover.
+      //
+      // Not the nav's arriving rule. `base.scss` underlines every `a` and
+      // gives it a bottom border, and both outrank a rule written here — a
+      // `::after` bar on top of them is two marks for one link, which is the
+      // thing that had to be taken out of the top bar.
+      & > a {
+        display: inline-flex;
+        margin-top: 28px;
+        border-bottom: 0;
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--olive-700);
+        text-decoration: underline;
+        text-decoration-color: transparent;
+        text-underline-offset: 4px;
+        transition:
+          color 0.2s ease,
+          text-decoration-color 0.2s ease;
+
+        &::before {
+          content: "←";
+          margin-right: 7px;
+        }
+
+        &:hover {
+          color: var(--olive-900);
+          text-decoration-color: var(--olive-400);
+        }
+      }
+    }
+
+    & .page-header > .popover-hint {
+      display: none;
+    }
+  }
+
+  // ── Nav ─────────────────────────────────────────────────
+  // Sticky, with a full-bleed frosted ground and hairline painted by
+  // `::before`: a `backdrop-filter` on the header itself would become the
+  // containing block of the fixed search overlay and trap it in the bar.
+  // `::after` is the reading-progress line on posts.
+  header:has(.site-nav) {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    height: 64px;
+    margin: 0 0 clamp(28px, 6vh - 8px, 48px);
+    padding: 0;
+    border: 0;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0 calc(50% - 50vw);
+      z-index: -1;
+      border-bottom: 1px solid color-mix(in oklab, var(--line) 80%, transparent);
+      background: color-mix(in oklab, var(--ground) 80%, transparent);
+      // Prefixed first: the minifier keeps only the last of the pair.
+      -webkit-backdrop-filter: saturate(160%) blur(14px);
+      backdrop-filter: saturate(160%) blur(14px);
+    }
+
+    & > .search {
+      flex: 0 0 auto;
+      width: auto;
+      min-width: 0;
+      margin: 0;
+
+      // A field, not a pill: OLD's underlined search line, in mono.
+      & > .search-button {
+        width: auto;
+        min-width: 168px;
+        height: auto;
+        gap: 10px;
+        padding: 6px 0 5px;
+        border: 0;
+        border-bottom: 1px solid var(--line-strong);
+        border-radius: 0;
+        background: none;
+        box-shadow: none;
+        transition: border-color 0.2s ease;
+
+        &:hover {
+          border-bottom-color: var(--olive-600);
+        }
+
+        & > p {
+          font-family: var(--mono);
+          font-size: 12.5px;
+          text-transform: lowercase;
+          color: var(--mute);
+        }
+
+        & kbd,
+        & > p > kbd,
+        & > span {
+          font-family: var(--mono);
+          font-size: 12px;
+          color: var(--faint);
+        }
+      }
+    }
+  }
+
+  // Reading progress: a 2px olive line on the bar's bottom edge, driven by the
+  // page's scroll position and nothing else. It is chrome, not prose — the
+  // article itself never moves — and a browser without scroll timelines
+  // simply shows no line.
+  @supports (animation-timeline: scroll()) {
+    #{$is-post} header:has(.site-nav)::after {
+      content: "";
+      position: absolute;
+      left: calc(50% - 50vw);
+      bottom: -1px;
+      width: 100vw;
+      height: 2px;
+      background: var(--olive-600);
+      transform-origin: 0 50%;
+      transform: scaleX(0);
+      animation: editorial-progress linear both;
+      animation-timeline: scroll(root block);
+    }
+
+    @keyframes editorial-progress {
+      to {
+        transform: scaleX(1);
+      }
+    }
+  }
+
+  // The search overlay opens on the page's frame, in the reading face.
+  html body .search > .search-container {
+    background: color-mix(in oklab, var(--ground) 94%, transparent);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+
+    & > .search-space {
+      width: min(760px, 100% - 2 * var(--gut));
+      margin-top: 12vh;
+
+      & > * {
+        border-radius: var(--r);
+        background: var(--card);
+        box-shadow: var(--card-shadow-lift);
+      }
+
+      & > input {
+        padding: 15px 20px;
+        border-color: var(--line);
+        font-family: var(--mono);
+        font-size: 16px;
+      }
+
+      & > .search-layout {
+        border-color: var(--line);
+        overflow: hidden;
+      }
+
+      & > .search-layout > .results-container .result-card {
+        padding: 14px 20px;
+        border-bottom-color: var(--line);
+        font-family: var(--bodyFont);
+
+        &:hover,
+        &:focus,
+        &.focus {
+          background: var(--olive-50);
+        }
+
+        & > h3 {
+          font-family: var(--bodyFont);
+          font-size: 15px;
+          font-weight: 600;
+          color: var(--ink);
+        }
+
+        & > p {
+          font-family: var(--bodyFont);
+          font-size: 13.5px;
+          line-height: 1.6;
+          color: var(--mute);
+        }
+
+        & .highlight {
+          border-radius: 0;
+          background: var(--olive-100);
+          color: var(--olive-800);
+        }
+      }
+    }
+  }
+
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex: auto;
+    min-width: 0;
+  }
+
+  // The logo: Fraunces, olive. It is also a link home — the second route, the
+  // one a reader reaches for without thinking — so it answers to the pointer
+  // rather than sitting there as a printed mark.
+  .site-nav-mark {
+    font-family: var(--serif);
+    font-size: 23px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--accent);
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--olive-800);
+    }
+  }
+
+  // Lowercase mono destinations, and **one** mark for the current one: a 1px
+  // olive rule that grows from the left edge of the word. It is the same
+  // gesture the home chooser's open tab makes, so "here" is drawn one way on
+  // the whole site.
+  //
+  // There used to be two marks at once — a `text-decoration` underline here
+  // and a `border-bottom` from custom.scss — which printed two olive lines
+  // four pixels apart under `topics`. One is the design; the other was a
+  // leftover, and it is gone from custom.scss.
+  //
+  // A bar rather than `text-decoration` because a rule that arrives is worth
+  // more than one that appears: `text-decoration-color` can only fade, and the
+  // wipe says which end the word starts at. Hover draws it in neutral — you
+  // could go here — and the current page holds it in olive.
+  .site-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0 8px 0 auto;
+
+    a {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 0 10px;
+      border-radius: 0;
+      font-size: 13px;
+      text-transform: lowercase;
+      color: var(--mute);
+      text-decoration: none;
+      transition: color 0.2s ease;
+
+      &::after {
+        content: "";
+        position: absolute;
+        left: 10px;
+        right: 10px;
+        bottom: 7px;
+        height: 1px;
+        background: var(--line-strong);
+        transform: scaleX(0);
+        transform-origin: 0 50%;
+        transition:
+          transform 0.22s var(--ease),
+          background-color 0.2s ease;
+      }
+
+      &:hover {
+        color: var(--ink);
+
+        &::after {
+          transform: scaleX(1);
+        }
+      }
+
+      &[aria-current] {
+        color: var(--ink);
+
+        &::after {
+          background: var(--olive-600);
+          transform: scaleX(1);
+        }
+      }
+    }
+  }
+
+  // The bar is the only thing that says which page you are on, so a reader who
+  // asked for less motion gets it drawn rather than not drawn.
+  @media (prefers-reduced-motion: reduce) {
+    .site-nav-links a::after {
+      transition: none;
+    }
+  }
+
+  @media all and ($mobile) {
+    header:has(.site-nav) {
+      gap: 10px;
+      height: 58px;
+      margin-bottom: 32px;
+
+      & > .search {
+        padding-top: 0;
+      }
+
+      // The icon alone. With three destinations in the bar there is no room
+      // for the word and the shortcut beside them, and they printed straight
+      // over `topics`; ⌘K means nothing on a phone anyway. This rule existed,
+      // and was lost with the block of dead home-page CSS it happened to sit
+      // in — the collision is what a regression looks like from the outside.
+      & > .search > .search-button {
+        min-width: 0;
+        padding: 12px;
+        margin: -12px -8px -12px -4px;
+        border: 0;
+        background: none;
+        box-shadow: none;
+
+        & > p,
+        & kbd {
+          display: none;
+        }
+      }
+    }
+
+    .site-nav {
+      flex-wrap: nowrap;
+      gap: 10px;
+    }
+
+    .site-nav-mark {
+      font-size: 21px;
+    }
+
+    .site-nav-links {
+      flex: 0 0 auto;
+      gap: 0;
+
+      a {
+        min-height: 40px;
+        padding: 0 7px;
+        font-size: 12.5px;
+      }
+
+      // The mark stays 1px inside the word at this size too.
+      a::after {
+        left: 7px;
+        right: 7px;
+      }
+    }
+  }
+
+  // ── Home: layout ────────────────────────────────────────
+  // One column, the frame's full width, in one order at every size: the
+  // masthead, the byline, the chooser, the open group's grid.
+  //
+  // It was rail | main — the byline and the layer filter standing in a 240px
+  // column beside the index. Two columns is a claim that the page has two
+  // subjects, and the home page has one: the writing. The rail also fixed the
+  // index at `frame - 240 - 64`, so the width of the thing a reader came for
+  // was decided by the chrome standing next to it.
+  //
+  // The stack is `display: contents` at every width, so its parts are items of
+  // the one page grid and can be ordered.
+  body[data-slug="index"] .page-footer > .home-stack {
+    display: contents;
+  }
+
+  html body[data-slug="index"] #{$shell} .page-footer > .home-stack > * {
+    grid-column: main-start / main-end;
+    min-width: 0;
+  }
+
+  // One column at every width, in DOM order: masthead, chooser, the open
+  // panel. `order` is enough, and **nothing here is explicitly placed** —
+  // there is no second column to place anything into now that the byline has
+  // moved to the footer, and a half-placed grid is how the bar ended up on
+  // top of the chooser once already: name every row or none of them.
+  html body[data-slug="index"] #{$shell} {
+    & > .center > article {
+      order: 1;
+    }
+
+    & .page-footer > .home-stack > .hs-filter {
+      order: 2;
+    }
+
+    // Every panel shares one slot; only one is ever shown.
+    & .page-footer > .home-stack > .hs-panel {
+      order: 3;
+    }
+
+    & > footer {
+      order: 4;
+    }
+  }
+
+  // `beforeBody` is empty on the index — breadcrumb, title, meta and tags are
+  // all `ConditionalRender`ed away — but Quartz still emits the wrapper, and an
+  // empty grid item claims a row of its own.
+  body[data-slug="index"] .page-header > .popover-hint {
+    display: none;
+  }
+
+  // ── Home: masthead ──────────────────────────────────────
+  // The statement the site is written under, in the display face at the only
+  // size on the page that is allowed to be large, and one line under it in the
+  // machine's voice.
+  //
+  // A mono status line — `12 posts · last write 2026-06-23` — used to sit
+  // above the statement. It is the first thing on the page and it was a
+  // changelog: the footer already prints both figures, where a reader who
+  // wants them is looking.
+  body[data-slug="index"] .center > article {
+    margin: 0;
+    padding: 0;
+    color: var(--mute);
+
+    h1 {
+      // `em` here is the h1's own size, so the cap moves with the font: a
+      // number that fits at one size clips the headline inside its own first
+      // line at another. 22em is 968px at 44px, against 685px for the longest
+      // line of the statement. **Measure the line before changing either.**
+      max-width: 22em;
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(26px, 1.2rem + 1.8vw, 44px);
+      // 600, not 700. Fraunces has a real 600, and at 40px the step from it to
+      // 700 is all ink and no more authority; the statement is the largest
+      // thing on the page already.
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+      text-wrap: balance;
+
+      // This Fraunces has a weight axis and no italic, so the emphasis in
+      // "from the mechanism up" is carried by the accent rather than by a
+      // synthesised slant, which on a serif at 40px looks like a rendering
+      // fault.
+      //
+      // And it takes its own line. Left to wrap, the statement set on one line
+      // at desktop and broke after "from" on a phone — a different shape at
+      // every width, and at two of them the break fell inside the phrase the
+      // colour is marking. Two lines with the accent on the second is the
+      // masthead's shape; `content/index.md` decides where it falls by where
+      // it puts the `_…_`.
+      em {
+        display: block;
+        font-style: normal;
+        font-weight: inherit;
+        color: var(--accent);
+      }
+    }
+
+    // The sub-line is the blog reported rather than written: the subjects, as
+    // a list. It is always English and never prose, so it goes in the mono —
+    // the same voice as the nav, the metadata and the footer's colophon — and
+    // it stops competing with the serif statement above it for the same job.
+    // A step smaller than the reading face, as everything in that voice is.
+    // One sentence supporting the statement above it, and `balance` so the two
+    // lines come out even instead of leaving three words stranded on the
+    // second. The measure is set in `ch` of the mono, so the break point does
+    // not move when the viewport does.
+    p {
+      max-width: 62ch;
+      margin: 16px 0 0;
+      font-family: var(--mono);
+      font-size: 13px;
+      text-wrap: balance;
+      font-weight: 400;
+      line-height: 1.75;
+      letter-spacing: 0;
+      color: var(--mute);
+      text-wrap: pretty;
+    }
+  }
+
+  // ── Home: chooser ───────────────────────────────────────
+  // One mono row, closed by a single rule: `pinned` first and open by default,
+  // then each layer. The open tab is inked and underlined in olive — the same
+  // mark `SiteNav` gives the page you are on, so the site has one vocabulary
+  // for "here". `all posts →` sits at the far end and is not a tab: every tab
+  // narrows the grid in place, and that link leaves the page.
+  .hs-filter {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0 24px;
+    margin: 48px 0 0;
+    padding: 0;
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .hs-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 24px;
+    min-width: 0;
+  }
+
+  .hs-tab {
+    position: relative;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 7px;
+    width: auto;
+    min-height: 0;
+    padding: 10px 0 11px;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 1;
+    color: var(--mute);
+    cursor: pointer;
+    transform: none;
+    transition: color 0.2s ease;
+
+    // Sits on the row's own rule rather than beside it, so the mark is the
+    // rule turning olive under one word.
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      height: 1px;
+      background: transparent;
+    }
+
+    &:hover {
+      transform: none;
+      background: none;
+      box-shadow: none;
+      color: var(--ink);
+    }
+
+    &[aria-pressed="true"] {
+      background: none;
+      box-shadow: none;
+      color: var(--ink);
+
+      &::after {
+        background: var(--olive-600);
+      }
+    }
+  }
+
+  .hs-tab-count {
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    font-size: 11.5px;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hs-all {
+    flex: 0 0 auto;
+    padding: 10px 0 11px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    letter-spacing: 0;
+    line-height: 1;
+    color: var(--olive-700);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 4px;
+    transition: text-decoration-color 0.2s ease;
+
+    &:hover {
+      text-decoration-color: var(--olive-400);
+    }
+  }
+
+  .hs-panel[hidden] {
+    display: none;
+  }
+
+  // ── Home: grid ──────────────────────────────────────────
+  // Every cell is the same cell: a hairline, one mono meta line, the title,
+  // the question the post asks. Nothing is boxed, tinted or raised — the only
+  // thing that varies from cell to cell is the writing.
+  //
+  // Rows have no vertical gap: the next row's rules are the separator, so the
+  // page is ruled once per row and never twice. Cells inside a row end where
+  // their own text ends, which nobody can see because a cell has no bottom
+  // rule — and it is why nothing here needs equal heights.
+  // **Three columns.** Two was tried, to fit the longest title on one line —
+  // `Phantom Phenomenon and Index Locking` measures 381px in the display face
+  // at 19px, against 317px for a third of the frame and 508px for a half — and
+  // it cost more than it bought: cards wide enough to look like rows, and six
+  // of them in three rows instead of two.
+  //
+  // Four of the twelve titles wrap to a second line here. That is fine now for
+  // the reason it was not before: nothing reserves a second line any more, so a
+  // wrapped title pushes only its own description down, and the gap between a
+  // title and the sentence under it is the same in every cell.
+  .hs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0 var(--col-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .hs-cell {
+    margin: 0;
+    padding: 0;
+  }
+
+  // The chooser's own rule is the first row's rule. Without this the two sit
+  // flush and the line under the tabs is 2px of `--line-strong` broken by
+  // 64px notches wherever the grid's column gaps fall.
+  //
+  // It hangs further below that rule than a cell hangs below its own: the
+  // chooser's is `--line-strong` and it closes a control, so it needs a clear
+  // beat under it before the reading starts. At the cells' own 18px the first
+  // row read as the chooser's last line.
+  .hs-grid > .hs-cell:nth-child(-n + 3) > .hs-cell-link {
+    border-top: 0;
+    padding-top: 26px;
+  }
+
+  // `box-sizing` first, and it is load-bearing: `a` is `content-box` here, so
+  // `height: 100%` sized the *content* to the row and the 40px of padding
+  // overflowed it. Every cell's stamp printed 38px below its own row, under
+  // the next row's rule, reading as the metadata of the card beneath it.
+  .hs-cell-link {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    // The row is as tall as its tallest cell; this is what lets a shorter one
+    // push its stamp down to meet the others.
+    height: 100%;
+    padding: 16px 0 28px;
+    border-top: 1px solid var(--line);
+    background: none;
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.2s ease;
+
+    // The whole mark is the rule turning olive and the title inking. Nothing
+    // moves, nothing fills: on a page of identical cells a hover that lifts
+    // or tints is the loudest thing on the screen.
+    &:hover {
+      border-top-color: var(--olive-600);
+
+      .hs-cell-title {
+        color: var(--olive-700);
+      }
+    }
+  }
+
+  // The stamp, at the foot of the cell. Every cell in a row is the same height
+  // — the title reserves two lines and the description is clamped to two — so
+  // `margin-top: auto` lands a row's stamps on one line without measuring
+  // anything. It does not wrap: a stamp that takes two rows in one cell and
+  // one in its neighbour breaks that line.
+  .hs-cell-meta {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 12px;
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .hs-cell-layer {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .hs-cell-stamp {
+    flex: 0 0 auto;
+  }
+
+  // Separated from the layer by a dot rather than by space, so `kernel` and
+  // `63 min` do not read as one run of machine output.
+  .hs-cell-layer + .hs-cell-stamp::before {
+    content: "·";
+    margin-right: 8px;
+    color: var(--line-strong);
+  }
+
+  // Two lines' worth of room, always. A one-line title beside a two-line one
+  // starts their two descriptions at different heights, and the grid's whole
+  // claim is that its cells are the same cell. `text-wrap: balance` keeps a
+  // two-line title from breaking after one word.
+  // It wraps if it has to, and nothing is reserved for the second line: the
+  // description sits the same distance under a one-line title as under a
+  // two-line one, which is the thing the reserve was breaking.
+  .hs-cell-title {
+    font-family: var(--serif);
+    font-size: 19px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.008em;
+    color: var(--ink);
+    text-wrap: balance;
+    transition: color 0.2s ease;
+  }
+
+  // The question the post answers — support for the title, not a second one,
+  // and two lines at most so a long one cannot make its cell look more
+  // important than the cells beside it.
+  //
+  // **One step under the title, in the colour the archive's rows use.** It was
+  // 13px on `--faint` at 1.7, which was an over-correction: pushed that far
+  // down it read as a caption someone had pasted under a headline — too small
+  // against a 19px serif, too pale, and too loosely set for a two-line block
+  // to hold together as one thought. Keeping the two apart is the *title's*
+  // job, and the title is 19px, 600 and near-black; the line under it does not
+  // also have to whisper.
+  //
+  // Tracking stays at 0: the reading face spaces Hangul correctly.
+  .hs-cell-desc {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    font-size: 13.5px;
+    font-weight: 400;
+    line-height: 1.62;
+    letter-spacing: 0;
+    color: var(--mute);
+    word-break: keep-all;
+  }
+
+  // ── Rows ────────────────────────────────────────────────
+  // The row answers to its own width, not the viewport's: three columns when
+  // there is room (date | title and description | layer and length), two
+  // with the metadata under the words, one on a phone.
+  .post-rows {
+    container: rows / inline-size;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .post-row {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .post-row-link {
+    display: grid;
+    grid-template-columns: 104px minmax(0, 1fr);
+    grid-template-areas:
+      "date main"
+      ". side";
+    align-items: baseline;
+    column-gap: 24px;
+    row-gap: 8px;
+    margin: 0;
+    padding: 20px 0;
+    border-radius: 0;
+    background: none;
+  }
+
+  // Three columns from 680px of the list's own width, so the home index
+  // (776px beside the rail) uses its right edge instead of stacking the
+  // metadata under every description.
+  @container rows (min-width: 680px) {
+    .post-row-link {
+      grid-template-columns: 100px minmax(0, 1fr) 150px;
+      grid-template-areas: "date main side";
+      column-gap: 28px;
+    }
+
+    .post-row-link > .post-row-side {
+      flex-direction: column;
+      align-items: flex-end;
+      text-align: right;
+    }
+  }
+
+  @container rows (max-width: 520px) {
+    .post-row-link {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        "date"
+        "main"
+        "side";
+      row-gap: 6px;
+      margin: 0;
+      padding: 18px 0;
+    }
+  }
+
+  .post-row-date {
+    grid-area: date;
+    padding-top: 0;
+    font-size: 12.5px;
+    color: var(--faint);
+  }
+
+  .post-row-main {
+    grid-area: main;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .post-row-title {
+    font-family: var(--serif);
+    font-size: 19px;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.008em;
+    color: var(--ink);
+    text-wrap: balance;
+    transition: color 0.2s ease;
+
+    &::after {
+      display: none;
+    }
+  }
+
+  // The same relationship the home grid's cells have — one step under a 19px
+  // title, `--mute`, 1.62, tracking 0 — a half-step larger because a row is
+  // the full measure wide and a cell is a third of it. The two lists used to
+  // set the same sentence at 15px with negative tracking here and 13px on
+  // `--faint` there, so a post looked like a different kind of thing depending
+  // on which page you met it on.
+  .post-row-desc {
+    font-weight: 400;
+    font-size: 14.5px;
+    line-height: 1.62;
+    letter-spacing: 0;
+    color: var(--mute);
+  }
+
+  .post-row-side {
+    grid-area: side;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+  }
+
+  .post-row-layer {
+    display: inline;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    font-size: 12px;
+    text-transform: lowercase !important;
+    color: var(--olive-700);
+
+    &::before {
+      display: none;
+    }
+  }
+
+  // The pinned post's row in the index: the one word that says why the title
+  // above is printed twice. The accent, in the machine's voice.
+  .post-row-pin {
+    font-size: 12.5px;
+    color: var(--olive-700);
+  }
+
+  .post-row-meta {
+    font-size: 12.5px;
+    color: var(--faint);
+  }
+
+  .post-row-link:hover .post-row-title,
+  .post-row-link:focus-visible .post-row-title {
+    color: var(--olive-700);
+  }
+
+  // Title first, where the eye enters a row. Under a post the order is
+  // editorial, not chronological, so a date down the left edge was the first
+  // thing read in every row and it read out of order; the date joins the
+  // length on the right instead. The archive keeps its date column: there the
+  // list is a timeline.
+  .read-next .post-row-link {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "main main"
+      "date side";
+    column-gap: 12px;
+    row-gap: 8px;
+    padding: 18px 0;
+  }
+
+  @container rows (min-width: 560px) {
+    .read-next .post-row-link {
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        "main date"
+        "main side";
+      grid-template-rows: auto 1fr;
+      column-gap: 40px;
+      row-gap: 6px;
+
+      & > .post-row-date {
+        justify-self: end;
+      }
+
+      // One line under the date: `pinned` sits beside the length rather
+      // than stacking a third line into the pinned post's row.
+      & > .post-row-side {
+        align-self: start;
+        flex-direction: row;
+        align-items: baseline;
+        justify-content: flex-end;
+        text-align: right;
+      }
+    }
+  }
+
+  // ── Lists ───────────────────────────────────────────────
+  .article-title.tag-page-title {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin: 6px 0 32px;
+    font-family: var(--serif);
+    font-size: clamp(2rem, 1.5rem + 1.4vw, 2.6rem);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -0.018em;
+    color: var(--ink);
+  }
+
+  .article-title.tag-page-title .article-title-count {
+    align-self: baseline;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--faint);
+  }
+
+  // The chip bar is closed by the rows' own top rule; its hairline doubled it.
+  .topic-bar {
+    margin-bottom: 24px;
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .topic-strip {
+    gap: 6px;
+  }
+
+  // OLD's `database 6`: a hairline box at the small radius, the count faint.
+  .topic-chip {
+    min-height: 32px;
+    padding: 5px 10px;
+    gap: 6px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r);
+    background: none;
+    box-shadow: none;
+    font-size: 12.5px;
+    color: var(--body);
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease;
+
+    &:hover {
+      border-color: var(--olive-300);
+      box-shadow: none;
+    }
+
+    // The open topic is ruled in olive and inked, not filled.
+    &[aria-current="true"] {
+      border-color: var(--olive-700);
+      background: none;
+      box-shadow: inset 0 -2px 0 var(--olive-600);
+      color: var(--ink);
+    }
+  }
+
+  .topic-chip-count {
+    color: var(--faint);
+  }
+
+  // ── Post header ─────────────────────────────────────────
+  .breadcrumb-container {
+    margin-bottom: 16px;
+    font-size: 12.5px;
+    color: var(--mute);
+
+    &::before {
+      display: none;
+    }
+
+    a {
+      color: var(--mute);
+    }
+  }
+
+  // The header closes with a hairline, and the writing starts after it: the
+  // title, the question it answers and the facts about it are one block.
+  //
+  // It is declared here rather than inherited. The rule and the gap used to
+  // come off the bottom margin of the topic-chip list, so unmounting that list
+  // took the header's own closing edge with it and the first `##` landed 11px
+  // under the metadata.
+  #{$is-post} .page-header > .popover-hint {
+    margin-bottom: 34px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  #{$shell} .article-title:not(.tag-page-title) {
+    margin: 0 0 12px;
+    font-family: var(--serif);
+    // 32px, not 44. The measure is 680px and the longest title the blog
+    // carries sets 652px at this size — one line, which is what a headline
+    // should be. At 44px it ran 897px and broke in the middle of a noun
+    // phrase on half the posts. A phone is narrower than any English title of
+    // this length, so the clamp floor lets it wrap there.
+    font-size: clamp(24px, 1.1rem + 1.4vw, 32px);
+    font-weight: 700;
+    line-height: 1.18;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  // The question the post answers, a step under the title: the reading face at
+  // lead size in grey, so it is read second and never mistaken for the title.
+  // A step under the title, not a second one. At 18px against a 44px title it
+  // was a subtitle; against a 32px title it was competing.
+  .post-dek {
+    max-width: 34em;
+    margin: 0 0 20px;
+    font-size: 15.5px;
+    font-weight: 400;
+    line-height: 1.65;
+    letter-spacing: 0;
+    color: var(--mute);
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    text-wrap: pretty;
+  }
+
+  // One mono line under the dek carrying every fact about the post: the layer,
+  // the date, the length. The same three the home cells print, in the same
+  // order and the same voice.
+  .content-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 0;
+    font-size: 12.5px;
+    color: var(--faint);
+  }
+
+  // The layer is the one segment that is a link — back to its tab on the home
+  // page, which is what the kicker above the title used to be for. Inked, so
+  // it reads as the first fact rather than as another grey one, and underlined
+  // only on hover.
+  .content-meta-layer {
+    border-bottom: 0;
+    color: var(--mute);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 3px;
+    transition:
+      color 0.2s ease,
+      text-decoration-color 0.2s ease;
+
+    &:hover {
+      color: var(--olive-700);
+      text-decoration-color: var(--olive-300);
+    }
+  }
+
+  // The compact outline, below the desktop breakpoint. It is the header's last
+  // line, held between its own top hairline and the header's rule, and closed
+  // by default: a reader who wants the chapter list opens it, and one who does
+  // not is not given a list of links before the first paragraph.
+  .compact-toc {
+    margin: 16px 0 0;
+    padding: 0;
+    border: 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    background: none;
+
+    & > summary {
+      padding: 10px 0;
+      font-size: 12.5px;
+      color: var(--body);
+      cursor: pointer;
+      list-style: none;
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+    }
+
+    &[open] > summary {
+      border-bottom: 1px solid var(--line);
+      color: var(--olive-700);
+    }
+
+    .ctoc-list {
+      margin: 0;
+      padding: 10px 0 12px;
+      list-style: none;
+
+      a {
+        font-family: var(--bodyFont);
+        font-size: 14px;
+        color: var(--mute);
+
+        &:hover {
+          color: var(--olive-700);
+        }
+      }
+    }
+  }
+
+  // ── Outline rail ────────────────────────────────────────
+  // Beside the post, chapters only; the compact outline below 1200px lists
+  // every section. `toc.inline.ts` marks every heading the reader has passed
+  // as `.in-view`, so the chapter being read is the last marked one.
+  #{$shell} > .sidebar.left .toc {
+    position: sticky;
+    top: 96px;
+    max-height: calc(100vh - 120px);
+
+    button.toc-header {
+      margin-bottom: 12px;
+      padding-bottom: 0;
+      border: 0;
+
+      & h3 {
+        font-size: 12px;
+        font-weight: 500 !important;
+        letter-spacing: 0.08em !important;
+        text-transform: uppercase !important;
+        color: var(--mute);
+      }
+    }
+
+    // Ten chapters fit; the overflow fade was greying out the last of them.
+    ul.toc-content {
+      mask-image: none;
+    }
+
+    ul.toc-content > li:not(.depth-0) {
+      display: none;
+    }
+
+    // Entries hang off one hairline; the chapter being read inks its text and
+    // takes the olive rule over that line — OLD's marker, not a filled pill.
+    ul.toc-content {
+      border-left: 1px solid var(--line);
+    }
+
+    ul.toc-content > li > a {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      opacity: 1;
+      margin: 0 0 0 -1px;
+      padding: 6px 0 6px 13px;
+      border-left: 2px solid transparent;
+      border-radius: 0;
+      font-size: 13.5px;
+      line-height: 1.45;
+      color: var(--mute);
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+      transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+
+      &:hover {
+        background: none;
+        color: var(--ink);
+      }
+
+      & > .toc-prefix {
+        flex: 0 0 auto;
+        min-width: 2em;
+        font-size: 12px;
+        line-height: 1.75;
+        color: var(--faint);
+      }
+
+      & > .toc-prefix,
+      & > .toc-body {
+        font-weight: inherit;
+      }
+
+      & > .toc-body {
+        font-size: inherit;
+        color: inherit;
+      }
+
+      &.in-view {
+        color: var(--mute);
+      }
+    }
+
+    // The old reading pass drew its own bar for the active entry.
+    ul.toc-content > li > a::before {
+      display: none;
+    }
+
+    ul.toc-content > li.depth-0:has(> a.in-view):not(:has(~ li.depth-0 > a.in-view)) > a {
+      border-left-color: var(--olive-600);
+      background: none;
+      color: var(--ink);
+      font-weight: 600;
+
+      & > .toc-prefix {
+        color: var(--olive-600);
+      }
+    }
+  }
+
+  // ── Markdown body ───────────────────────────────────────
+  // Set by one rhythm unit, R = 1em of body text (17px; 16px on a phone):
+  // every vertical space is 0.25R, 0.5R, 1R, 1.5R, 2R or 3R, and whatever
+  // follows a heading starts flush under it. Line-height 1.7 and a 1R
+  // paragraph gap keep a paragraph's lines closer together than paragraphs
+  // are to each other, which is what lets the eye find a block edge — at
+  // 1.85 and 1.35em the page read as evenly spaced lines. No gradients, no
+  // shadows, no highlighter: markdown, set carefully.
+  #{$post} {
+    max-width: none;
+    width: 100%;
+    font-family: var(--bodyFont);
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.7;
+    letter-spacing: -0.005em;
+    color: var(--body);
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    line-break: strict;
+
+    // One right edge for everything: prose, code, quotes and tables all end
+    // at the measure. The longest code lines here are ~70 characters, which
+    // fit; wider tables and diagrams scroll inside their own frame.
+    & > * {
+      max-width: var(--measure);
+    }
+
+    p {
+      margin: 0 0 1em;
+      line-height: inherit;
+      text-wrap: pretty;
+    }
+
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      color: var(--ink);
+      font-family: var(--bodyFont);
+      text-wrap: balance;
+      scroll-margin-top: 96px;
+    }
+
+    // A chapter and a section are titles, so they take the display face; h4
+    // and below are signposts inside a passage and stay on the reading face,
+    // where they sit closer to the paragraph they open. A Korean heading sets
+    // its Hangul in Noto Sans KR and its latin words in Fraunces.
+    h2,
+    h3 {
+      font-family: var(--serif);
+    }
+
+    h2 {
+      margin: 3em 0 0.75em;
+      padding: 0;
+      border: 0;
+      font-size: 25px;
+      font-weight: 600;
+      line-height: 1.32;
+      letter-spacing: -0.008em;
+
+      &::before {
+        display: none;
+      }
+    }
+
+    & > h2:first-child {
+      margin-top: 0;
+    }
+
+    h3 {
+      margin: 2em 0 0.5em;
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1.42;
+      letter-spacing: -0.004em;
+    }
+
+    h4 {
+      margin: 1.5em 0 0.25em;
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    h5,
+    h6 {
+      margin: 1.5em 0 0.25em;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--mute);
+    }
+
+    :is(h2, h3, h4, h5, h6) + * {
+      margin-top: 0;
+    }
+
+    a[role="anchor"] {
+      color: var(--faint);
+
+      &:hover {
+        color: var(--accent);
+      }
+    }
+
+    strong {
+      font-weight: 600;
+      color: var(--ink);
+      background: none;
+      padding: 0;
+    }
+
+    em {
+      color: var(--ink);
+    }
+
+    a:not(.tag-link):not([role="anchor"]):not(.internal.broken) {
+      color: var(--olive-600);
+      font-weight: inherit;
+      text-decoration: underline;
+      text-decoration-color: var(--olive-200);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+      background: none;
+      transition: text-decoration-color 0.2s ease;
+
+      &:hover {
+        text-decoration-color: var(--olive-600);
+      }
+    }
+
+    // Lists: native markers, the paragraph rhythm, items a quarter-line apart.
+    ul,
+    ol {
+      box-sizing: border-box;
+      margin: 0 0 1em;
+      padding-left: 1.4em;
+    }
+
+    ul {
+      list-style: disc;
+    }
+
+    ul ul {
+      list-style: circle;
+    }
+
+    li {
+      margin: 0 0 0.25em;
+      padding-left: 0.15em;
+      line-height: inherit;
+
+      & > p {
+        margin: 0;
+      }
+
+      & > ul,
+      & > ol {
+        margin: 0.25em 0 0;
+      }
+    }
+
+    ul > li::marker {
+      content: normal;
+      color: var(--olive-300);
+    }
+
+    ol > li::marker {
+      color: var(--mute);
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    // Inline code: a light chip, tight enough not to open holes in a line.
+    :not(pre) > code {
+      padding: 0.1em 0.35em;
+      border: 0;
+      border-radius: var(--r);
+      background: var(--olive-50);
+      font-family: var(--codeFont);
+      font-size: 0.88em;
+      color: var(--olive-800);
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+    }
+
+    :is(h2, h3, h4) > code {
+      font-size: 0.9em;
+    }
+
+    // Code blocks: a white sheet, a hairline, and the language as a mono tab
+    // label in lowercase — the way a shell names it, not a badge.
+    figure[data-rehype-pretty-code-figure] {
+      box-sizing: border-box;
+      position: relative;
+      margin: 1.5em 0;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: var(--card);
+      box-shadow: none;
+      overflow: hidden;
+
+      &::before {
+        position: static;
+        display: none;
+        padding: 6px 20px;
+        border-bottom: 1px solid var(--line);
+        background: var(--plate);
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 400;
+        letter-spacing: 0;
+        text-transform: none;
+        color: var(--mute);
+      }
+
+      &:has(> pre[data-language="c"])::before {
+        display: block;
+        content: "c";
+      }
+
+      &:has(> pre[data-language="sql"])::before {
+        display: block;
+        content: "sql";
+      }
+
+      &:has(> pre[data-language="bash"])::before {
+        display: block;
+        content: "sh";
+      }
+
+      & > pre,
+      &:has(> pre[data-language]) > pre {
+        margin: 0;
+        padding: 16px 20px;
+        border: 0;
+        border-radius: 0;
+        background: var(--card);
+      }
+
+      // A fence with no language is an ASCII diagram: a tinted plate.
+      &:has(
+        > pre:not([data-language]),
+        > pre[data-language="text"],
+        > pre[data-language="plaintext"]
+      ) {
+        border-color: var(--olive-100);
+        background: var(--olive-50);
+
+        & > pre {
+          padding: 14px 20px;
+          background: transparent;
+        }
+      }
+    }
+
+    pre {
+      box-sizing: border-box;
+      margin: 1.5em 0;
+      padding: 16px 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: var(--card);
+      box-shadow: none;
+      overflow-x: auto;
+
+      code {
+        padding: 0;
+        border: 0;
+        background: none;
+        font-family: var(--codeFont);
+        font-size: 13.5px;
+        line-height: 1.65;
+        color: #393a34;
+      }
+    }
+
+    // A bare fence (no language) renders as a lone `pre`: an ASCII diagram,
+    // set on a tinted plate rather than as a program.
+    & > pre:not([data-language]) {
+      padding: 14px 20px;
+      border-color: var(--olive-100);
+      background: var(--olive-50);
+    }
+
+    pre:not([data-language]) code,
+    pre[data-language="text"] code,
+    pre[data-language="plaintext"] code {
+      line-height: 1.45;
+      white-space: pre;
+      color: var(--olive-800);
+    }
+
+    pre:not([data-language]) code > [data-line]::before,
+    pre[data-language="text"] code > [data-line]::before {
+      display: none;
+    }
+
+    [data-line-numbers] > [data-line]::before,
+    code > [data-line]::before {
+      color: #b6b8b4;
+    }
+
+    pre > .clipboard-button {
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: var(--card);
+    }
+
+    // Tables: as wide as their content, ruled like a reference table — an
+    // inked rule above, a hairline under the head and below, nothing framed.
+    .table-container {
+      box-sizing: border-box;
+      width: fit-content;
+      max-width: 100%;
+      margin: 1.5em 0;
+      border: 0;
+      border-top: 1.5px solid var(--ink);
+      border-bottom: 1px solid var(--line-strong);
+      border-radius: 0;
+      background: none;
+      box-shadow: none;
+      overflow-x: auto;
+    }
+
+    table {
+      width: auto;
+      margin: 0;
+      border: 0;
+      border-collapse: collapse;
+      font-size: 15px;
+      line-height: 1.55;
+      font-variant-numeric: tabular-nums;
+    }
+
+    th {
+      padding: 9px 14px 8px;
+      border: 0;
+      border-bottom: 1px solid var(--line-strong);
+      background: none;
+      font-family: var(--bodyFont);
+      font-size: 13.5px;
+      font-weight: 600;
+      letter-spacing: 0;
+      text-transform: none;
+      text-align: left;
+      color: var(--ink);
+    }
+
+    td {
+      padding: 8px 14px;
+      line-height: 1.6;
+      border: 0;
+      border-bottom: 1px solid #ececea;
+      color: var(--body);
+      font-weight: 400;
+    }
+
+    // Columns are told apart by a very faint vertical rule, a shade lighter
+    // than the row rules; the outer edges stay open, flush with the text.
+    th + th,
+    td + td {
+      border-left: 1px solid #f0f0ee;
+    }
+
+    :is(th, td):first-child {
+      padding-left: 0;
+    }
+
+    :is(th, td):last-child {
+      padding-right: 0;
+    }
+
+    tr:last-child > td {
+      border-bottom: 0;
+    }
+
+    // Blockquotes carry definitions and key claims: a rule and an indent, in
+    // the body's own weight. No box.
+    blockquote {
+      box-sizing: border-box;
+      position: relative;
+      margin: 1.5em 0;
+      padding: 2px 0 2px 18px;
+      border: 0;
+      border-left: 2px solid var(--olive-400);
+      border-radius: 0;
+      background: none;
+      color: var(--body);
+      font-weight: 400;
+
+      &::before {
+        display: none;
+      }
+
+      & > :last-child {
+        margin-bottom: 0;
+      }
+
+      strong {
+        font-weight: 600;
+        color: var(--ink);
+      }
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+      margin: 1.5em auto;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: var(--card);
+      box-shadow: none;
+    }
+
+    p > img {
+      margin: 0 auto;
+    }
+
+    hr {
+      width: 100%;
+      max-width: var(--measure);
+      height: 0;
+      margin: 2.5em 0;
+      border: 0;
+      border-top: 1px solid var(--line);
+      background: none;
+    }
+
+    .katex-display {
+      margin: 1.5em 0;
+      padding: 4px 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    section[data-footnotes] {
+      margin-top: 3em;
+      padding-top: 1em;
+      border-top: 1px solid var(--line);
+      font-size: 14.5px;
+      color: var(--mute);
+    }
+  }
+
+  @media all and ($mobile) {
+    #{$post} {
+      font-size: 16px;
+
+      h2 {
+        margin: 44px 0 12px;
+        font-size: 21px;
+      }
+
+      h3 {
+        margin: 30px 0 8px;
+        font-size: 18px;
+      }
+
+      h4 {
+        font-size: 16px;
+      }
+
+      ul,
+      ol {
+        padding-left: 1.25em;
+      }
+
+      figure[data-rehype-pretty-code-figure],
+      pre,
+      .table-container,
+      blockquote {
+        margin-left: 0;
+        margin-right: 0;
+      }
+
+      figure[data-rehype-pretty-code-figure],
+      pre {
+        border-radius: var(--r);
+      }
+
+      pre,
+      figure[data-rehype-pretty-code-figure] > pre {
+        padding: 12px 14px;
+      }
+
+      pre code {
+        font-size: 12.5px;
+      }
+
+      table {
+        font-size: 14px;
+      }
+
+      :is(th, td) {
+        padding: 7px 10px;
+      }
+    }
+  }
+
+  // ── End of post ─────────────────────────────────────────
+  // Read next: the same rows every list uses under the same inked rule the
+  // pinned post opens with, so the page ends the way the home page begins.
+  .read-next {
+    max-width: none;
+    margin: 88px 0 0;
+    padding: 14px 0 0;
+    border: 0;
+    border-top: 2px solid var(--ink);
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+
+    .post-rows {
+      border-top: 0;
+    }
+
+    .post-row {
+      border-bottom-color: var(--line);
+
+      &:last-child {
+        border-bottom: 0;
+      }
+    }
+
+    .post-row-link {
+      padding: 18px 0;
+    }
+
+    .post-row-title {
+      font-size: 17.5px;
+    }
+
+    .post-row-desc {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+      overflow: hidden;
+      font-size: 14.5px;
+    }
+  }
+
+  .rn-label {
+    margin: 0 0 2px;
+    font-family: var(--serif);
+    text-transform: none;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.008em;
+    color: var(--ink);
+  }
+
+  .page-footer .backlinks {
+    max-width: none;
+    margin-top: 48px;
+
+    & > h3 {
+      font-size: 12px;
+      font-weight: 500 !important;
+      letter-spacing: 0.08em !important;
+      text-transform: uppercase !important;
+      color: var(--mute);
+    }
+
+    & > ul.overflow.gradient-active {
+      mask-image: none;
+    }
+  }
+
+  // ── Footer ──────────────────────────────────────────────
+  // A hairline, not a band. Three things and no more: what the site is, how to
+  // reach the person who writes it, and one line of credit.
+  //
+  // **Two columns, aligned at the top.** What the site is on the left, how to
+  // reach the author on the right, the credit under both — and the first line
+  // of each column starts at the same height, so the footer has a top edge the
+  // eye can find. It used to be a name, a role, a status line and two links
+  // aligned on their *bottoms*, at four different heights on the left and
+  // three on the right; nothing in it lined up with anything else in it.
+  #{$shell} > footer {
+    position: relative;
+    // Its own stacking context, so the band behind it paints above the page.
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 26px 48px;
+    width: 100%;
+    margin: 104px 0 0;
+    padding: 40px 0 44px;
+    border: 0;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0 calc(50% - 50vw);
+      z-index: -1;
+      display: block;
+      margin: 0;
+      border-top: 1px solid var(--line-strong);
+      background: none;
+    }
+
+    .footer-colophon {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      margin: 0;
+      font-size: 12px;
+      color: var(--faint);
+
+      a {
+        font-weight: 400;
+        color: var(--mute);
+      }
+    }
+  }
+
+  .footer-sign {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin: 0;
+  }
+
+  .footer-mark {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--accent);
+  }
+
+  // Three subjects, not a sentence — so it is set as the machine voice sets a
+  // list, on one line. It was `Notes on Linux internals, database concurrency
+  // and network paths.`, which spent its first two words saying what a note is
+  // and then wrapped.
+  .footer-note {
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.6;
+    letter-spacing: 0;
+    white-space: nowrap;
+    color: var(--mute);
+  }
+
+  // The three destinations: a mark, then the address in full. Stacked in the
+  // second column and aligned to its right edge, which is what makes the block
+  // read as a contact card rather than as three more words of chrome.
+  //
+  // **No underline, at rest or on hover.** The mark already says these are
+  // links, and three underlined addresses in a row is a fence. Hover inks the
+  // address and takes the mark to the accent with it.
+  // The block sits at the right; its rows share a left edge. Right-aligning
+  // the rows themselves stepped the three marks and the three addresses into
+  // a ragged left edge — the same thing that was wrong with the old footer,
+  // one column over.
+  #{$shell} > footer .footer-links {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: fit-content;
+    gap: 9px;
+    margin: 0 0 0 auto;
+    padding: 0;
+    list-style: none;
+
+    a {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0;
+      border-bottom: 0;
+      border-radius: 0;
+      background: none;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      font-weight: 400;
+      letter-spacing: 0;
+      text-transform: none;
+      color: var(--mute);
+      text-decoration: none;
+      transition: color 0.2s ease;
+
+      &:hover {
+        background: none;
+        color: var(--ink);
+
+        .footer-icon {
+          color: var(--olive-600);
+        }
+      }
+    }
+  }
+
+  .footer-icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    color: var(--line-strong);
+    transition: color 0.2s ease;
+
+    svg {
+      display: block;
+    }
+  }
+
+  @media all and ($mobile) {
+    #{$shell} > footer {
+      grid-template-columns: minmax(0, 1fr);
+      margin-top: 72px;
+      padding: 32px 0 36px;
+      gap: 18px 0;
+    }
+
+    // One column, so the destinations drop under the sign and align with
+    // everything else's left edge rather than hugging a right edge that is no
+    // longer there.
+    #{$shell} > footer .footer-links {
+      grid-column: 1;
+      grid-row: 2;
+      margin-left: 0;
+    }
+
+    #{$shell} > footer .footer-colophon {
+      grid-row: 3;
+    }
+  }
+
+  // ── Home: below 1100px ──────────────────────────────────
+  // Two columns instead of three. The cell keeps its shape; only how many of
+  // them fit on a line changes, which is the point of building the page as a
+  // grid rather than as a set of blocks.
+  @media all and #{$narrow} {
+    .hs-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 40px;
+    }
+
+    // Two columns, so the third cell opens the second row and takes its rule
+    // back from the three-column rule above.
+    .hs-grid > .hs-cell:nth-child(3) > .hs-cell-link {
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+    }
+
+    // The chooser is the one row that can outgrow the viewport, so it scrolls
+    // sideways to the edge while its rule keeps the page's gutter; the far
+    // edge fades to say there is more, and `all posts →` goes above it.
+    .hs-filter {
+      flex-wrap: wrap;
+      margin-top: 40px;
+      // The rule moves onto the scroller: `overflow-x: auto` also clips
+      // vertically, so an open tab's olive mark hanging 1px below its own box
+      // was cut off, and the row read as having no current tab at all. It is
+      // painted as a background on the padding box, which does not scroll with
+      // the tabs, and the mark now sits on it rather than under the container.
+      border-bottom: 0;
+    }
+
+    .hs-tabs {
+      order: 2;
+      flex-wrap: nowrap;
+      gap: 0 22px;
+      width: 100%;
+      margin: 0 calc(-1 * var(--gut));
+      padding: 0 var(--gut);
+      background: linear-gradient(var(--line-strong), var(--line-strong)) no-repeat var(--gut)
+        100% / calc(100% - 2 * var(--gut)) 1px;
+      -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+      mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .hs-tab {
+      flex: 0 0 auto;
+      white-space: nowrap;
+
+      &::after {
+        bottom: 0;
+      }
+    }
+
+    .hs-all {
+      order: 1;
+      padding: 0 0 10px;
+    }
+  }
+
+  // ── Phone ───────────────────────────────────────────────
+  @media all and ($mobile) {
+    body[data-slug="index"] .center > article {
+      padding-top: 4px;
+
+      p {
+        margin-top: 16px;
+        font-size: 16px;
+      }
+    }
+
+    .hs-cell-link {
+      padding: 15px 0 26px;
+    }
+
+    // One column, and the cell takes the whole measure.
+    .hs-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hs-grid > .hs-cell:nth-child(n + 2) > .hs-cell-link {
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+    }
+
+    .hs-cell-title {
+      font-size: 18px;
+    }
+
+    .hs-cell-desc {
+      -webkit-line-clamp: 3;
+    }
+
+    body[data-slug="index"] .center > article p {
+      font-size: 12.5px;
+    }
+
+    .read-next {
+      margin-top: 64px;
+    }
+
+    .post-dek {
+      margin-bottom: 18px;
+      font-size: 15px;
+    }
+
+    .rn-label {
+      font-size: 21px;
+    }
+  }
+}

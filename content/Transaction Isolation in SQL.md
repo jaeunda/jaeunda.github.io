@@ -3,7 +3,7 @@ tags:
   - topic/database
   - project/database-system
 Date: 2026-04-21
-description: "정확도를 성능과 바꾸기로 했다면, 격리 수준을 한 단계 낮출 때 정확히 무엇을 내주는가."
+description: "격리 수준마다 어떤 이상 현상이 허용되는지 하나씩 확인했다."
 layer: storage
 rank: 3
 ---

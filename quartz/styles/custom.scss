@@ -4,6 +4,7 @@
 @use "./fonts.scss";
 @use "./base.scss";
 @use "./readability-experiment.scss" as readability;
+@use "./editorial.scss" as editorial;
 @use "./portfolio.scss" as portfolio;
 @use "./portfolio-systems.scss" as portfolio-systems;
 
@@ -15,6 +16,8 @@ $site-scale: 1;
 $site-scale-inverse: math.div(1, $site-scale);
 $site-page-max-width: (map.get($breakpoints, desktop) + 300px) * $site-scale-inverse;
 $site-side-panel-width: $sidePanelWidth * $site-scale-inverse;
+// On: the portfolio pages still read through this pass. On the blog,
+// editorial.scss outranks it and draws the markdown body.
 $readability-experiment-enabled: true; // Roll back this reading pass by changing only this to false.
 
 :root {
@@ -64,11 +67,13 @@ body {
 }
 
 /* 헤딩 */
-/* 650, not 700. Pretendard is a variable face and Hangul is a run of full-width
-   squares with no ascender rhythm to break up the ink, so a Korean heading at
-   700 sits noticeably heavier than the same weight in Latin — heavy enough
-   that, on a page whose body is 400, the headings were the only thing the eye
-   could see. 650 keeps the step and takes the weight off. */
+/* 650, not 700. Noto Sans KR is a variable face and Hangul is a run of
+   full-width squares with no ascender rhythm to break up the ink, so a Korean
+   heading at 700 sits noticeably heavier than the same weight in Latin — heavy
+   enough that, on a page whose body is 400, the headings were the only thing
+   the eye could see. 650 keeps the step and takes the weight off. This is the
+   fallback scale; a blog post's headings are drawn by editorial.scss, where
+   h2 and h3 take Fraunces. */
 h1,
 h2,
 h3,
@@ -103,7 +108,7 @@ a {
   border-radius: 3px;
 }
 
-// Post header. Same vocabulary as the home index: Latin display face for the
+// Post header. Same vocabulary as the home index: the display serif for the
 // title, mono for the metadata line, and tags as quiet outline chips rather
 // than filled pills, so the header reads as part of one system.
 .article-title {
@@ -137,43 +142,6 @@ a {
   & > *:not(:last-child)::after {
     content: " · ";
     white-space: pre;
-  }
-}
-
-.content-meta + .content-tags {
-  margin-top: 0;
-  margin-bottom: 2.2rem;
-}
-
-// The post's topic chips. This was written as `.center > .content-tags`, but
-// the list renders inside `.page-header > .popover-hint`, so the child
-// combinator never matched and the whole block was dead: what actually painted
-// was TagList.css's `--highlight` fill, which is the exact costume
-// `.topic-chip[aria-current="true"]` wears. A post's tag looked like a filter
-// that was switched on. Outline chip, same as every other tag on the site.
-.content-tags {
-  gap: 0.35rem;
-
-  // 6px, not 3px: the boxes on this site are now 10px (layer tabs, topic
-  // chips) and 12-14px (the two cards). An inline tag is the smallest member
-  // of that family, not a different one — but it keeps a tighter corner than a
-  // control, because it is a label and not something you pick from a row.
-  a.internal.tag-link {
-    border-radius: 6px;
-    padding: 5px 9px;
-    border: 1px solid var(--lightgray);
-    background: transparent;
-    font-family: var(--codeFont);
-    font-size: 11.5px;
-    letter-spacing: 0.02em;
-    // Metadata, so `--gray` — a post's tags are how it files, not what it says.
-    color: var(--gray);
-
-    &:hover {
-      border-color: var(--tertiary);
-      background: var(--highlight);
-      color: var(--tertiary);
-    }
   }
 }
 
@@ -1224,9 +1192,8 @@ body[data-slug^="tags"] {
 }
 
 // The rail itself is a desktop device: below 1200px both sidebars are empty of
-// anything the column needs, so they come out of the flow entirely. The home
-// page keeps the identity — see `.page-header .profile-card` below, which puts
-// the same card in the column where the reading order actually reaches it.
+// anything the column needs, so they come out of the flow entirely. Identity
+// is not in the rail at any width — it is the footer's byline, on every page.
 @media all and not ($desktop) {
   .page > #quartz-body > .sidebar.left,
   .page > #quartz-body > .sidebar.right {
@@ -1256,17 +1223,6 @@ body[data-slug^="tags"] {
 
 // ── Identity in the column (below desktop) ────────────────
 // ── The home masthead byline ──────────────────────────────
-// `ProfileCard` is mounted on index only, in the column, at every width. Its
-// own styles live in `components/styles/profileCard.inline.scss`; this is only
-// the rule that closes the masthead.
-//
-// It used to be mounted twice — the rail at desktop, the foot of the column
-// below it — so identity changed address with the viewport.
-.page-footer .profile-card {
-  padding-bottom: 26px;
-  margin-bottom: 30px;
-  border-bottom: 1px solid var(--lightgray);
-}
 
 body[data-slug="index"] {
   .page {
@@ -1376,27 +1332,28 @@ header:has(.site-nav) {
   flex: 0 0 auto;
   white-space: nowrap;
 
+  // Colour only. The rule that marks the current destination belongs to
+  // `editorial.scss`, which draws it as one animated bar; this block used to
+  // add a `border-bottom` as well, so `topics` was underlined twice — a thin
+  // olive line under the word and a second, wider one under the whole link
+  // box, four pixels apart.
   a {
     display: inline-block;
     padding: 6px 0;
     font-size: 15px;
     color: var(--gray);
     text-decoration: none;
-    border-bottom: 1.5px solid transparent;
-    transition:
-      color 0.12s ease,
-      border-color 0.12s ease;
+    transition: color 0.12s ease;
 
     &:hover {
       color: var(--dark);
     }
 
     // `page` is the destination itself; `true` is a page inside it, such as a
-    // leaf topic under Topics. Same underline either way — the rule says where
-    // you are in the menu, and the menu has one level.
+    // leaf topic under Topics. Same mark either way — it says where you are in
+    // the menu, and the menu has one level.
     &[aria-current] {
       color: var(--dark);
-      border-bottom-color: var(--tertiary);
     }
   }
 }
@@ -1594,9 +1551,9 @@ body[data-slug^="tags"] {
 // reader coming back from a post watched the home page reassemble — the
 // animation punished exactly the reader who was browsing.
 //
-// Three steps, not five. The index is the point of the page and it used to wait
-// 280ms to appear; the masthead and its byline are one beat, the pick is the
-// second, the control and the list arrive together.
+// Two steps, not five. The grid is the point of the page and it used to wait
+// 280ms to appear; the masthead and its byline are one beat, the chooser and
+// the grid are the second.
 @keyframes home-rise {
   from {
     opacity: 0;
@@ -1612,545 +1569,51 @@ body[data-slug^="tags"] {
 @media (prefers-reduced-motion: no-preference) {
   body.home-entering {
     .center > article,
-    .page-footer .profile-card,
-    .hs-featured,
-    .hs-layers,
-    .hs-index {
+    .hs-filter,
+    .hs-panel {
       animation: home-rise 0.5s var(--lift-ease) backwards;
     }
 
-    .hs-featured {
-      animation-delay: 70ms;
-    }
-
-    .hs-layers,
-    .hs-index {
-      animation-delay: 140ms;
+    .hs-filter,
+    .hs-panel {
+      animation-delay: 90ms;
     }
   }
 
-  // Switching layers replaces the whole list, which used to happen in one
-  // frame: the page blinked and there was nothing to tell the reader the list
-  // they were looking at was a different one. `homeStack.inline.ts` numbers the
-  // visible rows in `--hs-i` and restarts this by re-adding the class, so the
-  // delay follows what is on screen rather than `nth-child`, which counts the
-  // hidden rows of every other layer too.
+  // Switching tabs replaces the whole grid, which used to happen in one frame:
+  // the page blinked and there was nothing to tell the reader the grid they
+  // were looking at was a different one. `homeStack.inline.ts` re-adds
+  // `is-swapping` after a forced reflow, which is what restarts a CSS
+  // animation.
   //
-  // The script caps `--hs-i`, because the stagger has to finish before the
-  // reader does: an uncapped ladder ran the six-row Storage tab for 490ms,
-  // which is slower than the eye that asked for it.
-  .hs-index.is-swapping .post-row:not(.is-hidden) {
+  // The ladder is capped at the fourth cell rather than running to the sixth:
+  // the stagger has to finish before the reader does, and an uncapped six-step
+  // ladder ran the Storage tab for 420ms — slower than the eye that asked for
+  // it. `nth-child` is safe here because every cell in an open panel is shown.
+  .hs-grid.is-swapping .hs-cell {
     animation: home-rise 0.3s var(--lift-ease) backwards;
-    animation-delay: calc(var(--hs-i, 0) * 24ms);
-  }
-}
-
-// ── Featured post ─────────────────────────────────────────
-// One post, and the only card on the home page.
-//
-// It was flat type closed by a `--lightgray` hairline — the *same declaration*
-// `.post-row` carries — so it was row zero set large, and the one filled plane
-// on the screen was the ASCII cover inside it, which out-weighted its own
-// parent. A reader could not see that the whole block was a single link.
-//
-// The card is the only element on this page with fill *and* radius *and*
-// shadow; the rows below stay transparent, square and unshadowed. They share a
-// left edge, so the card's padding indents its title 24px past every row title
-// — that offset is the tell that reads "one pick, then the list".
-//
-// Values are the portfolio's `.pf-ev-card`, translated to the blog's tokens:
-// 14px radius, the two-layer `--shadow`, and a 3px lift on hover.
-.hs-featured {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-  padding: 22px 24px 20px;
-  margin-bottom: 32px;
-  border: 1px solid var(--lightgray);
-  border-radius: 14px;
-  background: var(--surface);
-  box-shadow: var(--shadow);
-  text-decoration: none;
-  color: inherit;
-  transition:
-    transform 0.18s ease-out,
-    box-shadow 0.18s ease-out,
-    border-color 0.18s ease-out;
-
-  // The rail script swaps this with its row in the index.
-  &.is-hidden {
-    display: none;
   }
 
-  // `:focus-within` as well as `:hover`, like the portfolio card: a keyboard
-  // reader gets the same lift, not just the ring.
-  &:hover,
-  &:focus-within {
-    transform: translateY(-3px);
-    border-color: color-mix(in srgb, var(--tertiary) 45%, var(--lightgray));
-    box-shadow: var(--shadow-lift);
+  .hs-grid.is-swapping .hs-cell:nth-child(2) {
+    animation-delay: 24ms;
   }
 
-  &:hover .hs-featured-title,
-  &:focus-within .hs-featured-title {
-    color: var(--tertiary);
+  .hs-grid.is-swapping .hs-cell:nth-child(3) {
+    animation-delay: 48ms;
   }
 
-  &:hover .hs-featured-arrow,
-  &:focus-within .hs-featured-arrow {
-    transform: translateX(3px);
+  .hs-grid.is-swapping .hs-cell:nth-child(n + 4) {
+    animation-delay: 72ms;
   }
-
-  &:focus-visible {
-    outline: 2px solid var(--tertiary);
-    outline-offset: 3px;
-    border-radius: 14px;
-  }
-}
-
-// The lift is the one thing that goes; the colour and the border stay, so the
-// card still answers a pointer.
-@media (prefers-reduced-motion: reduce) {
-  .hs-featured:hover,
-  .hs-featured:focus-within {
-    transform: none;
-  }
-
-  .hs-featured-arrow {
-    transition: none;
-  }
-}
-
-// One eyebrow. The small uppercase mono label that opens a block: the featured
-// post's line, the Layers heading, Read next, Linked from. These had four
-// specs for one role — 11px/0.12em/olive, 11.5/0.14em/gray, 11.5/0.13em/gray
-// and 11.5/0.13em/gray — so the two that sit on the same screen did not match.
-// Grouped here so they cannot drift apart again. Olive is reserved for links
-// and active state; an eyebrow is metadata, so it takes `--gray` like the
-// rest of the metadata on the page.
-.hs-featured-eyebrow,
-.hs-layers-label,
-.rn-label,
-.page-footer .backlinks > h3 {
-  font-family: var(--codeFont);
-  font-size: 11.5px;
-  font-weight: 500;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--gray);
-}
-
-// The eyebrow used to be the layer alone, so the one post the author picked to
-// open the site was labelled `KERNEL` — which is where it files, not why it is
-// there. `Featured post` says what the block is; the layer follows it as
-// metadata. The dot is the one mark on the page that is purely a marker, and
-// it is the accent: this whole block is a link, which is what olive is for.
-.hs-featured-eyebrow {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 4px 9px;
-}
-
-.hs-featured-kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--tertiary);
-}
-
-.hs-featured-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--tertiary);
-}
-
-.hs-featured-layer {
-  position: relative;
-  padding-left: 11px;
-  color: var(--gray);
-
-  // A separator between two runs of uppercase mono, drawn rather than typed:
-  // a literal `·` in the markup would have to be hidden from the accessibility
-  // tree by hand.
-  &::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 50%;
-    width: 4px;
-    height: 1px;
-    background: currentcolor;
-  }
-}
-
-.hs-featured-title {
-  font-family: var(--displayFont);
-  font-size: clamp(22px, 2.7vw, 27px);
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.028em;
-  color: var(--dark);
-  text-wrap: balance;
-  // Slower than the lift, so the colour does not land before the card moves.
-  transition: color 0.15s ease;
-}
-
-.hs-featured-desc {
-  max-width: 52ch;
-  font-size: 15px;
-  line-height: 1.66;
-  color: var(--gray);
-  word-break: keep-all;
-  text-wrap: pretty;
-}
-
-// The cover is three lines of aligned mono, so it takes the same recessed plate
-// the article's code blocks use. It has no border of its own: a framed plate
-// inside a framed card is two boxes, and against the card's white it finally
-// has a real delta to read against — on the page ground it was a stray code
-// block dropped mid-page.
-.hs-featured-cover {
-  margin: 6px 0 4px;
-  padding: 14px 16px;
-  border: 0;
-  border-radius: 6px;
-  background: var(--reading-surface, #f2f3ed);
-  font-family: var(--codeFont);
-  font-size: 12px;
-  line-height: 1.72;
-  color: var(--darkgray);
-  white-space: pre;
-  overflow-x: auto;
-  font-variant-numeric: tabular-nums;
-}
-
-// The length and, opposite it, the one affordance on the block, over the
-// card's own internal hairline — `--surface-line` is the lighter of the two
-// line tokens and this is what it is for: a rule *inside* a card.
-.hs-featured-foot {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 4px 16px;
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid var(--surface-line);
-}
-
-.hs-featured-meta {
-  font-family: var(--codeFont);
-  font-size: 11.5px;
-  color: var(--gray);
-  font-variant-numeric: tabular-nums;
-}
-
-.hs-featured-go {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--codeFont);
-  font-size: 12px;
-  color: var(--tertiary);
-}
-
-.hs-featured-arrow {
-  display: inline-block;
-  font-style: normal;
-  transition: transform 0.18s ease-out;
-
-  &::before {
-    content: "→";
-  }
-}
-
-// ── Layers ────────────────────────────────────────────────
-// The layers of the request path as one axis cut into parts, not five loose
-// filters. The heading says what the control does, each tab keeps the blurb it
-// was always given in `postMeta`, and there is no `All` — the link beside the
-// heading goes everywhere, which is what `All` was doing.
-//
-// Tabs, not chips: chips are this site's tag vocabulary and these are not tags.
-//
-// They used to be borderless underline tabs, which was the last flat vocabulary
-// left on a screen that now opens with a shadowed card — it read as unfinished.
-// Each tab is its own surface now, and **the open one sits down rather than
-// floating**: hover lifts 2px onto `--shadow`, `aria-pressed` takes the accent
-// tint and border with no shadow and no transform. A pressed control is pressed.
-//
-// Three earlier legibility faults, all fixed here: the heading said `Layers`, a
-// noun that names the taxonomy without saying the thing under it can be
-// clicked; the open tab was marked only by a 2px underline across a five-column
-// grid; and the block closed with a `--lightgray` hairline 16px under tabs that
-// already ended in their own border, so the strip appeared underlined twice and
-// the second line belonged to nothing.
-.hs-layers {
-  margin-bottom: 8px;
-}
-
-.hs-layers-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.hs-layers-label {
-  margin: 0;
-}
-
-// `All 12 posts →`. The count is the one credibility number the home page never
-// printed, it is free — the component already knows it — and it stays true.
-//
-// 12px mono is a 21px-tall target, under the 24px floor. The padding opens it
-// and the matching negative margin takes the space back out of the layout, so
-// the baseline row it sits in does not move. Same device as the mobile search
-// button.
-.hs-layers-all {
-  font-family: var(--codeFont);
-  font-size: 12px;
-  color: var(--gray);
-  text-decoration: none;
-  white-space: nowrap;
-  padding: 8px 2px;
-  margin: -8px -2px;
-  transition: color 0.15s ease;
-
-  &:hover {
-    color: var(--tertiary);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--tertiary);
-    outline-offset: 2px;
-    border-radius: 4px;
-  }
-}
-
-// `auto-fit` rather than a fixed column count: a sixth layer joins the grid
-// without touching this file, and at phone width the same rule gives fewer
-// columns instead of five squeezed ones.
-.hs-layers-tabs {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(156px, 1fr));
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.hs-layer {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  min-height: 44px;
-  padding: 10px 12px 12px;
-  // The resting edge is carried by light, not by a line. A full-strength
-  // `--surface-line` box drew five hard rectangles across the first screen and
-  // made the strip the most ruled thing on a page whose whole vocabulary is
-  // hairlines; at 55% the card is still a card and the edge stops competing
-  // with the card above it. The contact shadow does the rest of the work.
-  border: 1px solid color-mix(in srgb, var(--surface-line) 55%, transparent);
-  border-radius: 10px;
-  background: var(--surface);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 3%);
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition:
-    transform 0.16s ease-out,
-    box-shadow 0.16s ease-out,
-    border-color 0.16s ease-out,
-    background-color 0.16s ease;
-
-  // Hover and the open state are where the edge is allowed to be definite:
-  // they are the two moments the reader is asking which box is which.
-  &:hover {
-    transform: translateY(-2px);
-    border-color: color-mix(in srgb, var(--tertiary) 40%, var(--surface-line));
-    box-shadow: var(--shadow);
-  }
-
-  &:hover .hs-layer-name {
-    color: var(--dark);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--tertiary);
-    outline-offset: 3px;
-  }
-
-  // The open tab. Tinted, bordered in the accent, and flat on the page — it is
-  // pressed, so it must not be the thing floating highest on the screen.
-  &[aria-pressed="true"] {
-    transform: none;
-    border-color: var(--tertiary);
-    background: color-mix(in srgb, var(--tertiary) 8%, var(--surface));
-    box-shadow: none;
-  }
-
-  &[aria-pressed="true"] .hs-layer-name,
-  &[aria-pressed="true"] .hs-layer-no {
-    color: var(--tertiary);
-  }
-
-  &[aria-pressed="true"] .hs-layer-name {
-    font-weight: 600;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hs-layer:hover {
-    transform: none;
-  }
-}
-
-// The meta line: the tab's place in the order at one end, its post count at the
-// other. Both mono, both `--gray`, so the line reads as the card's label strip
-// and the name below it is the only thing competing for attention.
-.hs-layer-meta {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-// The tab's place in the author's order. The strip is not sorted by post count
-// and never will be again (`LAYERS` in postMeta.ts is the order), so it prints
-// the number that ordering produced: `01 Kernel` is a first chapter, `Kernel`
-// on its own was one of five equal boxes.
-.hs-layer-no {
-  font-family: var(--codeFont);
-  font-size: 10.5px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  color: var(--gray);
-  font-variant-numeric: tabular-nums;
-  transition: color 0.16s ease;
-}
-
-// A full line to itself. `Storage Engine` is 14 characters and the widest label
-// the taxonomy has; it fits a 132px column at this size, which is what the meta
-// line above bought it.
-//
-// This is the page's primary control and it was set like a caption — 15px/500
-// on `--darkgray`, a step *below* the row descriptions underneath it, so the
-// five layer names read as labels on boxes rather than as the thing you are
-// meant to choose from. They take the display face now, like every other title
-// on the site: the layer ids are English by definition (`postMeta` `LAYERS`),
-// so Space Grotesk is safe here — it carries no Hangul and must never sit
-// where Korean can appear.
-.hs-layer-name {
-  font-family: var(--displayFont);
-  font-size: 15.5px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.25;
-  color: var(--dark);
-  text-wrap: balance;
-  transition: color 0.15s ease;
-}
-
-// At the tab's right edge, so five counts line up as a column instead of
-// trailing five names of different lengths.
-.hs-layer-count {
-  font-family: var(--codeFont);
-  font-size: 11.5px;
-  color: var(--gray);
-  font-variant-numeric: tabular-nums;
-}
-
-// Three or four words, on the tab it belongs to. It used to be one line under
-// the strip that the script rewrote on every click, so four of the five layers
-// never said what they covered.
-.hs-layer-blurb {
-  font-size: 12px;
-  line-height: 1.45;
-  color: var(--gray);
-  text-wrap: pretty;
-}
-
-// Every other divider on the page is a lightgray hairline; a near-black rule
-// here read as a table header and made the list a third box on the page.
-// No border-top here either: the tabs are their own surfaces now and the card
-// above closes itself.
-.hs-index .post-rows {
-  border-top: 0;
-}
-
-.hs-index {
-  margin-top: 18px;
 }
 
 @media all and ($mobile) {
-  header:has(.site-nav) {
-    margin-bottom: 1.5rem;
-    gap: 0.9rem;
-
-    // At phone width the label and the shortcut collided with the nav links.
-    // The icon alone is enough, and ⌘K means nothing on a phone anyway.
-    //
-    // A bare 16px icon is a 16x24 target, under the 24x24 floor. The padding
-    // opens the hit area to 44x44 and the matching negative margin takes the
-    // space back out of the layout, so nothing moves.
-    & > .search > .search-button {
-      // search.scss pins the height at 1.5rem, which caps the target at 29px.
-      height: auto;
-      padding: 14px;
-      margin: -14px;
-
-      & > p,
-      & > .search-shortcut {
-        display: none;
-      }
-
-      // Quartz ships the magnifier hidden; it is the whole control here.
-      & > svg {
-        display: block;
-        width: 16px;
-        min-width: 16px;
-        height: 16px;
-        margin: 0;
-      }
-    }
-  }
-
-  // Three links, a wordmark and the search control do not fit on one phone
-  // line: `.site-nav-links` is `white-space: nowrap` and will not shrink, so it
-  // ran straight out of its own box and sat 18px underneath the search icon at
-  // 390px. Giving the links a full-width basis drops them to a second line, so
-  // the bar holds at any width instead of at one width and wider.
-  .site-nav {
-    gap: 0.9rem;
-    flex-wrap: wrap;
-    row-gap: 0.6rem;
-  }
-
-  .site-nav-links {
-    flex: 1 0 100%;
-    gap: 1.1rem;
-  }
-
-  // With the nav two rows tall, centring pushed the search icon to the middle
-  // of both; it belongs on the wordmark's line.
   header:has(.site-nav) {
     align-items: flex-start;
 
     & > .search {
       padding-top: 0.35rem;
     }
-  }
-
-  // The card's inset comes in at phone width: 24px on each side of a 335px
-  // column is 14% of the measure.
-  .hs-featured {
-    padding: 18px 18px 16px;
-  }
-
-  // Same reason on the tabs — a 12px inset on each side of a 156px column costs
-  // a character of the blurb.
-  .hs-layer {
-    padding: 11px 10px 12px;
   }
 
   .post-row-link {
@@ -2657,8 +2120,8 @@ footer {
 // `content/index.md` is the masthead, not a config dump: the mono treatment it
 // once had made the first thing a visitor read look like machine output. It is
 // an `h1` tagline and one line under it, in the body face at reading size.
-// The tagline is always English, so the title takes the Latin display face; the
-// sub-line stays on the body face because the copy can change.
+// The tagline takes the display serif; the sub-line stays on the body face,
+// which is what a paragraph is set in everywhere else on the site.
 [data-slug="index"] .center > article {
   font-family: var(--bodyFont);
   letter-spacing: -0.005em;
@@ -2766,6 +2229,10 @@ footer {
 
 // Isolated 2026-08-12 reading pass; controlled by the boolean near the scale tokens.
 @include readability.styles($readability-experiment-enabled);
+
+// The blog's visual layer — frame, ground, type, lists and the markdown body.
+// See .agent/skills/design-system/references/blueprint-2026-09.md.
+@include editorial.styles();
 
 // Portfolio page components; the page itself is content/portfolio-it.md.
 @include portfolio.styles();

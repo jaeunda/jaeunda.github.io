@@ -1,10 +1,11 @@
 // The Topics page: one wrapped strip of subjects, one panel of posts.
 //
 // The chips are real links to `/tags/topic/<name>`, and this intercepts a plain
-// left click to switch the panel in place. That keeps the page working with no
-// script at all — the first panel is rendered open and every other subject is
-// one navigation away — and it keeps Cmd/Ctrl/Shift/middle-click opening the
-// full subject page, which is what a link is expected to do.
+// left click to switch the panel in place — the page does not move, and the
+// strip stays where the reader's eye left it. That keeps the page working with
+// no script at all — the first panel is rendered open and every other subject
+// is one navigation away — and it keeps Cmd/Ctrl/Shift/middle-click opening
+// the full subject page, which is what a link is expected to do.
 //
 // The strip used to scroll sideways with a step button at each end, which
 // needed centring, disabled-state syncing and an arrow-key handler. The chips
@@ -39,6 +40,13 @@ document.addEventListener("nav", () => {
         return
       }
       event.preventDefault()
+      // And `stopPropagation`, which is what actually keeps the page still.
+      // Quartz's SPA router listens for clicks on `window`, in the bubble
+      // phase, and `getOpts` in `spa.inline.ts` never looks at
+      // `defaultPrevented` — so the router was reached after this handler ran
+      // and navigated to the subject's own page anyway. Switching in place
+      // worked for exactly as long as it took the router to answer.
+      event.stopPropagation()
       if (chip.dataset.topic) tsSelect(root, chip.dataset.topic)
     }
     chip.addEventListener("click", handleClick)

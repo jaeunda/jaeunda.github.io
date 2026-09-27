@@ -4,9 +4,9 @@ tags:
   - project/csocrates2
   - topic/linux-kernel
 Date: 2026-02-04
-featured: true
+pinned: true
 pinOrder: 2
-description: "IP가 호스트까지 옮겨 준 패킷은, 커널 안에서 어떻게 프로세스 하나를 찾아가는가."
+description: "호스트까지 도착한 패킷은 커널 안에서 어떻게 프로세스를 찾아가는가."
 layer: transport
 rank: 1
 ---

@@ -4,9 +4,8 @@ tags:
   - topic/linux-kernel
   - project/csocrates2
 Date: 2026-06-23
-featured: true
 pinOrder: 1
-description: "프로세스가 주소 하나를 읽을 때 TLB와 페이지 테이블, 그리고 스왑까지 무슨 일이 벌어지는가."
+description: "주소 하나를 읽을 때 TLB와 페이지 테이블과 스왑에서 무슨 일이 벌어지는가."
 layer: kernel
 rank: 1
 pinned: true

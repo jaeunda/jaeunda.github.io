@@ -9,6 +9,8 @@ disagree, code wins; update this file in the same patch.
 | --------------------------------- | ---------------------------------------------- |
 | `quartz.config.ts`                | Color tokens, font families, site settings     |
 | `quartz.layout.ts`                | Component placement for content and list pages |
+| `quartz/styles/editorial.scss`    | The blog's visual layer — included last, wins  |
+| `quartz/styles/fonts.scss`        | `@font-face` declarations and the font stacks  |
 | `quartz/styles/custom.scss`       | Project-specific visual system                 |
 | `quartz/styles/variables.scss`    | Breakpoints, grid constants, font weights      |
 | `quartz/components/HomeStack.tsx` | The whole home page: featured, layers, index   |
@@ -16,6 +18,10 @@ disagree, code wins; update this file in the same patch.
 | `quartz/components/postMeta.ts`   | Layers, date and length contract               |
 | `quartz/components/SiteNav.tsx`   | The site's one navigation bar                  |
 | `content/index.md`                | The home masthead copy                         |
+
+> **Current design:** `references/blueprint-2026-09.md`, implemented in
+> `quartz/styles/editorial.scss`. Where a section below disagrees with the
+> blueprint, the blueprint is current.
 
 ## Design Principles
 
@@ -38,22 +44,52 @@ continue to use the base theme tokens shown below.
 
 | Token           | Value                    | Use                                |
 | --------------- | ------------------------ | ---------------------------------- |
-| `light`         | `#fcfcfa`                | Page background                    |
-| `lightgray`     | `#e4e5de`                | Borders and faint surfaces         |
-| `gray`          | `#5c6057`                | Metadata and secondary text        |
-| `darkgray`      | `#2f322c`                | Body text                          |
-| `dark`          | `#14170f`                | Headings and strong emphasis       |
+| `light`         | `#fbfbfa`                | Page background                    |
+| `lightgray`     | `#e5e6e2`                | Borders and faint surfaces         |
+| `gray`          | `#5c5f5a`                | Metadata and secondary text        |
+| `darkgray`      | `#2b2d2a`                | Body text                          |
+| `dark`          | `#191a18`                | Headings and strong emphasis       |
 | `secondary`     | `#4f5e3c`                | UI accent and decorative underline |
 | `tertiary`      | `#4f5e3c`                | Body links, active states          |
-| `highlight`     | `rgba(79, 94, 60, 0.10)` | Tints and table header backgrounds |
+| `highlight`     | `rgba(79, 94, 60, 0.12)` | Tints and table header backgrounds |
 | `textHighlight` | `#dde3d4`                | Markdown mark highlight            |
 
-Two tokens live outside `quartz.config.ts`, which only carries the nine named
-colours: `--surface` / `--surface-line` in `styles/fonts.scss` (`#ffffff` /
-`#eceee6` light, `#1c1f16` / `#2f3427` dark) for lifted blocks, and
-`--reading-surface` (`#f2f3ed` light, `#22261c` dark) for code and quote
-surfaces. Grounds sit close to white so headings can carry near-black; every
-text pair clears 6:1 on both the ground and the lifted surface.
+**Olive `#4f5e3c` is the point colour and the only colour on the page** —
+links, active state, the wordmark, a layer number. Everything else is a
+neutral, and the neutrals are set **for reading, not for mood**: a near-white
+ground a shade off pure white, so a sixty-minute post does not glare, carrying
+near-black text. The greys are hue-free on purpose; a grey that leans green
+competes with the one thing that is allowed to be a colour.
+
+Contrast on the ground: `dark` 16.9:1 · `darkgray` 13.4:1 · `gray` 6.3:1 ·
+olive 6.8:1.
+
+`styles/portfolio.scss` hard-codes its own literals (`--pf-page` / `--pf-ink` /
+`--pf-accent` …) because those pages are light-only and cannot read a theme.
+They share the accent and are deliberately **not** kept in lockstep on the
+neutrals: the portfolio is a printed page, the blog is a reading surface.
+
+`styles/editorial.scss` repeats the same nine under the names the blog's visual
+layer uses, and adds the olive scale the accent is cut from:
+
+| Editorial token            | Value                                                                                     | From                                      |
+| -------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------- |
+| `--ground`                 | `#fbfbfa`                                                                                 | `light`                                   |
+| `--card`                   | `#ffffff`                                                                                 | —                                         |
+| `--plate`                  | `#f1f2ef`                                                                                 | the reading surface                       |
+| `--line`                   | `#e5e6e2`                                                                                 | `lightgray`                               |
+| `--line-strong`            | `#cbccc7`                                                                                 | —                                         |
+| `--ink`                    | `#191a18`                                                                                 | `dark`                                    |
+| `--body`                   | `#2b2d2a`                                                                                 | `darkgray`                                |
+| `--mute`                   | `#5c5f5a`                                                                                 | `gray`                                    |
+| `--faint`                  | `#676a64`                                                                                 | 5.3:1, carries 12px mono                  |
+| `--olive-50 … --olive-900` | `#f2f4ec` `#dde3d4` `#c3ccb0` `#9fab85` `#7a8a60` `#4f5e3c` `#414e31` `#333e26` `#232b1a` | 600 is the accent, 100 is `textHighlight` |
+
+Two more tokens live outside `quartz.config.ts`, which only carries the nine
+named colours: `--surface` / `--surface-line` in `styles/fonts.scss` (`#ffffff`
+/ `#e9eae6`) for lifted blocks, and `--reading-surface` (`#f1f2ef`, the same
+value as `--plate`) for code and quote surfaces on the pages
+`readability-experiment.scss` still draws.
 
 ### No Dark Mode
 
@@ -68,8 +104,10 @@ The site is light only, and the removal is complete — not merely unused.
   `darkMode` key, so `quartz.config.ts` mirrors `lightMode` into it and nothing
   reads it.
 - `syntax.scss` carries only the light shiki rules, and
-  `SyntaxHighlighting` is configured with `github-light` for **both** themes, so
-  a second token set is not shipped on every span.
+  `SyntaxHighlighting` is configured with `vitesse-light` for **both** themes, so
+  a second token set is not shipped on every span. Vitesse's greens and clay sit
+  inside the olive palette; github-light's red and purple read as someone
+  else's site.
 - `fonts.scss` declares `color-scheme: light`.
 
 The emitted CSS contains zero occurrences of `prefers-color-scheme`,
@@ -82,8 +120,7 @@ The emitted CSS contains zero occurrences of `prefers-color-scheme`,
 - Metadata: `var(--gray)`, never `var(--lightgray)`
 - Links: `var(--tertiary)`
 - Borders: `var(--lightgray)`
-- Active selection: `var(--tertiary)` background with `var(--light)` text,
-  except dark-mode `.top-tag.active`, which uses `var(--dark)` text.
+- Active selection: `var(--tertiary)` background with `var(--light)` text.
 
 ## Typography
 
@@ -91,56 +128,75 @@ Every face is self-hosted from `quartz/static/fonts/` and declared once in
 `quartz/styles/fonts.scss`. `quartz.config.ts` therefore sets
 `fontOrigin: "local"`; the site makes no request to fonts.googleapis.com.
 
-| Token                     | Font          | Use                                         |
-| ------------------------- | ------------- | ------------------------------------------- |
-| `header` / `--headerFont` | Pretendard    | Article headings, section labels            |
-| `body` / `--bodyFont`     | Pretendard    | Body, h4-h6, navigation body text           |
-| `code` / `--codeFont`     | IBM Plex Mono | Code, tags, dates, counters, identifiers    |
-| `--displayFont`           | Space Grotesk | Latin-only display: post and article titles |
-| `--wordmarkFont`          | Fraunces      | `.page-title` only — the identity mark      |
+| Token                     | Font          | Use                                                      |
+| ------------------------- | ------------- | -------------------------------------------------------- |
+| `header` / `--headerFont` | Fraunces      | Article headings, section labels                         |
+| `body` / `--bodyFont`     | Noto Sans KR  | Body, descriptions, h4-h6, readable UI                   |
+| `code` / `--codeFont`     | IBM Plex Mono | Code, tags, dates, counters, identifiers                 |
+| `--displayFont`           | Fraunces      | The display face; `--serif` in editorial.scss aliases it |
+| `--wordmarkFont`          | Fraunces      | `.page-title` — the identity mark                        |
 
-`--displayFont` is defined in `fonts.scss`, not `quartz.config.ts`, because
-`joinStyles` in `quartz/util/theme.ts` appends its own `:root` block after every
-stylesheet; `fonts.scss` uses `html:root` so its overrides outrank it.
+Two faces are declared for the **unlisted portfolio pages only** and never
+appear on the blog: Pretendard (`--pf-sans`) and Space Grotesk (`--pf-latin`).
+A browser fetches only the faces a page sets, so a blog page downloads Fraunces
 
-Fraunces sets the wordmark and nothing else. It is the site's identity mark, and
-it is subset to basic latin because it only ever sets "jaeunda.log". It was
-briefly dropped when the type system moved to Pretendard; that was a mistake —
-the mark is the identity and does not follow the body face.
+- Noto Sans KR + Plex and a portfolio page downloads Pretendard + Space Grotesk
+- Plex; neither pays for the other.
 
-Space Grotesk carries no Hangul, so apply it only where the text is always
-Latin — post titles, article titles. Anything that can hold Korean stays on
-Pretendard so a single line never mixes two faces. `--codeFont` and
-`--wordmarkFont` fall back to Pretendard for the same reason.
+`--displayFont`, `--headerFont` and `--codeFont` are all redefined in
+`fonts.scss` under `html:root`, because `joinStyles` in `quartz/util/theme.ts`
+appends its own `:root` block after every stylesheet — and the stack it builds
+from `quartz.config.ts` falls back to a **system sans**, which would drop a
+Korean heading onto whatever face the OS supplies. The `html:root` copies put
+Noto Sans KR back in second place.
 
-The Pretendard file is a subset covering the characters in `content/` plus the
-UI copy; see `scripts/fonts/README.md` before adding Korean that might use new
-syllables.
+**Fraunces has no Hangul, and that is not a reason to keep it off headings.**
+It sets the wordmark, the home masthead, every post and list title, and the
+article's own h2/h3; the Hangul inside those lines falls through to Noto Sans
+KR and the latin words stay in the serif. That mixed line is the site's
+signature and is how the headings were always drawn — it is not a fallback
+failure. h4 and below stay on the reading face, where they sit closer to the
+paragraph they open.
+
+It is subset to full latin (not the eleven letters of "jaeunda.log", which is
+all it carried while it was the wordmark alone). The Noto Sans KR file is a
+subset covering the characters in `content/` plus the UI copy; see
+`scripts/fonts/README.md` before adding Korean that might use new syllables.
 
 ### Article Scale
 
-| Element          | Current Style                                                                                                                                                                     |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `.article-title` | Space Grotesk `clamp(30px, 3.4vw, 40px)`, 600, line-height 1.12, tracking -0.032em, `text-wrap: balance`                                                                          |
-| `article`        | 17px desktop / 16.5px mobile, line-height 1.85, box max-width 900px with a 68ch measure on direct children, letter-spacing 0, `word-break: keep-all`, `overflow-wrap: break-word` |
-| `p`              | inherited 1.85 line-height, margin `0 0 1.65em`, `text-wrap: pretty`                                                                                                              |
-| `h1`             | Pretendard 1.62em desktop / 1.5em mobile, 650, line-height 1.25                                                                                                                   |
-| `h2`             | Pretendard 1.4em desktop / 1.25em mobile, 650, line-height 1.28, margin-top 2.7em desktop / 2.4em mobile, no bottom border                                                        |
-| `h3`             | Pretendard 1.2em desktop / 1.06em mobile, 600, line-height 1.35, margin-top 2.2em desktop / 2em mobile                                                                            |
-| `h4`             | Body font 1em, 620, line-height 1.38, margin-top 1.8em, color `darkgray`                                                                                                          |
-| `h5`             | Body font 0.93em, 620                                                                                                                                                             |
-| `h6`             | IBM Plex Mono 0.87em, 600, uppercase, letter-spacing 0.08em                                                                                                                       |
-| `li`             | inherits the body's 1.85, margin-bottom 0.45em, nested items at 1em                                                                                                               |
-| inline `code`    | 0.9em IBM Plex Mono, `reading-surface` background, no border                                                                                                                      |
-| `pre code`       | 13.5px, line-height 1.72, `tab-size: 4`                                                                                                                                           |
-| `blockquote`     | `reading-surface` background, 2px `secondary` left edge, no italic                                                                                                                |
-| `img`            | block, `margin: 1.6em auto`; `p > img + em` is the caption, 0.82em `--gray`, centred                                                                                              |
+| Element          | Current Style                                                                                                                                                                               |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.article-title` | Fraunces `clamp(32px, 1.4rem + 1.9vw, 44px)`, 700, line-height 1.16, tracking -0.015em, `text-wrap: balance` (editorial.scss; the custom.scss fallback is `clamp(30px, 3.4vw, 40px)` / 600) |
+| `article`        | 17px desktop / 16.5px mobile, line-height 1.85, box max-width 900px with a 68ch measure on direct children, letter-spacing 0, `word-break: keep-all`, `overflow-wrap: break-word`           |
+| `p`              | inherited 1.85 line-height, margin `0 0 1.65em`, `text-wrap: pretty`                                                                                                                        |
+| `h1`             | `--headerFont` (Fraunces) 1.62em desktop / 1.5em mobile, 650, line-height 1.25                                                                                                              |
+| `h2`             | `--headerFont` (Fraunces) 1.4em desktop / 1.25em mobile, 650, line-height 1.28, margin-top 2.7em desktop / 2.4em mobile, no bottom border                                                   |
+| `h3`             | `--headerFont` (Fraunces) 1.2em desktop / 1.06em mobile, 600, line-height 1.35, margin-top 2.2em desktop / 2em mobile                                                                       |
+| `h4`             | Body font 1em, 620, line-height 1.38, margin-top 1.8em, color `darkgray`                                                                                                                    |
+| `h5`             | Body font 0.93em, 620                                                                                                                                                                       |
+| `h6`             | IBM Plex Mono 0.87em, 600, uppercase, letter-spacing 0.08em                                                                                                                                 |
+| `li`             | inherits the body's 1.85, margin-bottom 0.45em, nested items at 1em                                                                                                                         |
+| inline `code`    | 0.9em IBM Plex Mono, `reading-surface` background, no border                                                                                                                                |
+| `pre code`       | 13.5px, line-height 1.72, `tab-size: 4`                                                                                                                                                     |
+| `blockquote`     | `reading-surface` background, 2px `secondary` left edge, no italic                                                                                                                          |
+| `img`            | block, `margin: 1.6em auto`; `p > img + em` is the caption, 0.82em `--gray`, centred                                                                                                        |
 
-Article h1-h3 use the header font (Pretendard) at `letter-spacing: -0.02em`
-with `text-wrap: balance`, and remain subordinate to `.article-title`.
+On a blog post, `editorial.scss` draws the markdown headings: h2 is Fraunces
+25px / 600 / 1.32 at `-0.008em`, h3 is Fraunces 20px / 600 / 1.42 at `-0.004em`,
+and h4–h6 stay on the reading face. The table above is the custom.scss fallback
+scale, which still draws the pages editorial.scss does not reach. Both remain
+subordinate to `.article-title`.
 
-**Heading weight is 650, not 700 — and never 700 again.** Pretendard is a
-variable face, so 650 and 620 are real weights here. Hangul is a run of
+**Tracking on the serif is roughly half what it was on the sans.** Every title
+surface came down when the face changed — `-0.03em` → `-0.015em` on the post
+title and the featured card, `-0.035em` → `-0.018em` on the list titles,
+`-0.02em` → `-0.008em` on the rows. Fraunces is already tightly fitted, and the
+negative tracking that made Pretendard's wide sidebearings read as one word
+closed the serifs into each other.
+
+**Heading weight in the fallback scale is 650, not 700 — and never 700 again.**
+Noto Sans KR is a variable face, so 650 and 620 are real weights here. Hangul is a run of
 full-width squares with none of the ascender/descender rhythm that breaks up a
 Latin word, so the same numeric weight prints visibly more ink in Korean: on a
 page whose body is 400, a 700 heading was the only thing the eye could settle
@@ -157,14 +213,14 @@ h4-h6 `1.7em 0 0.45em`. They are in the heading's own em, so a bigger heading
 already gets a bigger gap; one shared `2.5em` put a chapter 62px from the text
 above and a section inside it 51px, which is not a difference a reader can see.
 
-**Why these numbers, for Korean set in Pretendard:**
+**Why these numbers, for Korean set in the reading face:**
 
 - **Measure** — 68ch is ~632px at 17px, about 37 Hangul syllables to the line,
   the top of the 30–40 band Korean sets comfortably in. Only prose takes it;
   `table`, `pre`, `figure` and `blockquote` opt back out to the full 900px box.
 - **Leading 1.85** — Hangul is a run of full-width squares with none of the
   ascender/descender rhythm that lets Latin breathe at 1.6, so it wants more.
-- **Tracking 0** — Pretendard already spaces Hangul correctly. The -0.01em this
+- **Tracking 0** — the reading face already spaces Hangul correctly. The -0.01em this
   file started with crowded it; the -0.003em that replaced it was 0.05px, a
   number that did nothing but look like a decision.
 - **Paragraph gap 1.65em** — 28px against 31px of leading. At 1.4em it was 24px,
@@ -178,7 +234,7 @@ measure, so prose keeps its reading width while `table`, `pre`, `figure` and
 `blockquote` opt back out to the full box. A four-column table squeezed into
 68ch was wrapping one word per line.
 
-The post header shares the index vocabulary: Latin display face for the title,
+The post header shares the index vocabulary: the display serif for the title,
 mono for the metadata line, and tags as outline chips rather than filled pills.
 It carries **one borrowed mark** — a `26px × 2px` accent rule above the
 breadcrumb, which is the gesture the portfolio opens a section with
@@ -336,17 +392,21 @@ tablet grid has left plus center; mobile stacks sections.
 
 ## Sidebar And TOC
 
-Shared type roles (families are declared in `quartz/styles/fonts.scss` and all
-four faces are self-hosted — nothing loads from a CDN):
+Shared type roles (families are declared in `quartz/styles/fonts.scss` and every
+face is self-hosted — nothing loads from a CDN):
 
-- `--displayFont` Space Grotesk: post titles, list-page titles, post-row titles,
-  the featured title, the home masthead h1.
-- `--wordmarkFont` Fraunces: the `jaeunda.log` wordmark, and nothing else.
-- `--bodyFont` / `--headerFont` Pretendard: paragraphs, descriptions, layer tab
-  labels. Pretendard carries Korean and Latin together, so a heading never mixes
-  two faces mid-line.
-- `--codeFont` IBM Plex Mono: dates, lengths, counts, tags, eyebrows, the
-  breadcrumb, code and TOC number prefixes.
+- `--displayFont` / `--headerFont` / `--wordmarkFont` / editorial's `--serif`
+  Fraunces: the `jaeunda.log` wordmark, the home masthead h1, post titles,
+  list-page titles, post-row titles, the featured title, the `Read next` label,
+  and a post's own h2/h3.
+- `--bodyFont` Noto Sans KR: paragraphs, descriptions, deks, h4-h6, and the
+  readable UI controls — the layer tab labels are 14.5px / 500 on this face,
+  because the rail is chrome, not writing.
+- `--codeFont` IBM Plex Mono: dates, lengths, counts, tags, eyebrows, the nav
+  destinations, the breadcrumb, code and TOC number prefixes.
+
+Fraunces carries no Hangul, so a Korean heading sets its Hangul in Noto Sans KR
+and its latin words in the serif. That is intended; see **Typography**.
 
 The left rail:
 
@@ -430,16 +490,107 @@ Footer:
   on `--gray`. `footer.scss` also pulls the list up by `-1rem` to tuck it under
   the colophon that used to come first; that is reset to `0`.
 
+### Top Bar
+
+`SiteNav.tsx`, styled in `editorial.scss` under **Nav**.
+
+**Three destinations, and they are the site's three views of one body of
+writing** — not a menu with a "back" on it:
+
+| Item     | Slug         | What it is                              |
+| -------- | ------------ | --------------------------------------- |
+| `home`   | `/`          | The author's selection, by layer        |
+| `posts`  | `tags/`      | Everything, newest first — the timeline |
+| `topics` | `tags/topic` | Everything, by subject                  |
+
+`home` is listed even though the wordmark beside it already links there. **A
+wordmark reads as identity, not as a destination**, so a reader who had walked
+into `topics` had no marked way back and was left with the browser's back
+button. Naming it makes the bar a complete set: wherever you are, you can see
+the whole site and which part of it you are standing in. The wordmark is not
+marked current on the index — `home` carries that, and one place gets one mark.
+
+**Exactly one item is current, always.** `activeSlug` takes the **longest**
+matching prefix, because `tags/topic` is also under `tags/` and matching every
+prefix lit `posts` and `topics` at once. `normalize` collapses the two spellings
+of each page — `tags/` / `tags/index`, and `/` / `index` — to one string; home
+becomes the empty string, which is a prefix of nothing, so it lights only on
+itself. `aria-current` is `page` on the destination itself and `true` on a page
+inside it, such as a leaf topic under `topics`.
+
+**One mark, and it is drawn once.** A 1px olive rule that grows from the left
+edge of the word, on `a::after` with `transform: scaleX()`:
+
+- rest — `scaleX(0)`
+- hover — `scaleX(1)` in `--line-strong`: you could go here
+- current — `scaleX(1)` in `--olive-600`: you are here
+
+It is a bar rather than `text-decoration` because **a rule that arrives is worth
+more than one that appears** — `text-decoration-color` can only fade, and the
+wipe says which end the word starts at. It is the same gesture the home
+chooser's open tab makes, so "here" is drawn one way on the whole site. Under
+`prefers-reduced-motion: reduce` the transition is dropped and the bar is simply
+drawn; it must never be the motion that makes it visible.
+
+**Do not add a second mark.** `custom.scss` carried a `border-bottom` on the
+same links for a long time after `editorial.scss` took the job, so `topics`
+printed two olive lines four pixels apart — one under the word at the
+`text-decoration` offset and one under the whole link box. That block is colour
+only now.
+
+### Footer
+
+`Footer.tsx`. Three things and no more: **what the site is, how to reach the
+person who writes it, and one line of credit.**
+
+- **Two columns, aligned at the top.** The first line of each column starts at
+  the same height, so the footer has a top edge the eye can find; the note hangs
+  under the wordmark and the credit under both. It used to be a name, a role, a
+  status line and two links aligned on their _bottoms_ — four heights on the
+  left and three on the right, nothing in it lined up with anything else in it.
+- **What went, and why.** The status line (`12 posts · last write …`) is a
+  changelog. The role is a CV. The name is the same fact as `jaeunda.log`,
+  `github.com/jaeunda` and the address, printed a fourth time. A reader at the
+  foot of a page is either leaving or looking for a way to get in touch.
+- **The destinations come from `components/socialLinks.ts` and nowhere else.**
+  `quartz.layout.ts` used to pass the footer its own `links` map, so the site's
+  addresses were written down twice and the two lists had already drifted.
+- **A mark, then the address in full**, stacked in the second column. Three
+  lowercase words — `github linkedin email` — were the right length and the
+  wrong thing: they read as three more items of chrome on a page full of
+  chrome, and nothing about them said _this is how you reach someone_. An
+  address is a fact a reader can act on, and the mark is recognised before the
+  text is read. The marks are inline SVG at 15px on `currentColor` (`MARKS` in
+  `Footer.tsx`), `--line-strong` at rest and `--olive-600` on hover.
+- **No underline, at rest or on hover.** The mark already says these are links,
+  and three underlined addresses in a row is a fence. Hover inks the address.
+- **The block is right-aligned; its rows share a left edge.** Right-aligning the
+  rows themselves stepped the marks and the addresses into a ragged left
+  edge — the same fault the old footer had, one column over.
+- **The `note` is a list of subjects, not a sentence** — `Linux internals ·
+Database concurrency · Network paths`, set in the mono on one line
+  (`white-space: nowrap`), for the reader who arrived on a post and has never
+  seen the home page. It was `Notes on Linux internals, database concurrency
+and network paths.`, which spent its first two words saying what a note is
+  and then wrapped.
+- **`.footer-mark` is `var(--accent)`** — the same `#4f5e3c` as the nav
+  wordmark, verified against the painted pixels. It is the one place on the
+  page besides the links where the point colour appears.
+- At `$mobile` everything stacks into one left-aligned column.
+- `ProfileCard.tsx` still exists because `Explorer.tsx` imports it. It is not
+  mounted in `quartz.layout.ts` and nothing renders it.
+
 ## Site Shell
 
 A narrow left rail carrying the profile, a horizontal bar at the top of the
 content column, and the content. The rail holds identity and nothing else, so it
 never competes with the post list.
 
-- `SiteNav` renders the bar: wordmark plus two destinations (`Posts`,
-  `Topics`), with `Search` beside it in `sharedPageComponents.header`.
+- `SiteNav` renders the bar: the wordmark plus **three** destinations — `home`,
+  `posts`, `topics` — with `Search` beside it in `sharedPageComponents.header`.
   **`Portfolio` is not one of them, and it is not anywhere else either.** See
-  **Portfolio Coverage**.
+  **Portfolio Coverage**, and **Top Bar** below for the destinations and the
+  current-page mark.
 - **There is one rail on the whole site and it is the outline.** `left` is
   `[DesktopOnly(TableOfContents())]` on reading pages and `[]` everywhere else;
   `right` is `[]` on every layout. The rail is 268px (`$site-rail-width`).
@@ -487,76 +638,11 @@ never competes with the post list.
 - Portfolio pages are untouched by all of this: `#quartz-body[data-unlisted]`
   resets `display`, hides `.page-header` and clears the page max-width.
 
-### Profile Rail
+### Profile Rail — removed
 
-`ProfileCard` carries the whole identity: name, role, the thesis the writing
-serves, and the three social rows.
-
-**It exists on the home page and nowhere else.** One copy, rendered into
-`afterBody` before `HomeStack`, in the column at every width, directly under the
-`content/index.md` tagline. Reading pages have an outline in their rail; the
-footer's three links carry identity everywhere else.
-
-It was previously on every page — the rail at desktop, the foot of the column
-below it — so identity both changed address with the viewport and took the
-widest rail on a reading page away from the document's own structure.
-
-It is a **byline, not a bio**: `.profile-name` at 16px and `.profile-role` in
-mono on one baseline row, the links wrapping onto the next, and no thesis — the
-tagline directly above already says what the writing is for, in the author's own
-words. A `--lightgray` hairline under it closes the masthead.
-
-The three destinations are **pills carrying the whole address** — the
-portfolio page's `.pf-caps` vocabulary, which is where this site already keeps
-"a short row of equal things".
-
-```
-( github.com/jaeunda )  ( linkedin.com/in/jaeunda )  ( jaeunda@gmail.com )
-```
-
-- `padding: 7px 14px`, `min-height: 34px` (**44px at `$mobile`**), `999px`
-  radius, `1px --surface-line`, `--surface` ground, mono 12.5px `--darkgray`.
-  Hover takes `--tertiary`, a 45%-accent border and `translateY(-1px)`.
-- **No shadow.** `.pf-caps` has none either, and a row of floating pills
-  directly above the featured card would compete with the one thing on the
-  page that is meant to be lifted.
-- **The 999px radius is the point of difference.** The site's tag chips are
-  3px; a tag is a filter and these are destinations, so they must not look
-  alike.
-- **The visible label is an address and the accessible name is the service**
-  (`aria-label="GitHub"`), so a screen reader says "GitHub" instead of spelling
-  a URL.
-- **The role is tied to the name by a drawn rule**, the same 4×1px device
-  `.hs-featured-layer` uses, set `display: inline-block` with
-  `vertical-align: middle` — baseline plus half the x-height, which is the
-  optical centre of the line it connects. An absolutely positioned bar has to
-  guess that offset against a span whose box is taller than its text, and lands
-  above the cap height, where it reads as a macron over the name. The role also
-  rises to 12.5px on `--darkgray`: it is the second half of the byline, not a
-  footnote to it. Before this it sat 12px away in a different face, a different
-  size and a different colour, touching the name only by adjacency.
-- At phone width they stack, and that is the intended shape:
-  `linkedin.com/in/jaeunda` is 23 monospace characters and the pair only fits a
-  326px column if the type drops to 11px — legibility traded for a wrap one
-  font metric would undo. The row re-forms on anything wider.
-
-**Three earlier versions of this row were wrong, each differently.** Keep all
-three in mind before changing it again:
-
-1. A label and a value per row (`github` / `github.com/jaeunda`) — six items,
-   no way to tell which three were clickable.
-2. One token per destination (`GitHub`, `Email`, `Daeun Jang`) — readable, but
-   nothing a reader could type, and one row named a person where the others
-   named places.
-3. A two-column `10ch` mono table. Three rows do not earn a table: it opened a
-   dead gutter across the column, `code` / `work` / `mail` was a private
-   taxonomy the reader had to decode, and three stacked underlined URLs made a
-   link-farm texture under the tagline — a block taller than the byline it is
-   subordinate to, spending ~130px of the first screen and pushing the writing
-   down. It also left ~20px tap targets, under the accessibility floor.
-
-All of its styling is in `components/styles/profileCard.inline.scss`, which also
-used to hide the whole card below 768px.
+There is no profile block on any page. `ProfileCard` is not mounted in
+`quartz.layout.ts`; the file survives only because `Explorer.tsx` imports it.
+Identity is the wordmark and the footer's three addresses — see **Footer**.
 
 ### Compact Table Of Contents
 
@@ -611,32 +697,156 @@ description 14px/1.62 clamped to two lines, metadata 11.5px mono.
 
 ## Home Page
 
-The home page is **three blocks and a masthead**, and the count is the design:
+The home page is a **masthead and one chooser over one grid**:
 
-0. **Masthead** — `content/index.md`'s `h1` tagline and one line under it, then
-   the `ProfileCard` byline, closed by a hairline. Not part of `HomeStack`.
-1. **Featured** — one post, set as type. `quartz/components/HomeStack.tsx`.
-2. **Layers** — the five layers, as a filter. One is always open.
-3. **Index** — the open layer's posts, one column.
+0. **Masthead** — `content/index.md`'s `h1` tagline and one mono line under it.
+   Not part of `HomeStack`. **There is no profile block here**: the author is
+   in the footer, on every page, so the first screen belongs to the posts.
+1. **Chooser** — one horizontal mono row: `pinned`, then each layer, with
+   `all posts →` at the far end. `pinned` is open by default.
+2. **Grid** — the open group's posts, three columns, every cell the same cell.
 
-It was six blocks in six visual vocabularies on one screen: a Fraunces wordmark
-bar, a large Korean opener, a mono uppercase `Pinned` label, two bordered cards
-with mono ASCII art inside them, outlined counter chips, and a date-gutter list.
-**Before adding a block here, remove one.**
+`pinned` is a tab beside the layers rather than a block above them because it is
+the same kind of thing — a way of cutting the writing — and a reader picks one
+cut at a time. It is also what a layer tab could never give: six posts chosen
+across the stack, which is the author's answer to "where do I start".
+
+**Before adding a block here, remove one.** There is no status line: `12 posts ·
+last write 2026-06-23` used to open the page, which made a changelog the first
+thing a reader saw. The footer prints both figures, where someone who wants them
+is looking.
+
+### Home Chooser
+
+`quartz/components/HomeStack.tsx` → `.hs-filter` / `.hs-tab`, drawn by
+`editorial.scss`.
+
+- **One mono row, closed by a single `--line-strong` rule.** Each tab is the
+  group's name and its count. **No numbers**: the tabs are already printed in
+  the stack's order, left to right, so a `01` in front of each one spells out
+  what the row's own arrangement says.
+- **The open tab is inked and underlined in olive** — the same mark `SiteNav`
+  gives the page you are on, so the site has one vocabulary for "here".
+- **`all posts →` is not a tab.** Every tab narrows the grid in place; that link
+  leaves the page. It sits at the far end of the row, and wraps above the tabs
+  below 1100px.
+- **The count is what the group holds, not what the grid shows.** A cut group
+  prints `9+`: a bare `9` on a tab that opens six would be a wrong number.
+- **The layer's blurb is the tab's `title`, not a line printed under the open
+  one.** Printed, it moved the grid down by its own height on every switch.
+- **`?layer=<id>` opens that tab on load** — the link a post's `PostKicker`
+  points at, so a reader who followed `storage engine` lands on the rest of
+  the layer they were reading. An unknown id keeps the server-rendered tab.
+- `HomeStack` renders **every** panel and marks all but the first `hidden`, so
+  the page is correct with no script at all.
+- Below 1100px the row scrolls sideways to the viewport edge and the far edge is
+  masked. **Its rule moves onto `.hs-tabs` as a background line there**:
+  `overflow-x: auto` also clips vertically, so an open tab's mark hanging 1px
+  below its own box was cut off and the row read as having no current tab.
+
+### Home Grid
+
+`.hs-grid` / `.hs-cell`, one per panel.
+
+- **`GROUP_LIMIT` is 6.** It is the length of the pinned set the author keeps,
+  and six cells is two full rows of the three-column grid — a group that ends
+  level rather than on a short row.
+- **A pinned post keeps its place in its layer as well.** A layer is the whole
+  layer, and being the author's pick is not a reason to be missing from it.
+- **Three columns at `$wide`, two below 1100px, one on a phone.** `gap` is
+  `0 var(--col-gap)`: **no row gap**, because the next row's top rules are the
+  separator. The page is ruled once per row and never twice.
+- **Two columns was tried and rolled back.** The longest title the blog carries
+  — `Phantom Phenomenon and Index Locking` — measures 381px in the display face
+  at 19px, against 317px for a third of the frame and 508px for a half, so two
+  columns is the only way to fit every title on one line. It costs more than it
+  buys: cards wide enough to read as rows, and six of them in three rows
+  instead of two. **Four of the twelve titles wrap here, and that is fine** —
+  see the title rule below.
+- **The first row of cells has no top border** — the chooser's own rule is that
+  row's rule. It is removed with `:nth-child(-n + 3)` and handed back at each
+  breakpoint (`:nth-child(3)` at two columns, `:nth-child(n + 2)` at one). Left
+  flush, the two rules stack into a 2px line broken by 64px notches wherever the
+  column gaps fall.
+- **A cell is a hairline, one mono meta line, the title, the description.** No
+  box, no tint, no shadow.
+- **A card is read title → question → stamp, so it is written in that order.**
+  The stamp used to sit above the title, which put two words of chrome in front
+  of the one thing a reader is scanning for.
+- **The stamp sits at the foot of the cell** (`margin-top: auto`), so a row's
+  stamps land on one line. That works because every cell in a row is the same
+  height by construction — the title reserves two lines and the description is
+  clamped to two — and it needs **`box-sizing: border-box` on
+  `.hs-cell-link`**. `a` is `content-box` here, so `height: 100%` sized the
+  _content_ to the row and 40px of padding overflowed it: every stamp printed
+  38px below its own row, under the next row's rule, reading as the metadata of
+  the card beneath it.
+- **The stamp is flush left and must not wrap.** A line that takes two rows in
+  some cells and one in others breaks that alignment. In `pinned` it is
+  `kernel · 63 min`; inside a layer the open tab has already said the layer, so
+  it is `63 min` alone — six cells repeating `storage engine` under a tab
+  reading `storage engine` is a column of noise down the grid.
+- **No date on the grid.** The index is in editorial order, not date order, so a
+  date here invites a reading the grid is not making. The archive prints every
+  date. `chapters` went with it: in a third of the frame two facts fit, and the
+  minutes are the number a reader is deciding on.
+- **`.hs-cell-title` wraps, and nothing is reserved for the second line.**
+  Those two go together: a wrapped title pushes only its own description down,
+  so the gap between a title and the sentence under it is the same in every
+  cell. It was the _reserve_ — `min-height: calc(2 * 1.28em)` — that put 25px
+  of nothing under every one-line title, not the wrapping. `text-wrap: balance`
+  keeps a two-line title from breaking after one word. `.hs-cell-desc` still
+  clamps to two lines.
+- **Hover is the rule turning olive and the title inking.** Nothing moves and
+  nothing fills. On a page of identical cells, a hover that lifts or tints is
+  the loudest thing on the screen.
+
+### Home Cell Type
+
+The one place on the site where a Latin serif title sits directly on top of
+Korean prose, so the step between them has to be set deliberately.
+
+| Part             | Style                                                  |
+| ---------------- | ------------------------------------------------------ |
+| `.hs-cell-meta`  | IBM Plex Mono 11.5px, `--faint`, tabular, never wraps  |
+| `.hs-cell-title` | Fraunces 19px / 600 / 1.3, `--ink`, `-0.008em`, wraps  |
+| `.hs-cell-desc`  | reading face 13px / 400 / 1.7, `--faint`, clamped to 2 |
+
+**The description is one step under the title, in the colour the archive's rows
+use.** Two earlier passes each over-corrected in one direction:
+
+- 14px on `--mute` at 1.6 was too heavy. Hangul is a run of full-width squares,
+  so the same grey prints visibly more ink than a line of Latin at the same
+  size, and the grid read as twelve paragraphs rather than twelve titles with a
+  note each.
+- 13px on `--faint` at 1.7 was too light. Pushed that far down it read as a
+  caption someone had pasted under a headline — too small against a 19px serif,
+  too pale, and too loosely set for a two-line block to hold together.
+
+13.5px on `--mute` at 1.62 is the settled value, and **keeping the two apart is
+the title's job**: it is 19px, 600 and near-black, so the line under it does not
+also have to whisper. Tracking stays at 0 — the reading face spaces Hangul
+correctly.
+
+**The archive's rows carry the same relationship** at 14.5px, a half-step larger
+because a row is the full measure wide and a cell is a third of it. The two
+lists used to set the same sentence at 15px with negative tracking in one and
+13px on `--faint` in the other, so a post looked like a different kind of thing
+depending on which page you met it on.
+
+**Do not fix a heavy description by lightening the title.** It was tried —
+18px/500 on `--body` — and it levelled the cell instead of stepping it.
 
 ### First-Screen Motion
 
 See **Mood And Elevation** for the budget these numbers come from.
 
-- **A wash behind the opening screen.** Two radial gradients of the accent at
-  7% and 4% on `body[data-slug="index"]`, `no-repeat` at the top, sized
-  `100% clamp(440px, 62vh, 760px)` — gone by the time the reader is in the
-  index and never behind body copy at a contrast that matters. `Posts` and
-  `Topics` take one weaker gradient; a post page takes none.
-- **One entrance, three steps, once per document.** `home-rise` is 10px and
-  500ms on `--lift-ease`: masthead and byline together, the featured card at
-  70ms, the layer strip and the index at 140ms. It was five steps 70ms apart,
-  so the index — the point of the page — waited 280ms to appear.
+- **No wash.** `editorial.scss` sets one flat ground on every page, including
+  the two radial gradients custom.scss still paints behind the home page.
+- **One entrance, two steps, once per document.** `home-rise` is 10px and 500ms
+  on `--lift-ease`: masthead and byline together, the chooser and the grid at
+  90ms. It was five steps 70ms apart, so the grid — the point of the page —
+  waited 280ms to appear.
 - **It is gated on `body.home-entering`, which `homeStack.inline.ts` adds on
   the first `nav` event and only the first.** Two bugs die with that class.
   The server-rendered page carries no class, so a browser that never runs the
@@ -646,16 +856,12 @@ See **Mood And Elevation** for the budget these numbers come from.
   a post watched the whole home page reassemble — the animation punished
   exactly the reader who was browsing. A `window.addCleanup` removes it on
   `prenav`; the module-scope flag outlives that.
-- **Switching layers staggers the incoming rows.** `--hs-i` is written on the
-  visible rows by the script and `is-swapping` is re-added after a forced
-  reflow, which is what restarts a CSS animation. The stagger reads `--hs-i`
-  rather than `nth-child` because `nth-child` counts the hidden rows of every
-  other layer — the first row of the last layer would start 200ms late — and
-  the script **caps it at 5 rows**, because an uncapped ladder ran the six-row
-  Storage tab for 420ms, slower than the eye that asked for it.
-- **One hover affordance per link surface**: `Read this first →` on the card,
-  and a `→` that fades in on each post row. The row's title recolouring alone
-  was too faint to notice from a date gutter 96px away that does not change.
+- **Switching tabs staggers the incoming cells.** `is-swapping` is re-added
+  after a forced reflow, which is what restarts a CSS animation. The ladder is
+  `nth-child` — safe, because every cell in an open panel is shown — and it is
+  **capped at the fourth cell** (`nth-child(n + 4)` shares one delay), because
+  an uncapped six-step ladder ran the Storage tab for 420ms, slower than the eye
+  that asked for it.
 
 ### Home Masthead
 
@@ -667,184 +873,206 @@ only `h1`. That is deliberate on both counts:
   line plus a sentence explaining how to use the filter. Do not put site voice
   in a component.
 - `.center > article` is therefore **shown** on index, not hidden. The `<hr>`
-  Quartz prints after it stays hidden; the byline's bottom border is the rule.
+  Quartz prints after it stays hidden.
 
 **What the masthead is allowed to claim** is whatever the author's own record
 already says. It is checked against four sources, in this order: her career
 workbench (`~/_workbench/_master` — the answers and project current-versions she
 actually submits), `content/portfolio-it.md`, the GitHub trail, and the twelve
-posts themselves. The current line —
-
-> Systems are clearest at the point they fail.
-> Linux and database internals, followed down to the mechanism — and lately to
-> how the hardware executes it.
-
-— is her portfolio's own sentence for this blog ("시스템이 실패하는 지점을
-따라가며 정리합니다") plus the direction the record supports: OS, system
-programming and compiler coursework, then the 2026.07–09 NPU and CUDA training
-and the CXL appendix in the Virtual Memory post. It replaced
-"Interested in the systems behind reliable software / …a growing focus on
-runtime execution and hardware-aware performance", which opened on a hedge and
-claimed a focus the writing did not yet show.
+posts themselves.
 
 **Check the wrap by rendering before shipping a new one.** Two lines at 1280,
-820 and 500; three at 375, with no orphan on the last line. The first draft of
-this sub-line ended "how the hardware underneath executes it" and left
-`executes it.` alone on a 120px line at 500px — one word shorter and it breaks
-cleanly at every width. `text-wrap: pretty` is not a substitute for measuring.
+820 and 500; three at 375, with no orphan on the last line. An earlier sub-line
+ended "how the hardware underneath executes it" and left `executes it.` alone on
+a 120px line at 500px — one word shorter and it breaks cleanly at every width.
+`text-wrap: pretty` is not a substitute for measuring.
 
-`h1` is the Latin display face at `clamp(27px, 3.4vw, 36px)`/600 — the tagline
-is always English. The sub-paragraph is the body face at 16px (15px mobile) on
-`--gray`, and the article caps at 54ch. `rehype-autolink-headings` appends an
-anchor to every heading, revealed on hover by `base.scss`; it is
-`display: none` here, since the site's one statement should not link to itself.
+`h1` is the display serif at `clamp(30px, 1.2rem + 1.6vw, 40px)` / **600** —
+Fraunces has a real 600, and at 40px the step up to 700 is all ink and no more
+authority on a line that is already the largest thing on the page. Its `em`
+takes the **accent colour, not a weight step and not an italic**: this Fraunces
+has a `wght` axis and no italic, and a synthesised slant on a serif at 40px
+reads as a rendering fault.
 
-### Layers
+**The sub-line is mono**, 13px on `--mute`, capped at 60ch (12.5px on a phone).
+It is the blog reported rather than written — the subjects, as a list — so it
+takes the same voice as the nav, the metadata and the footer's colophon, and it
+stops competing with the serif statement above it for the same job. It was the
+reading face at 17px, which read as a second, quieter statement. It is always
+English, so nothing in it can fall out of the mono.
 
-The five layers of the request path, as the home page's one filter.
+**The `em` takes its own line** (`display: block`). Left to wrap, the statement
+set on one line at desktop and broke after "from" on a phone — a different
+shape at every width, and at two of them the break fell inside the phrase the
+colour is marking. Two lines with the accent on the second is the masthead's
+shape, and `content/index.md` decides where it falls by where it puts the
+`_…_`.
 
-- **No `All`.** It sat first and did exactly what `All posts →` beside the label
-  does, so the page had two controls for "everything".
-- **One layer is always open**, so a click selects rather than toggles and
-  clicking the open tab leaves it open. `HomeStack` renders the opening state
-  server-side — other layers' rows ship with `is-hidden` and the blurb is
-  already the open layer's — so the page is correct with no script at all.
-- **Ordered by the author, and by nothing else.** `LAYERS` in `postMeta.ts` is
-  the display order — Kernel, Storage Engine, Transport, Orchestration,
-  Application — and `layersInOrder()` only drops the empty ones. The first one
-  opens. Two earlier orders both let something other than the author decide:
-  the request path (Application → Transport) opened a blog about Linux and
-  database internals on browsers, and `layersByWeight()` opened it on whichever
-  layer had accumulated the most posts, so the front page changed subject every
-  time a post was added. **Editing that array is an editorial decision**, not a
-  refactor.
-- **Each tab prints its number** — `01 Kernel` — because the order is a claim.
-  Five equally-weighted boxes said the strip was a set; a numbered strip says it
-  is a sequence, which is the thing the order is for.
-- **Every tab prints its own `blurb`**, three or four English words under the
-  label. It was one line under the strip that the script rewrote on each click,
-  so four of the five layers never said what they covered. Nothing in the script
-  writes text now.
-- **Tab names take the display face**, 15.5px/600 on `--dark` — the post-title
-  vocabulary, because this is the page's primary control and not a caption on a
-  box. The layer ids are English by definition (`postMeta` `LAYERS`), so Space
-  Grotesk is safe here; it carries no Hangul and must never sit where Korean
-  can appear.
-- **Tabs, not chips.** Chips are this site's tag vocabulary. Tab names were the
-  body face at 15px/500 — navigation, not metadata — with a mono `01` before
-  them, a mono count pushed to the tab's right edge by `margin-left: auto`, and
-  a 12px `--gray` blurb.
-- **Each tab is its own surface**: `--surface`, `1px --surface-line`, `10px`
-  radius, hover lifting 2px onto `--shadow`. Borderless underline tabs were the
-  last flat vocabulary on a screen that now opens with a card, and they read as
-  unfinished.
-- **The open tab is said three ways and sits flat**: an 8% accent ground, the
-  accent border, the accent on the name and number, and the name at 600 — with
-  `box-shadow: none` and `transform: none`, because a pressed control must not
-  be the thing floating highest. It used to be an underline and a colour on a
-  14px name, a 2px difference across a five-column grid.
-- **The number and the count share a meta line above the name.** With
-  `01 Storage Engine 6` on one line, a 132px column broke the label and left
-  `Engine` stranded; the name now owns a line and the five numbers and five
-  counts each align down the strip.
-- **The heading is `Browse by layer`, not `Layers`.** A noun names the taxonomy
-  without saying that the thing under it can be clicked.
-- **No rule closes the block.** `.hs-layers` used to carry a `border-bottom`
-  16px under tabs that already ended in their own border, so the strip appeared
-  underlined twice and the second line belonged to nothing. The tabs are their
-  own surfaces now; `.hs-index` takes an 18px top margin and no border.
-- **`All 12 posts →`, with the count.** A visitor could not tell whether the
-  site held twelve posts or the two under the open tab. `HomeStack` already
-  knows the number, so it cannot go stale.
-- **`grid-template-columns: repeat(auto-fit, minmax(156px, 1fr))`.** A sixth
-  layer joins the grid without touching the stylesheet, and the same rule gives
-  fewer columns at phone width instead of five squeezed ones. 44px tall, with
-  the horizontal padding tightened at `$mobile`.
+**The copy answers to the author's own record.** The current line is the blog's
+side of her GitHub profile README — _"Deterministic cores for nondeterministic
+systems. Concurrency and uncertainty are given."_ — turned from building to
+reading:
 
-### Featured Post
+> Mechanism before description, _evidence before assertion._
+>
+> The same order at every layer, from a page table to a distributed
+> transaction.
 
-One post — `FEATURED_LIMIT`, sourced from `pinned: true` ordered by `pinOrder`.
+**It states the author's position, not the blog's contents.** `Mechanism before
+description, evidence before assertion.` is the order she works in; the site is
+one place that order is applied. Every version that described the page instead
+— `How systems work, and why.`, `The mechanism behind the behaviour, worked out
+in full.` — was accurate and interchangeable with any other systems blog,
+because a description of the contents is not a position.
 
-**It is a card, and it is one of the site's two** (see **Mood And Elevation**):
-`--surface` ground, `1px --lightgray`, `14px` radius, `22px 24px 20px` padding
-(`18px` at `$mobile`), resting on `--shadow`. `:hover` **and `:focus-within`**
-take `translateY(-3px)`, `--shadow-lift`, and a border mixed 45% toward the
-accent, over 180ms `ease-out`.
+**It names nothing outside the page.** No projects, no repositories, no
+`GitHub`, and not the word `deterministic`. Two versions broke this and both
+were wrong in the same way: naming `weavegate` and `WeaveTrail` in the sub-line
+turned the top of a reading page into a portfolio index, and `Deterministic
+answers from nondeterministic systems.` is her GitHub profile line verbatim,
+which reads as a banner over a product.
 
-It used to be flat type closed by a `--lightgray` hairline — **the same
-declaration `.post-row` carries** — so it was row zero set large, and the one
-filled plane on the screen was the ASCII cover inside it, which out-weighted its
-own parent. Nothing said the whole block was a single link.
+**The thread that runs through her engineering work is present as the position
+itself**, which is why nothing has to point at it. `evidence before assertion`
+is the same stance her tools take, said in words that belong to the page. A
+reader who later finds the repositories will recognise it. **That recognition
+is the whole of the connection this page is allowed to make.**
 
-**How it stays distinct from the rows below**: it is the only element on the
-page with fill _and_ radius _and_ shadow, and the rows stay transparent, square
-and un-lifted. They share a left edge, so the card's padding indents its title
-24px past every row title; that offset is the tell that reads "one pick, then
-the list".
+**A noun phrase, not a sentence.** Two parallel phrases, `Mechanism before
+description` and `evidence before assertion`, with the second taking the
+accent. A masthead that forms a complete sentence starts arguing, and every
+version of this line that did — `“It works” is not an explanation.`,
+`Concurrency and failure are the normal case.` — was rejected for exactly that.
+A noun phrase states and stops.
 
-Inside it: the eyebrow, the title at `clamp(22px, 2.7vw, 27px)` in the display
-face, the `description`, the ASCII cover on the `--reading-surface` plate with
-**no border of its own** — a framed plate inside a framed card is two boxes —
-and a foot line over a `--surface-line` rule, which is what the lighter of the
-two line tokens is for.
+**`before`, not `over`.** `over` states a preference; `before` states an order
+of work, which is what the sub-line then confirms (`The order I work in`). The
+two halves have to agree about what kind of claim they are making.
 
-**The eyebrow says what the block is, then where the post files:**
-`● FEATURED POST – KERNEL`. It printed the layer alone, so the one post the
-author picked to open the site was labelled `KERNEL` — which is a taxonomy, and
-says nothing about why that post is at the top of the page. `Featured post` is
-`--tertiary` with a 5px accent dot; the layer follows it in `--gray`, separated
-by a 4px rule drawn in `::before` rather than a `·` typed into the markup that
-would then have to be hidden from the accessibility tree by hand. The dot and
-the kicker are the one place olive is used as a marker, and this whole block is
-an `<a>`, which is what olive is for.
+**Three rules the copy on this page follows:**
 
-**The foot line is the length and one affordance**: `Read this first →`, mono,
-`--tertiary`, the arrow translating 3px on hover. The block was a link with a
-title, a paragraph and a length in it and nothing that looked clickable.
+1. A noun phrase in the headline.
+2. One sentence under it, and only one.
+3. **No em dashes anywhere in the masthead.** An em dash is an aside, and there
+   is no room for an aside in three lines of copy. Use a full stop and start
+   again, or cut the clause.
 
-It was two bordered cards side by side under a `Pinned` label — a module that
-needed a border _and_ a label before it read as a pair, and whose 9px cover art
-was decoration nobody could read.
+**Six versions were rejected first, and the faults are worth keeping** because
+they are the five obvious ways to write this badly:
 
-**The featured post keeps its row in the index.** It used to be filtered out —
-it is printed in full above, so its layer showed it twice on one screen — but
-the tab said `Kernel 2` and the list under it had one post in it, so the layer
-looked like it was missing something, which is exactly what the author reported.
-A layer is the whole layer; being the pick is not a reason to be absent from it,
-and the duplication is only ever visible while that one layer is open.
+| Version                                                          | Fault                                                                                                                                                     |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Reading systems from the mechanism up.`                         | A gerund opening describes an activity instead of saying anything.                                                                                        |
+| `Concurrency and failure are the normal case.`                   | A premise the reader can agree with while learning nothing; the second half lands nowhere.                                                                |
+| `Operating systems, databases, networks, down to the mechanism.` | A list of fields reads as a table of contents.                                                                                                            |
+| `“It works” is not an explanation. Finding the mechanism is.`    | Clever. A masthead that argues with the reader is doing something other than telling them where they are.                                                 |
+| `How systems work, and why.`                                     | Plain, and generic — any systems blog could have written it. Clarity is not the only requirement; the line has to be **this** author's.                   |
+| `Deterministic answers from nondeterministic systems.`           | The author's own framing, and right — but lifted from her GitHub profile it reads as a product banner rather than as the top of a page someone writes on. |
 
-Frontmatter this component reads, all optional except `layer`:
+**The sub-line is one sentence that holds up the headline, and nothing more.**
+It says the position is invariant (`the same order at every layer`) and gives
+its range without listing fields: `a page table` and `a distributed
+transaction` are the two ends of the stack the chooser row below divides into
+five. `every layer` is that row's own word.
 
-| Key           | Role                                                       |
-| ------------- | ---------------------------------------------------------- |
-| `layer`       | Which layer the post joins; ids are in `postMeta` `LAYERS` |
-| `rank`        | Editorial order inside that layer; see **Editorial Rank**  |
-| `description` | The one-line hook under the title                          |
-| `pinned`      | Marks a representative post for the top of the page        |
-| `pinOrder`    | Order among pinned posts                                   |
-| `cover`       | ASCII art for the pinned card, rendered in the code face   |
+**No `I`, no `this blog`, no `each post`.** A version with `The order I work
+in` was dropped for the first, and several earlier ones for the second and
+third: a masthead that narrates the page or its author is doing something other
+than stating a position. The line is written with no subject at all, which is
+what makes it read as a standing fact rather than as an introduction.
 
-`LAYERS` is the author's order — Kernel, Storage Engine, Transport,
-Orchestration, Application — and it is both the taxonomy and the display order.
-See **Layers**.
+It has also been a slogan, a portfolio index naming the author's repositories,
+and a four-line paragraph with parenthetical examples, and was wrong every
+time. **No project names, no repositories, no "on GitHub".** Width is 62ch,
+which sets it on two lines.
 
-Keep cover art **pure ASCII and three lines**: IBM Plex Mono ships a latin
-subset, so box-drawing and arrow glyphs fall back to a proportional face and
-destroy the alignment, and a taller cover pushes the index below the fold.
+**The sizes are measured, not chosen.** `max-width` is in the h1's own `em`, so
+a number that fits at one size clips the headline inside its own first line at
+another: at 44px, 22em is 968px against 685px for the longest line. **Re-measure
+the first line and check the break at 1440, 1000 and 390 after editing this
+copy** — on a phone the first clause takes two lines and the accent clause must
+still land whole on its own.
 
-Filtering is the only interaction on the page, in
-`scripts/homeStack.inline.ts`. Preserve `data-home-stack`, `data-layer` on both
-the tabs and the rows, `aria-pressed` as the open-tab marker, the `is-hidden`
-class, and — for the stagger — the `is-swapping` class on `.hs-index` and the
-`--hs-i` custom property on the visible rows. `.inline.ts` files share one
-global scope for type-checking, so its identifiers are `hs`-prefixed and the
-import carries `// @ts-ignore`.
+**The index page grid places nothing explicitly**, and must not start: with the
+byline in the footer there is no second column to place anything into. Naming
+rows for the masthead and the chooser but not for the bar once left `header`
+and Quartz's empty `.page-header > .popover-hint` to auto-placement, which
+dropped them on top of the chooser and opened the page with no navigation above
+it. **Name every row of a grid or none of them.** The hint is `display: none`
+on the index, since `beforeBody` renders nothing there.
+
+`rehype-autolink-headings` appends an anchor to every heading, revealed on hover
+by `base.scss`; it is `display: none` here, since the site's one statement
+should not link to itself.
+
+### Post Header
+
+Three lines, and nothing above the title:
+
+```
+Phantom Phenomenon and Index Locking        ← .article-title, Fraunces 32px/700
+존재하는 행을 모두 잠가도 없던 행이…             ← .post-dek, 15.5px --mute
+storage engine · 2026-04-20 · 4 chapters · 14 min   ← .content-meta, mono 12.5px
+```
+
+- **The layer is the first segment of the metadata line**, and the only one
+  that is a link — back to its tab on the home page (`?layer=<id>`). It had a
+  row of its own above the title (`PostKicker`, printing the layer _and_ the
+  blurb it carries on the home chooser), with the date and length under the
+  title and a `#topic` chip under that: **three rows of classification around
+  one title, in three different shapes, before a word of the writing.** The
+  layer is a fact about the post and belongs with the other facts, in the same
+  mono voice and the same order the home cells print them.
+- **`PostKicker` is deleted** and `TagList` is no longer mounted. The topic
+  chip was a taxonomy the reader of a single post had not asked for, and
+  `Topics` is a destination in the bar for anyone who has. `TagList.tsx`
+  survives because `.design-sync` previews import it.
+- **`.article-title` is `clamp(24px, …, 32px)`.** The measure is 680px and the
+  longest title sets 652px at 32px — one line, which is what a headline should
+  be. At 44px it ran 897px and broke mid-noun-phrase on half the posts.
+- **`.post-dek` is 15.5px**, a step under the title rather than a subtitle
+  beside it. At 18px against a 32px title it was competing.
+- **The header closes with its own hairline**, declared on
+  `#{$is-post} .page-header > .popover-hint` — 18px of padding, a 1px `--line`
+  rule, 34px before the first `##`. It is declared rather than inherited
+  because it used to come off the bottom margin of the topic-chip list, so
+  unmounting that list took the header's closing edge with it. Below the rail
+  breakpoint the compact outline is the header's last line and brings its own
+  bottom rule, so the wrapper drops both there — `:has(> .compact-toc)` matches
+  at **every** width (the element is in the DOM at desktop, only `display:
+none`), which is why that override has to stay inside `@media #{$rail-down}`.
 
 ### Post Descriptions
 
 `description` is the one-line hook under a title, and it is read on the home
 card, every listing, `ReadNext` and the page's `<meta>`. It is prose the author
 signs, so it follows the blog's plain `~다` voice, not the portfolio's `합니다`.
+
+**A rhetorical question only where the post asks one.** Six of the twelve open
+on a question of their own — Virtual Memory (`왜 주소 공간이 필요한가`), WAL and
+ARIES (`커밋했는데 서버가 꺼지면?`), Kubernetes Packet Flow, Database Deadlocks,
+Linux Transport Layer Internals and CORS — and those take the question form.
+The other six are expositions and take a plain summary. Putting every one in the
+interrogative made the grid read as a quiz and told a reader nothing about which
+posts are arguments and which are reference.
+
+**No commas, in either form.** A comma is a second clause and a second clause is
+a second line; comma-free is what keeps these to one line in a third of the
+frame. The longest is 43 characters.
+
+**A summary covers the post, not its most quotable section.** Three failed that
+on review and were rewritten:
+
+- Database Deadlocks summarised only `Deadlock Resolution → Select a victim`,
+  the last quarter of a post that also prevents and detects them.
+- Transaction Isolation said the reader trades "정확성" for performance, which is
+  an interpretation laid over a post that mostly states what each level permits.
+- Virtual Memory asked how far the kernel `다녀오는가` — a metaphor doing work the
+  post does plainly, and the post is about translation and swap, not a journey.
+
+**Plain over clever.** These sit under a title in a 317px column and are read
+while deciding what to open; a summary that has to be unpacked has already
+failed. The other nine were checked against their own outlines and left alone.
 
 **One sentence, and usually a question.** The rhetorical question is the
 author's device and she wants it kept; what she does not want is two beats. Each
@@ -964,6 +1192,21 @@ same prefix. Adding a third namespace means deciding, here, whether readers see
 it.
 
 ### Topic Switcher
+
+**The subjects are ordered by the pinned set, not by post count.** Sorted by
+count the strip opened on whichever subject had accumulated the most writing —
+the same mistake the home page's layer order made before `LAYERS` fixed it. The
+`topic/` tags carried by the six pinned posts come first, in `pinOrder`, and
+everything else follows by count. Changing the order means changing which posts
+are pinned, which is an editorial decision rather than an arithmetic one.
+
+**A chip click must call `event.stopPropagation()`, not only
+`preventDefault()`.** Quartz's SPA router listens for clicks on `window` in the
+**bubble** phase, and `getOpts` in `spa.inline.ts` never looks at
+`defaultPrevented` — so a handler on the chip runs first, cancels the default,
+and the router is still reached and navigates to the subject's own page. The
+panel switched in place for exactly as long as it took the router to answer.
+This applies to **any** in-page interception of a link click on this site.
 
 `Topics` is a chooser, not a scroll. A vertical stack of every group was correct
 but ran nine sections deep; the switcher keeps the page on one screen.
@@ -1951,6 +2194,286 @@ at 375 / 500 / 820 / 1280; the entrance plays once across a home → post → ba
 round trip; the layer switch holds editorial order with the pressed tab flat;
 and the masthead breaks two lines at every width with no orphan.
 
+### 2026-09-22 (reading pass: one tone, outline right, body spec)
+
+- **Layer hues** collapsed to one tone (olive 700 on 50). The five colours had
+  read as a rainbow.
+- **Post outline** moved to the right, and the post now starts at the logo's
+  edge.
+- **Home layer stack** moved to the left of the index.
+- **Sticky fix.** The sticky stack had overlapped the footer at 1280×720
+  (a grid item is not clamped to its cell). The column now stretches to its
+  row, and its head and tabs stick inside it.
+- **Markdown body** was rewritten from a posting-layout specialist's review;
+  see blueprint section 6. The spec:
+  - 17px / 1.7 text, 1R paragraph gaps and the 1R rhythm unit.
+  - A 680px measure shared by every block.
+  - No gradients, highlighter or shadows.
+  - Native list markers.
+  - `fit-content` tables.
+  - Bare `pre` fences as diagram plates.
+- **Footer.** Removed RSS from the links. Removed a stray 24px `margin-bottom`
+  on the footer band's `::before`, which had left a strip below it.
+- **Copy.** The tagline is now "Understanding systems _from the mechanism
+  up._". The sub-line and footer note were rewritten from the portfolio and
+  the posts, with no em dashes. "write-ahead logs" became "recovery logs" so
+  the line cannot break at a hyphen.
+- **Topics chips** were tightened so the nine topics fit on one row at 1440px.
+
+### 2026-09-22 (calm colour and a review pass)
+
+- The author liked the third pass but asked for calmer colour: a less warm
+  ground, and a modern, professional mood that suits the posts' subject
+  matter.
+  - Every token moved down in chroma. The ground went from `#f8f8f4` to
+    `#f6f7f6`, and the accent from `#56692b` to `#4d5f3a`.
+  - The layer hues were re-tuned to one lightness and low chroma.
+  - `faint` darkened to `#6a726c`, which is 4.6:1.
+  - The home glow was removed and the dots made fainter.
+- **Featured card.** The forest-green block stood out too much against the
+  page. It is now a white card with a sage wash, an olive ring and a solid
+  olive button. The ASCII diagram is kept in a small dark terminal plate, as
+  the one focal point.
+- **Post titles.** They drop from `clamp(2.3rem…3.4rem)` to
+  `clamp(1.75rem…2.6rem)`, so the longest title no longer wraps at desktop.
+  The tagline caps at 3.6rem and list titles at 3rem.
+- **Review fixes.**
+  - The post footer band was offset; it now spans the frame.
+  - The 404 page no longer inherits the post layout.
+  - Added a focus-visible ring.
+  - Hover lifts now respect reduced motion.
+  - The featured card's footer runs on one row.
+- Portfolio is re-verified pixel-identical to `HEAD`.
+
+### 2026-09-22 (third pass: a used frame, colour, softer type)
+
+- Two passes the same day were withdrawn:
+  - **1180px wide editorial:** the width was left as air.
+  - **760px reading axis:** it felt empty, the colour was unchanged, mono was
+    everywhere, and the markdown body was still plain.
+- The author asked to keep the atmosphere and make it modern and refined:
+  moderately wide, real colour, no stiff faces, and a markdown body with
+  character. See `references/blueprint-2026-09.md`.
+- **Frame.** 1080px.
+  - Home: a two-column hero (masthead | forest featured card), then the index
+    beside a sticky vertical layer stack.
+  - Posts: a 220px rail, a 64px gap, then the post, with prose at a 720px
+    measure. Below 1200px the page narrows to 800px.
+  - Rows are laid out by container query.
+- **Colour.**
+  - The olive scale replaces the single `#4f5e3c`. The accent is now `#56692b`,
+    and `quartz.config.ts` follows it.
+  - Five muted layer hues, set through `data-layer`.
+  - One dark surface: the featured card.
+  - A dot-grid home ground.
+  - The Shiki theme is `vitesse-light`.
+- **Type.** Mono is now used for code only; about 25 UI selectors moved to
+  Pretendard with tabular figures. Fraunces extends to post titles, list
+  titles, the featured title and `Read next`.
+- **Markdown body.**
+  - An h2 bar instead of a rule.
+  - A highlighter on bold.
+  - Sage inline code.
+  - Code sheets with a language bar.
+  - Tinted ASCII plates.
+  - Tables with horizontal rules only.
+  - A blockquote panel.
+  - Olive list markers.
+  - A three-dot hr.
+- **Components.**
+  - `PostKicker` replaces the post breadcrumb and links to `/?layer=<id>`.
+  - `Footer` takes an optional `note`.
+  - `PostRow` always sets `data-layer` and gained a side slot.
+  - The tagline's second half is `_emphasis_` in `content/index.md`, set in
+    olive.
+- **Portfolio.** It stays on the old reading pass
+  (`$readability-experiment-enabled: true`), and `$post` excludes unlisted
+  pages. It was verified pixel-identical to `HEAD`.
+
+### 2026-09-22 (fourth pass: console, ruled not raised)
+
+The author asked to merge the monotone console feel of `1862d25` with the
+third pass, so the site looks authored rather than generated, and noted a
+personal liking for console type in English. A panel reviewed both versions
+(three senior and three junior designers, a Linux/SRE engineer, a Hangul
+typographer; two QA reviewers after the build). Their consensus:
+
+- **Why.** The third pass used the stock vocabulary of generated sites: a
+  two-tone serif hero, a white shadowed card with a `Featured post` pill and a
+  filled `Read this first →` button, a dot grid, 999px pills everywhere, and
+  eight radius values. `1862d25` read as a person because its English chrome
+  was mono and its surfaces were flat. The third pass kept the better
+  information architecture (layers, rows, outline, body rhythm).
+- **Type splits by who is speaking.** Hangul and anything a reader reads stays
+  Pretendard. Anything a program could have printed moves to IBM Plex Mono,
+  a step smaller and with no negative tracking: dates, counts, lengths, tags,
+  nav, labels, layer and outline numbers, the key/value ledger, the footer.
+  The two never share a run of text. Fraunces signs the wordmark and the
+  titles only. This reverses "mono for code only" from the third pass.
+- **Ruled, not raised.** No resting shadows and no hover lifts; radius 0 for
+  structure, 3px (`--r`) for code, inline code and topic chips. Emphasis is a
+  rule: a 2px ink rule opens the pinned post and `Read next`, a 2px olive rule
+  marks the open layer, the current outline chapter and the open layer on a
+  phone. The dot grid is gone. Rule 7's two resting cards are now zero.
+- **Home.** The masthead h1 is mono in one colour, with the thesis carried by
+  weight (as `1862d25` did with bold). The profile is the old ledger again
+  (`github  github.com/jaeunda`), with the key taken from the link's
+  `aria-label`. The pinned post is a ruled spread with a mono label strip
+  (`pinned … kernel`), a flat ASCII figure on a 1px olive rule, and a mono
+  `read →` link. Layers are a flat `lsblk`-like list with right-aligned
+  counts and are labelled `LAYERS`.
+- **Post.** The kicker is a mono path segment (`01 kernel`), the meta and tags
+  are bare mono, the outline hangs off one hairline with an olive rule on the
+  current chapter, code labels are lowercase (`c`, `sql`, `sh`), tables are
+  ruled like a reference table, and blockquotes are a rule and an indent.
+- **Honest numbers.** `lengthLabel` always prints minutes (`63 min`); the
+  `long read` substitution is gone. The footer's status line reports the posts
+  themselves (`12 posts · last write 2026-06-23`) ahead of the build credit.
+- **Rejected on purpose.** Man-page section heads, `$` prompts, blinking
+  cursors, green-on-black and `[brackets]` around counts. The panel's external
+  engineer called these costume, so the console voice comes from type and
+  alignment only.
+- **Deferred.** Mono spans for heading numbers (`1.1.`) need a rehype step, and
+  depth-1 outline entries under the current chapter need a `toc.inline.ts`
+  change.
+
+### 2026-09-22 (clear pass: cool ground, deeper olive, one-screen home)
+
+Author feedback on the console pass: a less warm, clearer ground; a deeper
+olive accent; less on the first screen, ideally everything the home page means
+to show visible without scrolling; the profile set kept but repositioned and
+smaller, with the name in English; faint vertical rules in body tables.
+
+- **Colour.** Neutrals lose their green tint: ground `#f8f9f9`, line
+  `#e2e5e5`, ink `#111516`, body `#2d3333`, mute `#565e5e` (6.3:1), faint
+  `#616969` (5.3:1; 5.0:1 on olive-50). The olive scale moves deeper and
+  slightly more yellow, away from sage: accent olive-600 `#44552a` (7.7:1),
+  700 `#364420`, 800 `#2a3518`. `quartz.config.ts` follows.
+- **One screen.** At 1440×800 the masthead, the profile, the pinned post, the
+  whole layer list and the first index row are visible without scrolling; at
+  1280×720 all but the last layer row. How: the masthead dek is its first
+  sentence only; only the open layer prints its blurb; the profile ledger is
+  340px wide with 5px rows; the nav gap and the hero/index divider scale with
+  the viewport height (`clamp(…vh…)`).
+- **Profile.** `Daeun Jang` replaces `장다은`, so the byline is Latin like the
+  rest of the chrome. It stays under the masthead, where the hero's flexible
+  row gives it room beside the taller pinned post.
+- **Tables.** Columns get a 1px `#edf0f0` vertical rule, a shade lighter than
+  the row rules; the outer edges stay open and flush with the text.
+
+### 2026-09-22 (balance pass: rail and index, two type families)
+
+Author feedback on the clear pass: the intro held too much while the post list
+looked empty for its width; balance the page, maximise the craft without
+losing the developer feel, and treat type as central. A visual-design and a
+typography consultant were asked, and reference sites (paco.me, brandur.org,
+antfu.me) were reviewed.
+
+- **Why.** The hero stacked five blocks in two columns with a dead 275px
+  gutter, three display voices (mono h1, Pretendard dek, Fraunces pinned
+  title) within 300px, and an index that showed two rows, one of them the
+  pinned post already printed above. Chrome outweighed content.
+- **Layout.** Home is rail 240 | gap 64 | main 776 from 1100px. The rail holds
+  the profile (stacked: name, role, ledger) and the layer filter (sticky). The
+  main column holds a mono status line (`12 posts · last write …`), the
+  masthead, the pinned post as one wide feature (words left, ASCII figure
+  right), then the index. Below 1100px it is one column ordered status →
+  masthead → pinned → layers → index → profile. `.home-stack` is
+  `display: contents` at every width.
+- **Index.** `All` is a tab and the default, so every post shows; a layer tab
+  narrows it and `?layer=` still works. Rows are grouped by layer in `LAYERS`
+  order, then editorial rank. Rows go three-column from 680px of their own
+  width (date 100 | title+desc | layer+length 150), print the layer, and clamp
+  the description to one line on the home page. The `all N posts →` archive
+  link is gone; `All` does its job.
+- **Type.** Two families plus a signature. Pretendard for everything read and
+  every title (700, tight tracking), IBM Plex Mono for the machine voice with
+  500 added as the UI emphasis, and Fraunces for the wordmark alone. Plex Mono
+  is now subset from the full IBM files with arrows (`→`) included. Fraunces
+  titles over a pale ground with mono labels had become a common signature of
+  generated sites, and they split titles between two faces. The 404 code is
+  mono.
+
+### 2026-09-22 (round 3 consults integrated)
+
+The round 3 visual-design and typography consultations (home redesign) are
+applied in full where they had not already landed with the balance pass.
+Where they conflict with the review pass below, the consults win, except as
+noted.
+
+- **Masthead back to mono.** The review pass's two-tone Pretendard 700 hero
+  broke the panel's unanimous "no two-tone hero" call and the typographer's
+  spec. It is Plex Mono again: 26→34px, 400 then `em` 600, line 1.2,
+  -0.02em, one colour (ink). Dek 17px / 1.65 / -0.005em.
+- **Pinned row kept.** The pinned post keeps its index row, marked `pinned`
+  (mono, olive) beside its length, so a layer is the whole layer and the
+  count on its tab stays true. `data-pinned` and the hide logic are gone.
+- **Filter toggles off.** Clicking the open layer again returns to `all`.
+- **Role table.** Nav 13px. `LAYERS` / `OUTLINE` / backlinks labels 500.
+  Post h1 32→44px / 700 / 1.18 / -0.03em. h3 19px / 650 / 1.45. Row title
+  19px / 650 / 1.35, row description 15px. Dates and meta 12.5px, tags 12px,
+  footer note 12px. Inline code 0.88em with 0.35em side padding; code blocks
+  line-height 1.65. Ledger value 500 over a 400 key.
+- **Weights.** 400 / 500 / 600 / 650 / 700. 650 returns for h3 and row
+  titles, as the typographer specified. The variable face sets it exactly.
+- **Not adopted, and why:**
+  - Plex Mono wordmark: the Fraunces olive logo is an author constraint.
+  - Dropping Space Grotesk: the portfolio pages still use it.
+  - Body 16.5 / 1.8: the body was set at 17 / 1.7 by the posting-layout
+    review after the author found 1.85 too airy. The home consult is not a
+    reason to undo that.
+  - Labels at 11.5px: mono stays ≥12px (clear pass).
+  - Ledger at 13px: the longest address wraps in the 240px rail. It is
+    12.5px, with the key at 12px in a 58px column.
+  - The four-column row (date | title | layer | length): the review pass's
+    layer group headings carry the layer, and title-first rows keep the
+    editorial order from reading as shuffled dates.
+  - `~/` in the status line: the typographer calls it tacky.
+
+### 2026-09-22 (review pass: reading order, one right edge, weight ladder)
+
+Author brief: a design and QA review of the whole blog — layout, type, colour,
+UX — keeping the concept but simpler and more refined, with the eye led
+through each page and particular care for type weight and the reading body.
+
+- **Why.** Screenshots at 1440 and 390 showed: the masthead set in mono at 400
+  and 600, which read as two phrases and competed with the pinned title; the
+  pinned post printed twice in a row (feature, then the first index row); a
+  date down the left edge of every index row, where the eye enters, in an
+  order that is editorial and so read as shuffled dates; six layer names at
+  600 in the rail competing with the titles; a post column of 796px with
+  prose at 680, so the header rule and Read next ended 116px past the text;
+  64px under the tags from Quartz's list margin; no line between a post's
+  title and its first paragraph saying what the post is for.
+- **Reading order, home.** Masthead → pinned → index. The masthead is
+  Pretendard 700 at up to 2.4rem, lead-in in `--faint`, the `em` in ink — the
+  one large type on the page. The index is grouped under layer headings
+  (`01 kernel ……… Memory and scheduling`, `h2.hs-group-head`), so rows no
+  longer print their layer. The pinned post's row carries `data-pinned` and
+  is hidden while `all` is open; opening its layer brings it back. A group
+  with nothing visible hides with it (`homeStack.inline.ts`).
+- **Rows, title first.** On the home index and in Read next the title takes
+  the left edge (shared with the pinned title) and date + length sit right
+  from 560px of the list's width, under the words below that. The archive
+  keeps its date column: it is a timeline.
+- **Post, one right edge.** `--measure` is 680px and is the post column
+  itself; the gap to the outline takes the remainder, and `--rail` is 240.
+  Below 1200px the frame is the measure. The compact outline sits between
+  its own hairline and the header rule.
+- **Dek.** `PostDek` prints the post's own `description` frontmatter under the
+  title (18px, 400, `--mute`; 16.5px on a phone) — never Quartz's
+  auto-description.
+- **Weight ladder.** 400 reading text · 500 UI emphasis (rail names, group
+  names) · 600 strong, h3–h6, row titles, the open layer, the byline name ·
+  700 page titles, the masthead, the pinned title, h2. The 650 steps are
+  gone: Pretendard has no named instance there, and two nearly equal bolds
+  blurred the ladder.
+- **Body theory kept.** 17px / 1.7 on a 680px measure (~40 Hangul syllables,
+  inside the 35–45 range), paragraph gap 1R so paragraphs separate more than
+  lines, headings closer to what follows than to what precedes, `keep-all`
+  with `line-break: strict` and `text-wrap: pretty`, off-black `#262c2c` on
+  `#f8f9f9`, underlined links.
+
 ### 2026-09-21
 
 - Added the systems portfolio as an overview plus four detail pages under
@@ -1965,3 +2488,542 @@ and the masthead breaks two lines at every width with no orphan.
 - Reordered the projects to collaboration platform → verification tool →
   IoT service, so a reader meets application and backend work first and
   embedded integration second. Detail pages now open on architecture.
+
+### 2026-09-23 (type and palette restored to the site's own)
+
+Author's brief: go back to the design frame the blog had at `1862d25`, keep the
+dark-mode removal, keep the posts/topics taxonomy that replaced the tag cloud,
+and carry the improvements built since then over into it. Scope, after the
+brief was narrowed: **type and colour only** — the shell (SiteNav, HomeStack,
+the outline rail, the row vocabulary) is the current one and does not move.
+
+**What changed**
+
+- **Fraunces is the display face again, for the whole blog.** It had been cut
+  back to the wordmark alone during the console pass, with Pretendard 700
+  setting every title. It now sets the wordmark, the home masthead h1, post
+  titles, list-page titles, post-row titles, the featured title, the
+  `Read next` label and a post's own h2/h3. `quartz.config.ts` `header` is
+  Fraunces; `--displayFont`, `--headerFont`, `--wordmarkFont` and editorial's
+  `--serif` all resolve to it.
+- **Noto Sans KR sets the prose again**, in place of Pretendard, which is now
+  declared for the unlisted portfolio pages only. `quartz.config.ts` `body` is
+  Noto Sans KR.
+- **The palette went back to the warm green-grey family**: ground `#fafaf8`,
+  line `#e3e4df`, mute `#5f6259`, body `#33362f`, ink `#1a1d17`, accent
+  `#4f5e3c`. The olive scale is re-cut around that accent and `--olive-100` is
+  the original `textHighlight` `#dde3d4`. `--plate` is `#eceee5`, the reading
+  surface. The stray cool literals inside `editorial.scss` (`#262c2c`,
+  `#f4f6f6`, `#b3b9b9`, `#eaeded`, `#edf0f0`) went with them.
+- **Tracking came down roughly by half on every title surface**, because the
+  numbers were fitted to a sans: `-0.03em` → `-0.015em` on the post title and
+  the featured card, `-0.035em` → `-0.018em` on list titles, `-0.02em` →
+  `-0.008em` on rows, `-0.02em` → `-0.008em` on h2.
+- **The home masthead left the mono.** It is Fraunces `clamp(30px, 40px)` / 700,
+  and its `em` is the accent rather than a weight step: this Fraunces has a
+  `wght` axis and no italic, and a synthesised slant on a serif at 40px reads
+  as a rendering fault.
+- Fonts: `fraunces-wordmark.woff2` (basic latin, eleven letters' worth) is
+  replaced by `fraunces-latin.woff2` (full latin, 36KB), and
+  `noto-sans-kr-subset.woff2` (188KB) is cut from Google's variable file with
+  the same charset the Pretendard subset uses. Both self-hosted;
+  `fontOrigin` stays `local`.
+
+**Why**
+
+- The nine colours here were never only the blog's: `styles/portfolio.scss`
+  hard-codes `#fafaf8` / `#1a1d17` / `#4f5e3c` / `#e3e4df` as `--pf-*`, because
+  that page is light-only and cannot read a theme. Moving the blog to a cool
+  grey set printed the two halves of one site in two different greens, and the
+  portfolio is the half that could not follow.
+- The console pass's argument for dropping Fraunces was that a title must not
+  mix two faces mid-line. That is true of a sans and a sans. A serif display
+  face beside a Korean text face is a pairing, not a fallback failure — it is
+  what the site's headings looked like for its whole life before the pass, and
+  it is what distinguishes a title from the paragraph under it at a glance,
+  which weight alone was not doing.
+
+**What deliberately did not change**
+
+- No dark mode. The removal stays complete; see **No Dark Mode**.
+- The tag cloud, the tag index and the `homeFilter` / `tagIndexFilter` scripts
+  stay deleted. Navigation is `posts` and `topics`, and `topic/` frontmatter
+  tags feed the topic switcher; `project/` tags stay invisible to readers.
+- `SiteNav`, `HomeStack`, `PostRow`, `PostKicker`, `PostDek`, `ReadNext`,
+  `CompactToc`, the editorial rank ordering and the `chapters · min` length
+  label are all current work and were kept as they are.
+- The unlisted portfolio pages are untouched: they keep Pretendard, Space
+  Grotesk and their own literals, and they render identically before and after.
+- `vitesse-light` stays the syntax theme for both keys.
+
+### 2026-09-23 (the home page as one grid; a ground set for reading)
+
+Two notes from the author, in one pass.
+
+**1. "Make the main page that plain grid form — take it as a reference, not a
+copy, and make it minimal and plain but simple and refined."** The reference is
+the 2×n bordered card grid the home page carried at `1862d25`.
+
+The home page is now a masthead and one grid, and nothing else. See **Home
+Page**, **Home Grid** and **Home Filter** for the contract; the reasoning:
+
+- **What was taken from the old grid:** that every cell is the same cell. That
+  was its whole virtue — nothing on the page was arguing to be read first.
+- **What was not:** the 1px bordered box on each card. Twelve boxes is twelve
+  rectangles competing with the type inside them. A cell is opened by a single
+  hairline now, rows have no vertical gap, and the next row's rules are the
+  separator — the page is ruled once per row and never twice.
+- **Three columns, not two.** Twelve posts make four clean rows; at two columns
+  the same twelve are six rows of tall cells, which is a list wearing a grid's
+  clothes.
+- **The featured hero and the five headed groups are gone.** A hero two type
+  sizes larger above an index broken into sections is three layouts on one
+  screen: the page decided for the reader and then changed its mind twice on
+  the way down. The pinned post is a cell like the others, marked `pinned` in
+  its meta line.
+- **The 240px rail is gone.** Two columns is a claim that the site has two
+  subjects. It has one. The filter is a mono row above the grid; the byline is
+  two lines under the masthead, with the ledger's keys dropped (they survive as
+  the links' accessible names).
+- **The date left the grid.** The index is in editorial order, not date order,
+  so a date invites a reading the grid is not making — and two facts is what
+  fits on one line in a third of the frame. `chapters` went with it. Both are
+  still on the archive, where the list _is_ a timeline.
+- Two alignment devices do the rest: the title reserves two lines and the
+  description clamps to two, so every description in a row starts at the same
+  height. Both are released at phone width, where there is one column.
+
+Deleted with it: `.hs-featured*`, `.hs-layers*`, `.hs-layer*`, `.hs-group*` and
+`.hs-index` — 517 lines from `custom.scss` and ~650 from `editorial.scss`.
+`homeStack.inline.ts` now filters `.hs-cell` and knows nothing about groups.
+
+**2. "I didn't mean change the background — keep the point colour and set the
+background to maximise readability."** Fair: the 2026-09-23 type-and-palette
+entry above moved the ground as part of a revert rather than as a decision.
+
+Olive `#4f5e3c` stays as the one point colour. The neutrals are now chosen for
+contrast and are hue-free: ground `#fbfbfa`, ink `#191a18` (16.9:1), body
+`#2b2d2a` (13.4:1), mute `#5c5f5a` (6.3:1), line `#e5e6e2`, plate `#f1f2ef`.
+The cream ground tinted every grey standing on it, which put the page's one
+colour in competition with its greys; a near-white ground a shade off pure
+white keeps the contrast without the glare of `#ffffff` under a sixty-minute
+post. `--reading-surface` is `#f1f2ef` to match `--plate`, and the olive-tinted
+ASCII plate (`--olive-50`) stays — it is what tells a diagram from a program.
+
+The portfolio pages keep their own literals and are unchanged. They share the
+accent and no longer share the neutrals, which is correct: that page is a
+printed sheet, the blog is a reading surface.
+
+### 2026-09-23 (the home index as sections; the cells de-emphasised)
+
+Author's note: show `Pinned` and then each layer, with a way to all posts on the
+right; six pinned, and no more than six per layer; and take some of the weight
+out of the posts.
+
+**Sections replaced the filter.** The home page had one grid of all twelve posts
+under a row of layer tabs. The filter worked, but it asked the reader to operate
+the page before it would say what was on it, and whatever they picked replaced
+what they were looking at. Six headed grids show the same thing instead of
+offering it: the whole shape of the writing is on the page at once and a reader
+scrolls instead of clicking. See **Home Sections** for the contract.
+
+- **`Pinned` is what the filter could never give.** Six posts chosen across the
+  layers — the author's answer to "where do I start" — where a layer tab can
+  only ever give one layer.
+- **One flag, not two.** `featured: true` (six posts, with `pinOrder`) and
+  `pinned: true` (two, added later) were the same idea spelled twice, and the
+  home page read the one with two posts in it. `featured` is gone from every
+  file; `pinned` + `pinOrder` is the pair.
+- **`SECTION_LIMIT` is 6** — the length of the pinned set, and two full rows of
+  the three-column grid, so a section ends level rather than on a short row.
+- **`all posts →` is on the pinned header** (the top of the index) **and on any
+  section that is cut**, where it replaces the layer's blurb: a cut section
+  needs the exit more than it needs a description. Today nothing is cut, so it
+  appears once.
+- **`PostKicker` now links to `#layer-<id>`** instead of `?layer=<id>`. The
+  section anchor is a better link than the filter state was — it needs no script
+  and it lands the reader on the section rather than on a re-filtered page.
+- `homeStack.inline.ts` lost the filter and is eleven lines: it adds
+  `home-entering` once per document and nothing else. The `--hs-i` stagger and
+  `is-swapping` went with the filter, and the entrance is one beat for the whole
+  index rather than one per section.
+- **The layer is not printed on a cell inside its own layer's section.** Six
+  cells reading `02 storage engine` under a heading reading `02 storage engine`
+  is a column of noise down the left of the grid. It stays in `Pinned`, which is
+  the one section where the cell's layer is news.
+- **The meta line moved flush left.** With the layer gone from most cells, a
+  lone `24 min` pushed to the right edge was a number hanging in space over a
+  title that starts at the left.
+- **The first row of each grid has no top rule** — the section header's own rule
+  is that row's rule. Left flush, the header's `--line-strong` and the cells'
+  `--line` stacked into a 2px line broken by 64px notches at every column gap.
+
+**Weight came out of the cells.** `.hs-cell-title` was Fraunces 19px/600 on
+`--ink`; it is 18px/500 on `--body`. 600 in near-black is a display weight, and
+eighteen of them on one screen read as eighteen headlines — the page was all
+emphasis, which is the same as none. The description came down with it (14px →
+13.5px). The titles are still the darkest and largest thing in the grid; they
+no longer shout over the rules and the metadata holding them.
+
+### 2026-09-23 (the chooser back, and the weight moved off the summaries)
+
+Four notes from the author on the previous pass, which had turned the home page
+into six stacked sections and lightened the cell titles.
+
+**1. The groups go back to a horizontal chooser.** `pinned` and each layer are
+tabs again, `pinned` open by default, with `all posts →` at the far end of the
+row. The sections were a misreading: the six groups are six _cuts of the same
+writing_, and a reader takes one at a time — stacking them printed the storage
+layer's six posts twice on one page, once under `pinned` and once under its own
+heading, and turned a chooser into a scroll. `pinned` earns a tab beside the
+layers rather than a block above them because it is the same kind of thing.
+
+`PostKicker` goes back to `?layer=<id>` from `#layer-<id>`, since the panels are
+hidden and an anchor cannot reach one. See **Home Chooser**.
+
+**2. The status line is gone.** `12 posts · last write 2026-06-23` was the first
+thing on the page, which made a changelog the opening statement. The footer
+prints both figures, where a reader who wants them is looking.
+
+**3. The masthead came down a step and its sub-line moved to the mono.** `h1` is
+Fraunces 600, not 700. The paragraph under it was the reading face at 17px,
+which read as a second and quieter statement competing with the first; it is
+mono 13px now — the blog reported rather than written, in the same voice as the
+nav and the colophon. It is always English, so nothing in it falls out of the
+face.
+
+**4. The weight came off the summaries, not the titles.** The previous pass
+lightened `.hs-cell-title` to 18px/500 on `--body`, which was the wrong half of
+the cell: it levelled the cell instead of stepping it. The title is back to
+19px/600 on `--ink`, and the description went from `--mute`/14px/1.6 to
+`--faint`/13px/1.7.
+
+That is the real fix, and the reason is a property of the type rather than a
+preference: Hangul is a run of full-width squares, so the same grey prints
+visibly more ink than a line of Latin at the same size. Two clamped lines of
+Korean description at `--mute` carried nearly the weight of the Latin serif
+title above them, and the grid read as twelve paragraphs rather than twelve
+titles with a note each. See **Home Cell Type** for the table and the floor the
+description is held to.
+
+### 2026-09-24 (one mark in the bar, `home` in it, and a switcher that switches)
+
+Four notes from the author, two of them bugs.
+
+**1. A topic chip navigated instead of switching in place.** The switcher called
+`event.preventDefault()` and stopped there, which does nothing here: Quartz's
+SPA router listens for clicks on `window` in the bubble phase and `getOpts` in
+`spa.inline.ts` never looks at `defaultPrevented`, so the chip's handler ran,
+the panel swapped, and the router then navigated to the subject's own page over
+the top of it. `event.stopPropagation()` is what keeps the page still. Cmd,
+Ctrl, Shift, Alt and middle clicks still return before that line, so the link
+still behaves like a link. See **Topic Switcher** — this applies to any in-page
+interception of a link click on this site.
+
+**2. `topics` was underlined twice.** `editorial.scss` drew the current
+destination as a `text-decoration` underline and `custom.scss` was still drawing
+it as a `border-bottom` on the same links, four pixels lower and the width of
+the whole link box. The `custom.scss` block is colour only now.
+
+The one mark that remains is **a 1px olive rule that grows from the left edge of
+the word** — `a::after` with `transform: scaleX()`, `--line-strong` on hover and
+`--olive-600` for the current page. A bar rather than `text-decoration` because
+a rule that arrives is worth more than one that appears, and because it is the
+same gesture the home chooser's open tab makes: "here" is now drawn one way on
+the whole site. The wordmark gained a hover colour in the same pass — it is a
+link and was styled like a printed mark.
+
+**3. `home` is a destination in the bar.** The wordmark already linked there,
+but a wordmark reads as identity, not as somewhere to go, so a reader who walked
+into `topics` was left with the browser's back button — which the author
+(rightly) did not want to be the answer.
+
+The design answer is not a back button but **a complete set**: `home`, `posts`,
+`topics` are the site's three views of one body of writing — the author's
+selection by layer, the timeline, and the subjects — and exactly one of them is
+always marked. Wherever you are, the bar shows the whole site and which part of
+it you are standing in. `normalize` had to learn that `/` and `index` are the
+same page, the way it already knew `tags/` and `tags/index` are; home collapses
+to the empty string, which is a prefix of nothing, so it lights only on itself.
+See **Top Bar**.
+
+**4. `PostKicker` drops the layer number.** It printed `02 Storage Engine`; it
+prints `Storage Engine`. The home page numbers its tabs because there the layers
+are a set shown all at once and the number is their order in the stack. A post
+is inside one of them: `02` answers a question the reader of a single post is
+not asking, and it put two tokens of chrome in front of the one word that means
+something. The number stays on the home chooser and in the pinned cells.
+
+### 2026-09-24 (numbers off the home, a masthead with levels, cards read in order)
+
+**1. The layer numbers are gone from the home page too.** The previous pass took
+them off `PostKicker` only. The tabs are printed in the stack's order, left to
+right, so `01` in front of each one spells out what the row's own arrangement
+already says; on a cell it put two tokens of chrome in front of the one word
+that means something. `LAYERS` is still the order — it just is not narrated.
+`pinned` loses the `--` it carried to align with the numbers.
+
+**2. The masthead has a boundary and levels.** It opened with a statement, a
+mono line, a name, a role and three full URLs, all down the left edge in five
+sizes with nothing between them: text in a pile.
+
+At `$wide` it is two columns now — the statement across two thirds of the frame,
+the byline in the third — and the index page grid is cut into the same three
+tracks the post grid uses, so the byline's left edge and the grid's last column
+are one line. The byline itself is three levels with a hairline between the two
+halves: name, role in the mono, rule, destinations. And the destinations print
+`github` / `linkedin` / `email` rather than the full address, which is now the
+`title`: three addresses side by side are three strings of near-identical
+characters with the distinguishing word buried in the middle of each. Below
+1100px the byline lies down into two lines rather than stacking six deep.
+
+It also buys ~90px of the first screen, which is what keeps the grid on it.
+
+**3. A card is read title → question → stamp, so it is written that way.** The
+stamp moved from above the title to the foot of the cell. It is safe there now
+in a way it was not two passes ago: the title reserves two lines and the
+description is clamped to two, so every cell in a row is the same height and
+`margin-top: auto` lands a row's stamps on one line.
+
+**Two layout bugs came out of this pass, and both are worth remembering:**
+
+- **`box-sizing` on `.hs-cell-link`.** `a` is `content-box` here, so
+  `height: 100%` sized the _content_ box to the row and the 40px of padding
+  overflowed it. Every stamp printed 38px below its own row, under the next
+  row's rule, where it read as the metadata of the card beneath it.
+- **Partial explicit grid rows.** Naming `grid-row` for the masthead and the
+  chooser but not for the bar left `header` — and Quartz's empty
+  `.page-header > .popover-hint`, which still claims a row — to auto-placement.
+  They landed in the first free slot, on top of the chooser, and the page
+  opened with no navigation above the masthead. Place every row or none.
+
+### 2026-09-24 (the profile goes to the foot, and a sweep of the whole site)
+
+**1. The author moved from the top of the home page to the footer.** Author's
+note: the writing should be the first thing, not her. See **Footer Byline** —
+the block merged with the two bare links the footer was already carrying, so
+the site's addresses are written down once (`socialLinks.ts`) instead of twice,
+and the home page's index now starts ~180px higher.
+
+With the byline gone the index needs no second column, so the `$wide` three
+track override on the page grid went with it and the home is back to one column
+placed by `order` alone. **That is the safe shape**: name every row of a grid or
+none of them.
+
+**2. A sweep of every page type, at desktop and on a real 390px viewport.**
+What it found, and what was done:
+
+- **The top bar collided on a phone.** With three destinations in it, the search
+  trigger's label and `⌘K` printed straight over `topics`. The rule that hid
+  them at phone width had existed and was deleted with a block of dead
+  home-page CSS it happened to sit inside — a regression introduced two passes
+  earlier and invisible at desktop width. Restored, and the nav's own padding
+  tightened: the bar now measures 20→378 in a 390px viewport with no overlap.
+- **`Read next` stood over a single row on four of twelve posts**, and over
+  exactly one row on two of them — a heading that reads as something that
+  failed to load. `ReadNext` now fills to three from the rest of the archive
+  after layer and topic matches are exhausted. Relevance still decides the
+  order; it no longer decides the length. Verified: every post returns three.
+- **The 404 page spoke in Quartz's voice, not the site's.** Its sentence was
+  the upstream default and `Return to Homepage` was a large underlined body
+  link — the only link on the site drawn that way. The copy is the site's now
+  and the link is `← home` in the mono, with the underline that colours in on
+  hover that `all posts →` uses. It is deliberately **not** the nav's arriving
+  rule: `base.scss` underlines every `a` and gives it a bottom border, and both
+  outrank a rule written in `editorial.scss`, so a `::after` bar on top of them
+  is two marks for one link — the exact thing that came out of the top bar.
+- **The breadcrumb duplicated the nav on list pages.** `Home › Topics` sat
+  directly above an `h1` reading `Topics`, and `home` is a destination in the
+  bar now. It is mounted only on a leaf topic page, where `Home › Topics ›
+database` is a real trail.
+- Dead `.profile-card` CSS removed from `custom.scss`; the shared mono-voice
+  selector list updated to the footer's class names.
+
+**Not changed, and why:** the search overlay, the archive, the topic switcher
+and the two unlisted portfolio pages were reviewed and left alone. The `404`
+heading is the one large block of accent colour on the site, which is
+deliberate — an error code is machine output.
+
+### 2026-09-25 (the footer cut to three things, and the copy rewritten)
+
+**1. `ReadNext` was mounted on every page.** It guards against the home page and
+unlisted pages and nothing else, so `Posts`, `Topics` and every leaf topic ended
+a list of posts with three more posts under a heading reading `Read next` — a
+suggestion on a page that is nothing but suggestions. It is a
+`ConditionalRender` on `isPost` in the layout, with the same check inside the
+component as a brace.
+
+**2. The footer is three things now.** See **Footer**: the wordmark and its note
+on the left, `github · linkedin · email` on the right, a credit line under both,
+and the two columns share a baseline. Gone: the post count, the last-write date,
+the role, and the name. Author's call on the name, and the right one — it is the
+same fact `jaeunda.log` and `github.com/jaeunda` already carry. Short labels
+rather than full URLs, for the same reason they are short in the byline.
+
+**3. The home grid got its air back.** The first row now hangs 30px below the
+chooser's rule rather than 12px — that rule is `--line-strong` and it closes a
+control, so it needs a beat under it before the reading starts; at the cells'
+own padding the first row read as the chooser's last line. The cell's padding
+went to `18px 0 34px` and its internal gap to 11px.
+
+**4. The two post lists were set differently.** The same sentence was 15px with
+negative tracking in the archive and 13px on `--faint` in the home grid, so a
+post looked like a different kind of thing depending on where you met it. They
+are one relationship now; see **Home Cell Type**.
+
+**5. New copy, checked against the author's own record.**
+
+- The masthead is the blog's side of her GitHub profile README (_"Deterministic
+  cores for nondeterministic systems. Concurrency and uncertainty are given."_),
+  turned from building to reading. The GitHub trail it has to be true to: xv6
+  kernel extensions, ext2 and daemon work in C, a compiler, deterministic
+  transaction replay against InnoDB, an NPU RAG agent.
+- **Every post's `description` is one rhetorical question with no commas.**
+  They had commas and one of them was not a question at all. Comma-free forces
+  a single clause, which is what makes them short enough to set on two lines in
+  a third of the frame — the longest is 43 characters.
+- `scripts/fonts/README.md` says to re-subset after adding Korean copy. Checked:
+  every syllable in the new descriptions and the new masthead is already in the
+  Noto Sans KR subset, so no regeneration was needed. **Check, do not assume** —
+  the charset covers `content/` as it was plus Hangul without a final consonant,
+  and these rewrites happened to stay inside it.
+
+### 2026-09-25 (one-line titles, a contact block, and a page that opens at the top)
+
+**1. `description` is a question only where the post asks one.** Six of the
+twelve open on a question of their own and take the interrogative; the other six
+are expositions and take a plain summary. Putting all twelve in the question
+form made the grid read as a quiz. No commas either way — see **Post
+Descriptions**.
+
+**2. Every title fits on one line, on the home and on the post.**
+
+- The home grid went from three columns to **two**. A third of the frame is
+  317px and the longest title needs 381px at 19px; half the frame is 508px.
+  `white-space: nowrap` holds the guarantee, with `text-overflow: ellipsis` as
+  the failure mode and a documented ~46-character budget.
+- The post title went from `clamp(…, 44px)` to `clamp(…, 32px)`. At 44px the
+  longest title ran 897px against a 680px measure and broke mid-noun-phrase on
+  half the posts; at 32px it sets 652px. The dek came down with it, 18px →
+  15.5px — against a 32px title, 18px was competing rather than supporting.
+
+**3. The gap between a title and its description is gone with the wrapping it
+came from.** `.hs-cell-title` no longer reserves a second line. That reserve
+existed to keep descriptions aligned across a row of mixed one- and two-line
+titles; with every title one line there is nothing to align and it was putting
+25px of nothing under every title.
+
+**4. The footer's three links are a contact block.** A mark and the address in
+full, stacked, right-aligned as a block with the rows sharing a left edge, no
+underline. Three lowercase words read as three more items of chrome; an address
+is a fact a reader can act on. See **Footer**.
+
+**5. A post used to ride up from wherever the list had been scrolled to.**
+`spa.inline.ts` scrolled to the top _after_ `micromorph`, and `base.scss` sets
+`scroll-behavior: smooth` on `html`: the incoming post rendered at the outgoing
+list's offset and then animated up to its own title. The scroll now happens
+before the morph and with `behavior: "instant"` — a page change is not a jump
+within a page, and the animation only ever showed the reader where they had
+been, which they already knew. An in-page `#hash` still scrolls after the morph
+and still animates, because there it is telling the reader where they landed.
+
+**6. Topics are ordered by the pinned set.** See **Topic Switcher**.
+
+**Two process notes from this pass**, both cheap and both worth keeping:
+
+- **Measure type in the browser before choosing a size.** The column/title
+  arithmetic above came from a `Runtime.evaluate` probe that set every title in
+  the real face at six sizes and reported the widest. Guessing at em-widths for
+  a display serif would have been wrong in both directions.
+- **A multi-edit script that asserts should write after every edit, or the
+  first bad assertion throws away the good ones.** Three separate passes in this
+  session lost their earlier replacements that way.
+
+### 2026-09-26 (width rolled back, a contact block, a post header of three lines)
+
+**1. The grid is three columns again.** Two was the only way to fit every title
+on one line, and it cost more than it bought — cards wide enough to read as rows
+and six of them in three rows. Four titles wrap at three columns and that is
+fine now: the thing that made wrapping expensive was the reserved second line,
+and that is gone. A wrapped title pushes only its own description down, so the
+gap between a title and the sentence under it is the same in every cell. Page
+height went 1165 → 1064.
+
+**2. `.footer-mark` was already the point colour.** Checked against the painted
+pixels: `rgb(79, 94, 60)`, identical to the nav wordmark. Nothing to change.
+
+**3. The footer note is a list, not a sentence.** `Linux internals · Database
+concurrency · Network paths`, mono, one line. It spent its first two words —
+`Notes on` — saying what a note is, and then wrapped.
+
+**4. New masthead.** Core word first, one supporting sentence. See **Home
+Masthead**, including the non-breaking space that keeps `page fault` together.
+
+**5. The post header is three lines.** The layer moved into the metadata line,
+`PostKicker` is deleted and the `#topic` chip is unmounted. See **Post Header**.
+
+**A verification note.** Chrome caches `index.css` across a rebuild, so a
+headless screenshot taken right after `npx quartz build` can show the previous
+stylesheet. Two "regressions" in this pass were the cache, not the code. Drive
+the browser with `Network.setCacheDisabled` before believing a screenshot.
+
+**Housekeeping in this file.** Three passes of "replace from `## Home Page` to
+`### Home Masthead`" had each left the old tail behind, so the reference carried
+`### Home Masthead` three times, `### First-Screen Motion` twice, and a
+superseded `### Footer Byline` and `### Home Byline`. All byte-identical
+duplicates removed, `### Footer` filed next to `### Top Bar` where it belongs,
+and the dead `### Profile Rail` section replaced with a pointer. **When
+replacing a span in this file, check the outline afterwards** — a stale
+duplicate reads as current to the next agent.
+
+### 2026-09-27 (a masthead with a direction, and three summaries corrected)
+
+**The masthead names its subjects.** `Concurrency and failure are the normal
+case.` was a premise a reader could agree with without learning what the blog
+is about — abstract in the same way the version before it was, from the other
+end. It is `Operating systems, databases, networks, down to the mechanism.`
+now, with one sentence under it saying what that depth means in practice. See
+**Home Masthead**, including why `max-width` had to move from 20em to 22em when
+the size came down to 38px.
+
+**Three of the twelve post summaries were rewritten; nine were left alone.**
+Each was read against its own outline. The three that failed did so in ways
+worth naming — a summary of the most quotable section rather than of the post,
+an interpretation laid over an expository post, and a metaphor doing work the
+post does plainly. See **Post Descriptions**.
+
+The nine that stayed include two that are arguably partial and were kept
+deliberately: `Linux Transport Layer Internals` describes the receive path when
+the post also covers `send()`, and `CORS` leads on preflight when the post also
+has a practice section. In both cases the line states the post's **thesis**,
+which is a better summary than an inventory of its sections.
+
+### 2026-09-28 (the masthead states a position, not a table of contents)
+
+> Mechanism before description, _evidence before assertion._
+>
+> The same order at every layer, from a page table to a distributed
+> transaction.
+
+Nine versions. **See Home Masthead for the table of what failed.** The last
+correction is the one that matters and it was not about wording: every earlier
+version described _the page_ — what the posts are, what they do, where they
+start and stop — and a description of the contents is interchangeable with any
+other systems blog. **A masthead carries the author's position; the page is one
+place that position is applied.**
+
+Three rules the copy settled into, all of them earned:
+
+1. **A noun phrase, not a sentence.** Every complete sentence tried here ended
+   up arguing with the reader instead of telling them where they were.
+2. **One sentence under it, with no subject.** No `I`, no `this blog`, no
+   `each post`. The sub-line had been a slogan, a portfolio index naming the
+   author's repositories, a four-line paragraph, and a first-person aside; a
+   masthead that narrates the page or its author is not stating a position.
+3. **No em dashes.** An em dash is an aside, and three lines of copy have no
+   room for an aside.
+
+`before`, not `over`: `over` is a preference, `before` is an order of work, and
+the sub-line confirms it as one. The determinism thread that also runs through
+her engineering work is not referred to, because the headline _is_ it. Nothing
+on the page points outside the page.

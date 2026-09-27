@@ -2,7 +2,6 @@
 title: jaeunda.log
 ---
 
-# Systems are clearest at the point they fail.
+# Mechanism before description, _evidence before assertion._
 
-Linux and database internals, followed down to the mechanism — and lately to
-how the hardware executes it.
+The same order at every layer, from a page table to a distributed transaction.

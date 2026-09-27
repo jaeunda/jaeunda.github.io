@@ -3,7 +3,7 @@ tags:
   - topic/database
   - project/database-system
 Date: 2026-04-18
-description: "상위 노드만 보고 하위의 락 상태를 알려면, 무엇을 미리 표시해 두어야 하는가."
+description: "락의 단위를 계층으로 나누고 상위 노드에 의도를 미리 표시해 두는 방법."
 layer: storage
 rank: 5
 ---

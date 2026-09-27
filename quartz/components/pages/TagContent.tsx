@@ -35,7 +35,7 @@ function ArchivePostList({
   return (
     <ul class="post-rows">
       {list.map((page) => (
-        <PostRow page={page} here={fileData.slug!} cfg={cfg} />
+        <PostRow page={page} here={fileData.slug!} cfg={cfg} showLayer />
       ))}
     </ul>
   )
@@ -96,6 +96,23 @@ export default ((opts?: Partial<TagContentOptions>) => {
     // page on one screen at nine subjects and at ninety: nothing here is sized
     // to the current count.
     if (tag === TOPIC_TAG) {
+      // Every `topic/` tag the pinned posts carry, keyed to the order the
+      // author pinned them in. A subject on the first pinned post outranks a
+      // subject on the sixth, and both outrank a subject on none of them.
+      const pinnedRank = new Map<string, number>()
+      allFiles
+        .filter((page) => page.frontmatter?.pinned === true)
+        .sort((a, b) => {
+          const ao = typeof a.frontmatter?.pinOrder === "number" ? a.frontmatter.pinOrder : 99
+          const bo = typeof b.frontmatter?.pinOrder === "number" ? b.frontmatter.pinOrder : 99
+          return ao - bo
+        })
+        .forEach((page, i) => {
+          for (const t of (page.frontmatter?.tags ?? []) as string[]) {
+            if (t.startsWith(`${TOPIC_TAG}/`) && !pinnedRank.has(t)) pinnedRank.set(t, i)
+          }
+        })
+
       const topics = [
         ...new Set(
           allFiles
@@ -104,7 +121,17 @@ export default ((opts?: Partial<TagContentOptions>) => {
         ),
       ]
         .map((t) => ({ tag: t, label: t.slice(TOPIC_TAG.length + 1), pages: allPagesWithTag(t) }))
+        // The author's order, then everything else.
+        //
+        // Sorted by post count, the strip opened on whichever subject happened
+        // to have accumulated the most writing — the same mistake the home
+        // page's layer order made before `LAYERS` fixed it. The pinned set is
+        // the author's answer to "where do I start", so the subjects those six
+        // posts carry come first, in `pinOrder`; the rest follow by count.
         .sort((a, b) => {
+          const ra = pinnedRank.get(a.tag) ?? Infinity
+          const rb = pinnedRank.get(b.tag) ?? Infinity
+          if (ra !== rb) return ra - rb
           const diff = b.pages.length - a.pages.length
           return diff === 0 ? a.label.localeCompare(b.label) : diff
         })

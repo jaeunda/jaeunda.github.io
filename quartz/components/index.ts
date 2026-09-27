@@ -24,6 +24,7 @@ import Flex from "./Flex"
 import ConditionalRender from "./ConditionalRender"
 import HomeStack from "./HomeStack"
 import ReadNext from "./ReadNext"
+import PostDek from "./PostDek"
 import SiteNav from "./SiteNav"
 import CompactToc from "./CompactToc"
 
@@ -54,6 +55,7 @@ export {
   ConditionalRender,
   HomeStack,
   ReadNext,
+  PostDek,
   SiteNav,
   CompactToc,
 }

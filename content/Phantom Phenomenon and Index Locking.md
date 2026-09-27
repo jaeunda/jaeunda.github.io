@@ -3,7 +3,7 @@ tags:
   - topic/database
   - project/database-system
 Date: 2026-04-20
-description: "있는 행마다 락을 걸어도 아직 없는 행이 나타난다면, 무엇에 락을 걸어야 하는가."
+description: "존재하는 행을 모두 잠가도 없던 행이 나타나는 이유와 그것을 막는 방법."
 layer: storage
 rank: 4
 ---

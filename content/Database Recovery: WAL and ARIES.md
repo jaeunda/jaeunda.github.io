@@ -3,9 +3,8 @@ tags:
   - topic/database
   - project/csocrates2
 Date: 2026-03-29
-featured: true
 pinOrder: 3
-description: "커밋을 알린 뒤에도 데이터가 아직 메모리에만 있다면, 무엇이 그 약속을 지켜주는가."
+description: "커밋을 알린 순간 데이터가 메모리에만 있다면 무엇이 그 약속을 지키는가."
 layer: storage
 rank: 2
 pinned: true

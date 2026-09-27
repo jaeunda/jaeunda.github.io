@@ -101,17 +101,26 @@ async function _navigate(url: URL, isBack: boolean = false) {
   announcer.dataset.persist = ""
   html.body.appendChild(announcer)
 
+  // Put the viewport at the top *before* the new page is painted.
+  //
+  // This used to run after the morph, and `base.scss` sets
+  // `scroll-behavior: smooth` on `html`: a reader who clicked a post from
+  // halfway down a list watched the post render at that offset and then ride
+  // up to its own title. `instant` because this is a page change, not a jump
+  // within a page — the animation only ever showed the reader where they had
+  // been, which they already knew.
+  if (!isBack && !url.hash) {
+    window.scrollTo({ top: 0, behavior: "instant" })
+  }
+
   // morph body
   await micromorph(document.body, html.body)
 
-  // scroll into place and add history
-  if (!isBack) {
-    if (url.hash) {
-      const el = document.getElementById(decodeURIComponent(url.hash.substring(1)))
-      el?.scrollIntoView()
-    } else {
-      window.scrollTo({ top: 0 })
-    }
+  // An in-page anchor still has to wait for the element to exist, and there
+  // the smooth scroll is the point: it shows the reader where they landed.
+  if (!isBack && url.hash) {
+    const el = document.getElementById(decodeURIComponent(url.hash.substring(1)))
+    el?.scrollIntoView()
   }
 
   // now, patch head, re-executing scripts

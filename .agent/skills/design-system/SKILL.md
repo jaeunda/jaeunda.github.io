@@ -21,6 +21,8 @@ the relevant files first:
 - `quartz/components/SiteNav.tsx`: the site's one navigation bar
 - `quartz/components/HomeStack.tsx`: the whole home page — featured, layers, index
 - `quartz/components/PostRow.tsx`: the one post row, used by every listing
+- `quartz/components/PostKicker.tsx`: the layer line above a post's title
+- `quartz/components/PostDek.tsx`: the post's `description` under its title
 - `quartz/components/postMeta.ts`: layers, editorial rank, the date/length
   contract
 - `quartz/styles/fonts.scss`: the type stack plus `--surface`, `--shadow`,
@@ -28,33 +30,64 @@ the relevant files first:
 - `quartz/components/scripts/homeStack.inline.ts`: home layer filtering
 - `content/index.md`: the home masthead copy
 
-For detailed current tokens and component specs, read
-`references/design-system.md`.
+- `quartz/styles/editorial.scss`: **the visual layer** — frame, ground, type,
+  nav, home, rows, post header, outline rail and the whole markdown body. It
+  is included last by `custom.scss` and decides the look; `custom.scss` rules
+  underneath are the structural base it overrides.
+
+For the current design read `references/blueprint-2026-09.md` first — it is the
+drawing the visual layer was built from. Its **type and colour** sections are
+superseded by the 2026-09-23 entry in `references/design-system.md`, which put
+the display serif and the warm olive palette back; its layout, component and
+"ruled, not raised" sections still stand. The reference holds the history and
+the component contracts.
 
 ## Non-Negotiable Principles
 
-1. Preserve the quiet green-gray system. Use existing CSS variables before adding
-   a new color.
-2. Keep body reading dense but breathable: compact line height, larger paragraph
+1. **A 1080px frame, used.** The home page is one column across it — masthead,
+   a horizontal chooser (`pinned`, then each layer, six posts each), and the
+   open group's three-column grid; a post is the post at a 680px measure + a
+   240px outline rail, on the right; lists carry a metadata column. Do not
+   leave the width as air, and do not widen past it.
+2. **Olive is the only colour.** `--olive-600` (`#4f5e3c`) carries links,
+   active state, the wordmark and a layer number, and nothing else on the page
+   is a colour. Every neutral is hue-free and chosen for contrast: a near-white
+   `--ground` (`#fbfbfa`) under near-black `--ink` (16.9:1). The logo stays
+   Fraunces olive. Use the tokens in editorial.scss before adding a colour.
+3. **Type splits by who is speaking.** Three voices, and they do not trade
+   places. **Fraunces** is the display serif: the wordmark, the home masthead,
+   every post title, the list-page titles and the article's own h2/h3.
+   **Noto Sans KR** is everything read as prose — body copy, descriptions,
+   h4–h6 and readable UI controls — and it picks up the Hangul inside a
+   Fraunces heading, because Fraunces carries no Korean; that mixed line is
+   intended. **IBM Plex Mono** is anything a program could have printed (dates,
+   counts, lengths, tags, nav, labels, layer and outline numbers, key/value
+   rows), lowercase, a step smaller, never negatively tracked. Prose and mono
+   never share a run of text, and mono never carries Korean. No console
+   costume: no `$` prompts, cursors, or green-on-black.
+4. **Ruled, not raised.** Structure is hairlines — one per row of the home
+   grid, and never two where one will do. There are no resting shadows, hover
+   lifts, or 999px pills. The radius is 0 for structure and `--r` (3px) for
+   code, inline code and chips. Emphasis is a rule: olive marks what is open,
+   current, or hovered.
+5. Keep body reading dense but breathable: compact line height, larger paragraph
    spacing, and asymmetric heading margins.
-3. Keep hierarchy subtle. Important text uses `var(--dark)` or
+6. Keep hierarchy subtle. Important text uses `var(--dark)` or
    `var(--tertiary)`; metadata uses `var(--gray)`.
-4. Never use `var(--lightgray)` for metadata or body-adjacent text. It is for
+7. Never use `var(--lightgray)` for metadata or body-adjacent text. It is for
    borders and faint surfaces.
-5. Mobile text must never touch viewport edges. Preserve the `.center` padding
+8. Mobile text must never touch viewport edges. Preserve the `.center` padding
    floor of 20px on mobile.
-6. Prefer small, restrained changes that match the existing Quartz structure.
+9. Prefer small, restrained changes that match the existing Quartz structure.
    Do not introduce landing-page or marketing styling.
-7. **Elevation is rationed, and the ration is two.** The site has exactly two
-   resting cards — the home page's featured post and the foot-of-post
-   `ReadNext` — and they are deliberately the first and last things a reader
-   sees. Everything between them is flat: rows, article body, code blocks,
-   tables, callouts. Lift on hover is cheap and allowed on controls; a new
-   _resting_ card is a design change that needs a reason and a log entry.
-8. **Motion belongs to lists and controls, never to prose.** Entrances and
-   reveals run on the home page and on lists; nothing in an article body ever
-   moves. All of it sits behind `prefers-reduced-motion: no-preference`, and no
-   animation may be the only thing that makes content visible.
+10. **Nothing rests raised.** Not the home grid's cells, not the foot-of-post
+    `ReadNext`, not rows, the article body, code blocks, tables or callouts.
+    The search overlay is the only floating layer. A new resting card or shadow
+    is a design change that needs a reason and a log entry.
+11. **Motion belongs to lists and controls, never to prose.** Entrances and
+    reveals run on the home page and on lists; nothing in an article body ever
+    moves. All of it sits behind `prefers-reduced-motion: no-preference`, and no
+    animation may be the only thing that makes content visible.
 
 ## Deterministic Workflow
 

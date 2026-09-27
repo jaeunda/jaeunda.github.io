@@ -1,10 +1,16 @@
 interface SocialLink {
+  // The accessible name, and — lowercased — what the byline prints.
   name: string
   url: string
   icon: string
-  // What the reader sees, and the whole of the pill's label: the address in
-  // full, never a display name. `Daeun Jang` sat in this field for LinkedIn, so
-  // two rows printed a destination and one printed a person.
+  // The address in full, never a display name. `Daeun Jang` sat in this field
+  // for LinkedIn, so two rows printed a destination and one printed a person.
+  //
+  // The byline used to print this. Three full addresses stacked in a column is
+  // three lines of near-identical text with the one distinguishing word buried
+  // in the middle of each; it reads as a paste, not as a signature. It is the
+  // link's `title` now, so the address is one hover away and `name` carries
+  // the line.
   text: string
 }
 

@@ -1,20 +1,34 @@
-// Home page layer tabs. One layer is always open — there is no "All", because
-// the archive link beside the tabs already goes everywhere — so a click selects
-// rather than toggles, and clicking the open tab leaves it open.
+// The home page's group chooser: one tab open, one panel shown.
 //
-// `HomeStack` renders the opening layer server-side — the rows of other layers
-// ship with `is-hidden` — so the page is correct before this runs and with no
-// script at all. Every tab carries its own blurb, so nothing here writes text.
+// `HomeStack` renders every panel and marks all but the first `hidden`, so the
+// page is correct before this runs and with no script at all. Every tab carries
+// its own label and count, so nothing here writes text.
 
-const HS_HIDDEN_CLASS = "is-hidden"
 const HS_SWAPPING_CLASS = "is-swapping"
 const HS_ENTERING_CLASS = "home-entering"
 
-// The stagger has to finish before the reader does. Uncapped, the six-row
-// Storage tab ran a 24ms ladder plus a 300ms rise — 420ms of list still
-// arriving after the click that asked for it. Past this many rows every
-// remaining row shares the last delay and they land together.
-const HS_STAGGER_CAP = 4
+function hsOpen(group: string, animate: boolean) {
+  const root = document.querySelector<HTMLElement>("[data-home-stack]")
+  if (!root || group === "") return
+
+  root.querySelectorAll<HTMLButtonElement>(".hs-tab").forEach((tab) => {
+    tab.setAttribute("aria-pressed", String((tab.dataset.group ?? "") === group))
+  })
+
+  root.querySelectorAll<HTMLElement>(".hs-panel").forEach((panel) => {
+    const open = panel.dataset.group === group
+    panel.hidden = !open
+    if (!open || !animate) return
+    // Removing the class, forcing a reflow and re-adding it is what restarts a
+    // CSS animation; without the reflow the browser coalesces the two changes
+    // and nothing plays from the second switch onwards.
+    const grid = panel.querySelector<HTMLElement>(".hs-grid")
+    if (!grid) return
+    grid.classList.remove(HS_SWAPPING_CLASS)
+    void grid.offsetWidth
+    grid.classList.add(HS_SWAPPING_CLASS)
+  })
+}
 
 // The page's entrance is opt-in, and it is opted into here rather than in the
 // stylesheet, for two reasons.
@@ -30,39 +44,6 @@ const HS_STAGGER_CAP = 4
 // who was browsing. This module's scope outlives those navigations.
 let hsEntered = false
 
-function hsApplyLayer(layer: string, animate: boolean) {
-  const root = document.querySelector<HTMLElement>("[data-home-stack]")
-  if (!root || layer === "") return
-
-  // The rows are re-numbered from the top of what is now visible. The stagger
-  // used to be a `nth-child` ladder, which counts every hidden row of every
-  // other layer too, so the first row of the last layer started 200ms late.
-  let visible = 0
-  root.querySelectorAll<HTMLElement>(".post-row[data-layer]").forEach((row) => {
-    const hidden = row.dataset.layer !== layer
-    row.classList.toggle(HS_HIDDEN_CLASS, hidden)
-    if (hidden) {
-      row.style.removeProperty("--hs-i")
-    } else {
-      row.style.setProperty("--hs-i", String(Math.min(visible, HS_STAGGER_CAP)))
-      visible += 1
-    }
-  })
-
-  root.querySelectorAll<HTMLButtonElement>(".hs-layer").forEach((button) => {
-    button.setAttribute("aria-pressed", String((button.dataset.layer ?? "") === layer))
-  })
-
-  const index = root.querySelector<HTMLElement>(".hs-index")
-  if (!index || !animate) return
-  // Removing the class, forcing a reflow and re-adding it is what restarts a
-  // CSS animation; without the reflow the browser coalesces the two changes and
-  // nothing plays from the second switch onwards.
-  index.classList.remove(HS_SWAPPING_CLASS)
-  void index.offsetWidth
-  index.classList.add(HS_SWAPPING_CLASS)
-}
-
 document.addEventListener("nav", () => {
   const root = document.querySelector<HTMLElement>("[data-home-stack]")
   if (!root) return
@@ -73,9 +54,17 @@ document.addEventListener("nav", () => {
     window.addCleanup(() => document.body.classList.remove(HS_ENTERING_CLASS))
   }
 
-  root.querySelectorAll<HTMLButtonElement>(".hs-layer").forEach((button) => {
-    const handleClick = () => hsApplyLayer(button.dataset.layer ?? "", true)
-    button.addEventListener("click", handleClick)
-    window.addCleanup(() => button.removeEventListener("click", handleClick))
+  // `?layer=storage` opens that tab — the link a post's kicker points at, so
+  // the reader lands on the rest of the layer they were just reading. An
+  // unknown id is ignored and the page keeps its server-rendered tab.
+  const requested = new URLSearchParams(window.location.search).get("layer")
+  if (requested && root.querySelector(`.hs-tab[data-group="${CSS.escape(requested)}"]`)) {
+    hsOpen(requested, false)
+  }
+
+  root.querySelectorAll<HTMLButtonElement>(".hs-tab").forEach((tab) => {
+    const handleClick = () => hsOpen(tab.dataset.group ?? "", true)
+    tab.addEventListener("click", handleClick)
+    window.addCleanup(() => tab.removeEventListener("click", handleClick))
   })
 })

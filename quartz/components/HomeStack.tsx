@@ -1,48 +1,74 @@
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
 import { FullSlug, resolveRelative } from "../util/path"
 import { QuartzPluginData } from "../plugins/vfile"
-import { byEditorialRank, LAYER_LABEL, layerOf, layersInOrder, lengthLabel } from "./postMeta"
-import { PostRow } from "./PostRow"
+import {
+  byEditorialRank,
+  isListedPost,
+  LAYER_LABEL,
+  layerOf,
+  layersInOrder,
+  minutesOf,
+} from "./postMeta"
 // @ts-ignore: .inline.ts files are loaded as text by the esbuild inline-script-loader
 import script from "./scripts/homeStack.inline"
 
-// The home page, index only. Three blocks and nothing else:
+// The home page, index only: one horizontal chooser over one grid.
 //
-//   Featured — one post, set as type. Labelled as the pick, not as its layer.
-//   Layers   — the layers of the request path, as a filter, in the author's
-//              order. One is always active; there is no `All`, because that is
-//              what the archive is.
-//   Index    — the active layer's posts, in one column, in editorial order.
+//   pinned — the author's six, in `pinOrder`, and the default. A selection
+//            across the stack, which is the answer to "where do I start".
+//   layers — each layer, in the author's order, and inside a layer in
+//            editorial rank.
 //
-// It used to be six: a wordmark bar, an opener, a `Pinned` label, two bordered
-// cards with ASCII art inside them, the chips and the list — six visual
-// vocabularies stacked on one screen. The masthead above (content/index.md plus
-// the profile byline) is the page's identity; this component is the writing.
+// **No layer numbers anywhere on this page.** The tabs are already printed in
+// the stack's order, left to right, so a `01` in front of each one spells out
+// what the row's own arrangement says; on a cell it put two tokens of chrome
+// in front of the one word that means something. `LAYERS` is still the order —
+// it just is not narrated.
+//
+// Every group is rendered; the script shows one. `pinned` is a tab beside the
+// layers rather than a block above them because it is the same kind of thing —
+// a way of cutting the writing — and a reader picks one cut at a time.
 //
 // Frontmatter this component reads:
 //   layer        — which layer the post belongs to (ids in postMeta LAYERS)
 //   rank         — editorial order inside that layer; see postMeta
-//   description  — the one-line hook shown under the title
-//   pinned       — marks a representative post for the top of the page
-//   pinOrder     — order among pinned posts
-//   cover        — ASCII art for the pinned card, rendered in the code face
-
-// One. Two cards side by side made a module that needed its own label and its
-// own border to be read as a pair; one post needs neither and can be set large.
-const FEATURED_LIMIT = 1
+//   description  — the one-line question shown under the title
+//   pinned       — in the pinned group
+//   pinOrder     — order within it
 
 interface Options {
   filter: (f: QuartzPluginData) => boolean
 }
 
 const defaultOptions: Options = {
-  filter: (page) => page.slug !== "index" && page.frontmatter?.unlisted !== true,
+  filter: isListedPost,
 }
 
-function pinnedSort(a: QuartzPluginData, b: QuartzPluginData): number {
-  const ao = typeof a.frontmatter?.pinOrder === "number" ? (a.frontmatter.pinOrder as number) : 99
-  const bo = typeof b.frontmatter?.pinOrder === "number" ? (b.frontmatter.pinOrder as number) : 99
-  return ao - bo
+// Six. It is the length of the pinned set the author keeps, and six cells is
+// two full rows of the three-column grid — a group that ends level rather than
+// on a short row. A layer past six is cut here, and its tab says so.
+const GROUP_LIMIT = 6
+
+const PINNED = "pinned"
+
+interface Group {
+  id: string
+  name: string
+  // Printed as the tab's `title`, not as a line under the open tab: printed,
+  // it moved the grid down by its own height every time the tab changed.
+  blurb?: string
+  total: number
+  pages: QuartzPluginData[]
+  // Print each cell's layer? Only the pinned group needs it: it is the one cut
+  // that crosses the stack. Inside a layer, the open tab has already said the
+  // layer, and six cells repeating `02 storage engine` under a tab reading
+  // `02 storage engine` is a column of noise down the left of the grid.
+  showLayer?: boolean
+}
+
+function pinOrder(page: QuartzPluginData): number {
+  const order = page.frontmatter?.pinOrder
+  return typeof order === "number" ? order : 99
 }
 
 export default ((userOpts?: Partial<Options>) => {
@@ -60,117 +86,117 @@ export default ((userOpts?: Partial<Options>) => {
     if (posts.length === 0) return null
 
     const here = fileData.slug!
-    const featured = posts
-      .filter((p) => p.frontmatter?.pinned === true)
-      .sort(pinnedSort)
-      .slice(0, FEATURED_LIMIT)
+    const archive = resolveRelative(here, "tags/" as FullSlug)
 
     const counts = new Map<string, number>()
     for (const post of posts) {
       const layer = layerOf(post)
       if (layer) counts.set(layer, (counts.get(layer) ?? 0) + 1)
     }
-    // The author's order, and the first layer opens. It used to be sorted by
-    // post count, so the page opened on whatever had the most posts.
     const layers = layersInOrder(counts)
-    const openLayer = layers.at(0)?.id ?? ""
 
-    // The featured post keeps its row. It was filtered out of the index because
-    // it is printed in full above — but the tab said `Kernel 2` and listed one
-    // post, so the layer looked like it was missing something. A layer is the
-    // whole layer; being the pick is not a reason to be absent from it.
-    const rows = posts
+    // A pinned post keeps its place in its layer as well. A layer is the whole
+    // layer, and being the author's pick is not a reason to be missing from it.
+    const pinned = posts.filter((p) => p.frontmatter?.pinned === true)
+    pinned.sort((a, b) => pinOrder(a) - pinOrder(b))
+
+    const groups: Group[] = [
+      {
+        id: PINNED,
+        name: PINNED,
+        showLayer: true,
+        total: pinned.length,
+        pages: pinned.slice(0, GROUP_LIMIT),
+      },
+      ...layers.map((layer) => {
+        const all = posts.filter((p) => layerOf(p) === layer.id)
+        return {
+          id: layer.id,
+          name: layer.label.toLowerCase(),
+          blurb: layer.blurb,
+          total: all.length,
+          pages: all.slice(0, GROUP_LIMIT),
+        }
+      }),
+    ].filter((group) => group.pages.length > 0)
+
+    const open = groups.at(0)?.id
 
     return (
       <section class={`home-stack ${displayClass ?? ""}`} data-home-stack>
-        {featured.map((page) => {
-          const cover = page.frontmatter?.cover as string | undefined
-          return (
-            <a class="hs-featured" href={resolveRelative(here, page.slug!)} data-hs-featured>
-              {/* The eyebrow used to print the layer alone, so the site's one
-                  representative post was labelled `KERNEL` — a taxonomy, which
-                  says nothing about why this post is at the top of the page.
-                  It says what the block is first; the layer follows it. */}
-              <span class="hs-featured-eyebrow">
-                <span class="hs-featured-kicker">
-                  <i class="hs-featured-dot" aria-hidden="true"></i>Featured post
-                </span>
-                <span class="hs-featured-layer">{LAYER_LABEL.get(layerOf(page) ?? "")}</span>
-              </span>
-              <span class="hs-featured-title">{page.frontmatter?.title}</span>
-              {page.description && <span class="hs-featured-desc">{page.description}</span>}
-              {cover && <pre class="hs-featured-cover">{cover.replace(/\n+$/, "")}</pre>}
-              <span class="hs-featured-foot">
-                <span class="hs-featured-meta">{lengthLabel(page)}</span>
-                <span class="hs-featured-go">
-                  Read this first<i class="hs-featured-arrow" aria-hidden="true"></i>
-                </span>
-              </span>
-            </a>
-          )
-        })}
-
-        {/* The five layers were a flat row of counter chips, which read as six
-            arbitrary filters rather than as one axis cut into parts. The
-            section says what the control does, each layer carries the blurb it
-            was always given in postMeta, and one layer is always open — `All`
-            used to sit first and do exactly what the archive link beside it
-            does. The number on each tab is its place in the author's order,
-            which is why the strip is not sorted by post count. */}
-        <nav class="hs-layers" aria-labelledby="hs-layers-label">
-          <div class="hs-layers-head">
-            <p class="hs-layers-label" id="hs-layers-label">
-              Browse by layer
-            </p>
-            {/* The count is the one credibility number the home page never
-                printed — a visitor could not tell whether the site held twelve
-                posts or the two under the open tab — and the component already
-                knows it, so it cannot go stale. */}
-            <a class="hs-layers-all" href={resolveRelative(here, "tags/" as FullSlug)}>
-              All {posts.length} posts →
-            </a>
+        {/* The chooser, and the way past it. `all posts →` is not a tab: every
+            tab narrows the grid in place, and that link leaves the page. */}
+        <nav class="hs-filter" aria-label="Posts by group">
+          <div class="hs-tabs">
+            {groups.map((group) => {
+              const cut = group.pages.length < group.total
+              return (
+                <button
+                  type="button"
+                  class="hs-tab"
+                  data-group={group.id}
+                  aria-pressed={group.id === open ? "true" : "false"}
+                  title={group.blurb}
+                >
+                  <span class="hs-tab-name">{group.name}</span>
+                  {/* What the group holds, not what the grid will show. A `6`
+                      on a tab that opens six of nine would be a wrong number;
+                      the `+` says the grid is a top six. */}
+                  <span class="hs-tab-count">
+                    {group.total}
+                    {cut && "+"}
+                  </span>
+                </button>
+              )
+            })}
           </div>
-          <div class="hs-layers-tabs">
-            {layers.map((layer, i) => (
-              <button
-                type="button"
-                class="hs-layer"
-                data-layer={layer.id}
-                aria-pressed={layer.id === openLayer ? "true" : "false"}
-              >
-                {/* The order number and the count share a meta line above the
-                    name, rather than sitting either side of it: on a 132px
-                    column `02 Storage Engine 6` broke the label in half and
-                    left `Engine` on its own line. The name now owns a line,
-                    and the five numbers and five counts each align down the
-                    strip. */}
-                <span class="hs-layer-meta">
-                  <span class="hs-layer-no">{String(i + 1).padStart(2, "0")}</span>
-                  <span class="hs-layer-count">{counts.get(layer.id) ?? 0}</span>
-                </span>
-                <span class="hs-layer-name">{layer.label}</span>
-                {/* The blurb belongs to the layer, so it is printed on every
-                    tab rather than swapped into one line under them: five
-                    proper nouns in a row said nothing about what they were. */}
-                <span class="hs-layer-blurb">{layer.blurb}</span>
-              </button>
-            ))}
-          </div>
+          <a class="hs-all" href={archive}>
+            all posts <span aria-hidden="true">→</span>
+          </a>
         </nav>
 
-        <div class="hs-index">
-          <ul class="post-rows">
-            {rows.map((page) => (
-              <PostRow
-                page={page}
-                here={here}
-                cfg={cfg}
-                layer={layerOf(page) ?? ""}
-                hidden={layerOf(page) !== openLayer}
-              />
-            ))}
-          </ul>
-        </div>
+        {groups.map((group) => (
+          <div class="hs-panel" data-group={group.id} hidden={group.id !== open}>
+            <ul class="hs-grid">
+              {group.pages.map((page) => {
+                const layer = group.showLayer ? layerOf(page) : undefined
+                return (
+                  <li class="hs-cell">
+                    <a
+                      class="hs-cell-link"
+                      href={resolveRelative(here, page.slug!)}
+                      aria-label={page.frontmatter?.title as string}
+                    >
+                      {/* Title, the question it answers, then the stamp. A
+                          card is read in that order, so it is written in that
+                          order: the metadata used to sit above the title,
+                          which put two words of chrome in front of the one
+                          thing a reader is scanning for.
+
+                          The stamp sits at the foot of the cell. Every cell in
+                          a row is the same height — the title reserves two
+                          lines and the description is clamped to two — so it
+                          costs one `margin-top: auto` and a row's stamps land
+                          on one line. It does not wrap: in `pinned` it is the
+                          layer and the length, inside a layer the length
+                          alone. */}
+                      <span class="hs-cell-title">{page.frontmatter?.title}</span>
+                      {page.description && <span class="hs-cell-desc">{page.description}</span>}
+                      <span class="hs-cell-meta">
+                        {layer && (
+                          <span class="hs-cell-layer">
+                            {(LAYER_LABEL.get(layer) ?? layer).toLowerCase()}
+                          </span>
+                        )}
+                        <span class="hs-cell-stamp">{minutesOf(page)} min</span>
+                      </span>
+                    </a>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        ))}
       </section>
     )
   }

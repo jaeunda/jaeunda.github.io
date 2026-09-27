@@ -3,7 +3,7 @@ tags:
   - topic/database
   - project/database-system
 Date: 2026-04-17
-description: "락을 규칙대로 걸어도 직렬성이 깨진다면, 결국 무엇이 순서를 결정하는가."
+description: "2PL이 직렬성을 보장하는 원리와 그 대가로 따라오는 문제를 정리했다."
 layer: storage
 rank: 1
 ---

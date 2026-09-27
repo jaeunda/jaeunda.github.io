@@ -5,9 +5,9 @@ tags:
   - topic/distributed-systems
   - type/notes
   - project/co-op-cloud
-featured: true
+pinned: true
 pinOrder: 4
-description: "이미 커밋된 다른 서비스의 변경을, 롤백도 없이 어떻게 되돌리는가."
+description: "롤백이 없는 분산 환경에서 보상 트랜잭션으로 일관성을 되돌리는 방법."
 layer: application
 rank: 1
 ---

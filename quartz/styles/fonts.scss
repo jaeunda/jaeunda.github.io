@@ -6,12 +6,32 @@
 // `fontOrigin: "local"`; see `scripts/fonts/README.md` for the subset and how
 // to regenerate it after adding Korean copy.
 //
-// Roles:
-//   Pretendard    — Korean and Latin body copy, headings, UI. Variable 100–900.
-//   Space Grotesk — Latin-only display: the wordmark and post titles, which are
-//                   always English. Never used where Korean can appear, so a
-//                   line never mixes two faces.
-//   IBM Plex Mono — code, dates, counts and labels.
+// Roles (blog):
+//   Fraunces      — the display face: the wordmark, the home masthead, every
+//                   post title and the article's own h2/h3. Variable 100–900,
+//                   latin only, so a Korean heading falls through to Noto
+//                   Sans KR mid-line. That is the intended look; the two faces
+//                   were chosen to sit together.
+//   Noto Sans KR  — everything read as prose: Korean and Latin body copy,
+//                   descriptions, h4–h6 and readable UI. Variable 100–900.
+//   IBM Plex Mono — the machine's voice: code, nav, dates, counts, tags,
+//                   labels, the profile ledger. 400 / 500 / 600, 500 being the
+//                   UI emphasis. Subset with arrows and ⌘ so `→` and `⌘K` do
+//                   not fall back mid-line.
+//   Pretendard    — the unlisted portfolio pages only (`--pf-sans`).
+//   Space Grotesk — the unlisted portfolio pages only (`--pf-latin`).
+//
+// A browser downloads only the faces a page actually sets, so a blog page
+// fetches Fraunces + Noto Sans KR + Plex and never touches the two portfolio
+// faces, and a portfolio page fetches the reverse.
+
+@font-face {
+  font-family: "Noto Sans KR";
+  src: url("/static/fonts/noto-sans-kr-subset.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
 
 @font-face {
   font-family: "Pretendard";
@@ -29,12 +49,12 @@
   font-display: swap;
 }
 
-// The wordmark keeps Fraunces: it is the site's identity mark and the one place
-// a display serif belongs. Subset to basic latin, since it only ever sets
-// "jaeunda.log".
+// Fraunces is the display face for the whole blog, not just the wordmark, so
+// it carries the full latin range rather than the eleven letters of
+// "jaeunda.log". It has no Hangul by design: see the role note above.
 @font-face {
   font-family: "Fraunces";
-  src: url("/static/fonts/fraunces-wordmark.woff2") format("woff2-variations");
+  src: url("/static/fonts/fraunces-latin.woff2") format("woff2-variations");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -44,6 +64,14 @@
   font-family: "IBM Plex Mono";
   src: url("/static/fonts/ibm-plex-mono-latin-400.woff2") format("woff2");
   font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/static/fonts/ibm-plex-mono-latin-500.woff2") format("woff2");
+  font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
@@ -61,15 +89,21 @@
 // equal cascade order without `!important`.
 html:root {
   // Korean fallback for the faces that have no Hangul, so a missing glyph lands
-  // on Pretendard instead of whatever the OS picks.
-  --codeFont: "IBM Plex Mono", "Pretendard", ui-monospace, SFMono-Regular, Menlo, monospace;
+  // on the reading face instead of whatever the OS picks. Quartz builds both
+  // stacks from `quartz.config.ts` with a system sans as the fallback, which
+  // would drop a Korean heading onto whatever the OS supplies; these two are
+  // the same stacks with the reading face put back in second place.
+  --codeFont: "IBM Plex Mono", "Noto Sans KR", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --headerFont: "Fraunces", "Noto Sans KR", Georgia, serif;
 
-  // Latin display face. Applied per-component, never to a surface that can hold
-  // Korean text.
-  --displayFont: "Space Grotesk", "Pretendard", system-ui, sans-serif;
+  // The display face. Unlike Space Grotesk before it, this one *is* allowed on
+  // a surface that can hold Korean: Fraunces sets the latin run and Noto Sans
+  // KR the Hangul, which is how the site's headings were always drawn.
+  --displayFont: "Fraunces", "Noto Sans KR", Georgia, serif;
 
-  // Identity mark only.
-  --wordmarkFont: "Fraunces", "Pretendard", Georgia, serif;
+  // Identity mark. Same face; kept as its own name so the wordmark can be
+  // retuned without moving every heading with it.
+  --wordmarkFont: "Fraunces", "Noto Sans KR", Georgia, serif;
 
   // The site is light only — there is no theme toggle and no dark palette.
   color-scheme: light;
@@ -77,7 +111,7 @@ html:root {
   // Lifted surface, a step above the page ground. Not a theme token because
   // quartz.config.ts only carries the nine named colours.
   --surface: #ffffff;
-  --surface-line: #eceee6;
+  --surface-line: #e9eae6;
 
   // Elevation, shared with the portfolio page, which is where both values were
   // designed (`--pf-shadow` / `--pf-shadow-lift` in styles/portfolio.scss).

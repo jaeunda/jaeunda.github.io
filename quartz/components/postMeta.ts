@@ -74,11 +74,16 @@ export function byEditorialRank(cfg: GlobalConfiguration): SortFn {
   }
 }
 
-// Past this many minutes the figure stops reading as a plan and starts reading
-// as a warning, so long posts say so instead of printing `63 min`. The whole
-// metadata line is English — `10 chapters · long read` — so that one Korean
-// phrase does not sit in the middle of it.
-const LONG_READ_MINUTES = 40
+// A post the blog lists: not the home page, not an unlisted page (the
+// portfolios), not a generated tag page. The home index and the footer's
+// status line both count with this, so they cannot disagree.
+export function isListedPost(page: QuartzPluginData): boolean {
+  return (
+    page.slug !== "index" &&
+    page.frontmatter?.unlisted !== true &&
+    !(page.slug ?? "").startsWith("tags/")
+  )
+}
 
 export function layerOf(page: QuartzPluginData): string | undefined {
   return page.frontmatter?.layer as string | undefined
@@ -111,7 +116,10 @@ export function lengthLabel(page: QuartzPluginData): string {
   const minutes = minutesOf(page)
   const parts: string[] = []
   if (chapters > 0) parts.push(`${chapters} chapters`)
-  if (minutes > 0) parts.push(minutes > LONG_READ_MINUTES ? "long read" : `${minutes} min`)
+  // The real figure, always. `long read` replaced it past 40 minutes, but a
+  // reader who is deciding whether to start wants the number, and the line is
+  // set in mono as something a program measured.
+  if (minutes > 0) parts.push(`${minutes} min`)
   return parts.join(" · ")
 }
 
