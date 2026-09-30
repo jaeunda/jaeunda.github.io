@@ -1462,6 +1462,43 @@ application document is named anywhere in it.
 - An unlisted folder has no folder page (FolderPage only sees listed files),
   so `contentPage.tsx` renders an unlisted `index.md` itself.
 
+### 4DPLEX Portfolio
+
+`portfolio-4dplex/` is the third portfolio and the first that is **not a Quartz
+page**. It is a standalone Vite + React + TypeScript app with its own
+`package.json`, built to `portfolio-4dplex/dist` and copied into
+`public/portfolio-4dplex/` by `.github/workflows/deploy.yml` after the Quartz
+build, so it is served at `/portfolio-4dplex/`. Its README holds the run, build
+and deploy steps.
+
+- It is written for one employer and role, which the systems portfolio
+  deliberately is not. The home page (`/portfolio-4dplex/`) is the first screen
+  that states the whole case, with the profile below it. Each project is its
+  own page (`/ongi/`, `/weavegate/`, `/cuda/`, `/foundation/`), opened from the
+  home cards or the top bar, and carries a way back and a previous/next pager.
+  Within a page, detail is added on selection (`StepExplorer`, `Tabs`,
+  `ControlPath`, native `<details>`); interaction only adds detail and nothing
+  is hidden behind it.
+- A project page reads in one order, and the page shows it: header (name,
+  what it is, one message, facts) → a three-fact summary → a contents row of
+  numbered links → numbered blocks → a closing block that ties the work to the
+  role → the pager. Evidence comes before implementation detail (results sit
+  above code), and second-layer material is folded into `<details>`.
+- It shares none of the blog's or the other portfolios' CSS. Tokens live in
+  `portfolio-4dplex/src/styles/global.css`: a deep plane (`--deep` `#0a1017`,
+  `--signal` `#62d5e8`) for the overview and footer, a reading plane (`--paper`
+  `#f4f5f3`, `--ink` `#10161d`, `--accent` `#0a6a82`) for every detail section,
+  and `--fail` / `--pass` for verification results only.
+- Type is the portfolio set: Pretendard for Korean and prose, Space Grotesk for
+  latin display and numbers, IBM Plex Mono for English labels and code. Mono
+  does not carry Korean labels. The font files are copies under
+  `portfolio-4dplex/static/fonts/`; the Pretendard subset there is cut from
+  `portfolio-4dplex/scripts/font-chars.txt`, and the build fails if the copy
+  uses a character outside it.
+- Like the other portfolios it is unlinked: nothing on the blog points to it.
+- The root `tsconfig.json` and `.prettierignore` exclude the directory, because
+  it has its own React JSX settings and build output.
+
 ## Design Decisions Log
 
 ### 2026-05-27
@@ -3027,3 +3064,26 @@ Three rules the copy settled into, all of them earned:
 the sub-line confirms it as one. The determinism thread that also runs through
 her engineering work is not referred to, because the headline _is_ it. Nothing
 on the page points outside the page.
+
+### 2026-09-30 (a third portfolio, outside Quartz)
+
+- Added `portfolio-4dplex/`, a standalone Vite + React + TypeScript site served
+  at `/portfolio-4dplex/`. It needed selectable diagrams, tabs and a scroll-spy
+  navigation, which a Quartz content page has no place for without adding
+  inline scripts to the blog's own bundle; keeping it out of Quartz also gives
+  it its own title, description and Open Graph tags instead of the unlisted
+  shell's `noindex`.
+- Every route is prerendered at build time and hydrated, so the first paint,
+  a direct visit to a project URL and the no-JavaScript view carry the full
+  content.
+- The projects moved off the home page onto their own pages the same day: as
+  one page it took so much scrolling that a reader did not reach the end.
+- `deploy.yml` builds it after Quartz and copies it into `public/`. The blog,
+  `portfolio-it` and `portfolio-systems` are unchanged. See **4DPLEX
+  Portfolio**.
+- A third-party read of the finished pages found the project headers
+  overloaded (message, facts, role note and summary all competing on the first
+  screen) and no way to see how long a page was or where its evidence sat. The
+  role note moved to the end of each page, a contents row and block numbers
+  were added, results moved above implementation detail on the weavegate and
+  CUDA pages, and the Ongi design notes were folded.

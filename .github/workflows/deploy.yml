@@ -28,6 +28,17 @@ jobs:
         run: npm ci
       - name: Build Quartz
         run: npx quartz build
+      # The 4DPLEX portfolio is a separate Vite app served from a sub-path.
+      # Quartz empties `public` when it builds, so this has to run after it.
+      - name: Build portfolio-4dplex
+        working-directory: portfolio-4dplex
+        run: |
+          npm ci
+          npm run build
+      - name: Add portfolio-4dplex to the site
+        run: |
+          mkdir -p public/portfolio-4dplex
+          cp -R portfolio-4dplex/dist/. public/portfolio-4dplex/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:

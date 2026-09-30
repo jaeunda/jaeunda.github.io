@@ -1,0 +1,153 @@
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(10, 16, 23, 0.94);
+  border-bottom: 1px solid var(--deep-line);
+  color: var(--on-deep);
+  backdrop-filter: blur(10px);
+}
+
+.in {
+  max-width: var(--frame);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.brand b {
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.brand span {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--on-deep-2);
+}
+
+.list {
+  display: flex;
+  gap: 4px;
+}
+
+.link {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: 17px 12px;
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--on-deep-2);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+.link i {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-style: normal;
+  opacity: 0.75;
+}
+
+.link::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: -1px;
+  height: 2px;
+  background: var(--signal);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+
+.link:hover {
+  color: var(--on-deep);
+}
+
+.link[aria-current="page"] {
+  color: var(--on-deep);
+}
+
+.link[aria-current="page"]::after {
+  transform: scaleX(1);
+}
+
+.link:focus-visible,
+.brand:focus-visible {
+  outline-color: var(--signal);
+}
+
+@media (max-width: 900px) {
+  .brand span {
+    display: none;
+  }
+
+  .link i {
+    display: none;
+  }
+}
+
+/* Phone: the brand takes its own row and the five links scroll sideways
+   beneath it, so every destination stays one tap away without a drawer. */
+@media (max-width: 560px) {
+  .in {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
+  }
+
+  .brand {
+    padding: 11px var(--gutter) 0;
+  }
+
+  .brand span {
+    display: inline;
+  }
+
+  .list {
+    overflow-x: auto;
+    padding: 0 calc(var(--gutter) - 10px);
+    gap: 0;
+    scrollbar-width: none;
+    mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent);
+  }
+
+  .list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .list li:last-child {
+    padding-right: 28px;
+  }
+
+  .link {
+    padding: 12px 10px;
+    font-size: 13.5px;
+  }
+
+  .link::after {
+    left: 10px;
+    right: 10px;
+  }
+}

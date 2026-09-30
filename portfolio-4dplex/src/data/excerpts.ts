@@ -1,0 +1,14 @@
+// Copied verbatim from the public repositories by line range. Do not edit by
+// hand: re-cut from the source if the pinned commit in links.ts changes.
+export const EXCERPTS = {
+  motorTask:
+    'while (1) {\n    TickType_t wait_ticks = auto_close_pending ? get_auto_close_wait_ticks(auto_close_deadline) : portMAX_DELAY;\n    QueueSetMemberHandle_t ready_queue = xQueueSelectFromSet(s_motor_queue_set, wait_ticks);\n\n    if (ready_queue == NULL) {\n        if (auto_close_pending && tick_deadline_expired(xTaskGetTickCount(), auto_close_deadline)) {\n            MotorCommand auto_close_command = { .type = MOTOR_COMMAND_CLOSE_ALL };\n            ESP_LOGW(TAG, "OPEN_ALL auto-close timeout reached; closing all slots");\n            (void)process_motor_command(auto_close_command, servo);\n            auto_close_pending = false;\n        }\n        continue;\n    }\n\n    if (ready_queue == dispense_queue) {\n        DispenseEvent event;\n        if (xQueueReceive(dispense_queue, &event, 0) == pdTRUE) {\n            (void)process_dispense_event(event, servo, detector);\n        }\n    } else if (ready_queue == s_motor_command_queue) {\n        MotorCommand command;\n        if (xQueueReceive(s_motor_command_queue, &command, 0) == pdTRUE) {\n            (void)process_motor_command(command, servo);',
+  snapshot:
+    "// Acquire the mutex to safely read the schedule store data\nif (xSemaphoreTake(s_schedule_mutex, portMAX_DELAY) != pdTRUE) {\n    return ESP_ERR_TIMEOUT;\n}\n\n// Critical section: copy the current schedule store data into the snapshot\nmemset(snapshot, 0, sizeof(*snapshot));\nmemcpy(snapshot->slots, s_slots, s_slot_count * sizeof(SlotEntry));\nsnapshot->count = s_slot_count;\nsnapshot->version = s_version;\n\n// Release the mutex after reading the data\nxSemaphoreGive(s_schedule_mutex);",
+  schedule:
+    '{\n  "id": "sch_ba00582f9632",\n  "steps": [\n    {\n      "worker": "w1",\n      "point": "after_read_request"\n    },\n    {\n      "worker": "w2",\n      "point": "after_read_request"\n    },\n    {\n      "worker": "w1",\n      "point": "before_insert_assignment"\n    },\n    {\n      "worker": "w2",\n      "point": "before_insert_assignment"\n    }\n  ]\n}',
+  scenario:
+    'scenarios:\n  concurrent-assign:\n    workers:\n      - id: w1\n        command: assign\n        args:\n          request_id: "42"\n      - id: w2\n        command: assign\n        args:\n          request_id: "42"\n    sync_points:\n      - after_read_request\n      - before_insert_assignment',
+  assertion:
+    "oracle:\n  assertions:\n    - id: active-assignment-is-unique\n      sql: |\n        SELECT\n            project_request_id,\n            COUNT(*) AS active_assignment_count\n        FROM assignment\n        WHERE status = 'ACTIVE'\n        GROUP BY project_request_id\n        HAVING COUNT(*) > 1\n        ORDER BY project_request_id;\n      expect_rows: 0",
+} as const

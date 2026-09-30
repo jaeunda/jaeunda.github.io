@@ -1,0 +1,258 @@
+.results {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+  gap: 16px;
+}
+
+.panel {
+  padding: 22px 26px 24px;
+  border: 1px solid var(--line-2);
+  border-top: 3px solid var(--accent);
+  border-radius: var(--r);
+  background: var(--surface);
+}
+
+.panel[data-kind="accuracy"] {
+  border-top-color: var(--pass);
+}
+
+.panelK {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.panelK span {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  background: var(--ink);
+  color: #fff;
+  letter-spacing: 0;
+}
+
+.nums {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 14px;
+}
+
+.num {
+  font-family: var(--display);
+  font-size: 46px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+.num small {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.cap {
+  margin-top: 2px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.table {
+  width: 100%;
+  margin-top: 22px;
+  border-top: 1px solid var(--line);
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table th,
+.table td {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: middle;
+  font-weight: 400;
+}
+
+.table thead th {
+  padding: 8px 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.table thead i {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin: 0 5px 0 0;
+  border-radius: 2px;
+}
+
+.table thead i[data-kind="actual"] {
+  background: var(--accent);
+}
+
+.table thead i[data-kind="target"] {
+  margin-left: 10px;
+  background: var(--line-2);
+}
+
+.table tbody th {
+  width: 150px;
+  padding-right: 16px;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.table td:last-child,
+.table thead th:last-child {
+  width: 64px;
+  text-align: right;
+  font-family: var(--display);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.table thead th:last-child {
+  font-family: var(--sans);
+  font-weight: 400;
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px;
+  align-items: center;
+  gap: 10px;
+}
+
+.bar + .bar {
+  margin-top: 4px;
+}
+
+.bar i {
+  height: 10px;
+  border-radius: 2px;
+}
+
+.bar[data-kind="actual"] i {
+  background: var(--accent);
+}
+
+.bar[data-kind="target"] i {
+  background: var(--line-2);
+}
+
+.bar b {
+  font-family: var(--display);
+  font-size: 13.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.bar[data-kind="target"] b {
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.code {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: 32px;
+  align-items: start;
+}
+
+.verified {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  font-family: var(--display);
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  color: var(--pass);
+}
+
+.verified i {
+  position: relative;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--pass);
+}
+
+.verified i::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 6px;
+  width: 8px;
+  height: 14px;
+  border-right: 2.5px solid #fff;
+  border-bottom: 2.5px solid #fff;
+  transform: rotate(45deg);
+}
+
+.verified + .cap {
+  margin-top: 8px;
+}
+
+.accD {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--ink-2);
+}
+
+@media (max-width: 900px) {
+  .results,
+  .code {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .code {
+    gap: 16px;
+  }
+
+  .table tbody th {
+    width: 96px;
+  }
+
+  .panel {
+    padding: 18px 18px 20px;
+  }
+
+  .num {
+    font-size: 36px;
+  }
+}
+
+@media (max-width: 560px) {
+  .nums {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .verified {
+    font-size: 21px;
+  }
+}

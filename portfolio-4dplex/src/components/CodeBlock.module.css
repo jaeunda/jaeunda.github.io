@@ -1,0 +1,52 @@
+.root {
+  border: 1px solid #1d2a37;
+  border-radius: var(--r);
+  background: var(--deep);
+  overflow: hidden;
+  min-width: 0;
+}
+
+.cap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--deep-line);
+  font-size: 12.5px;
+  color: var(--on-deep-2);
+}
+
+.cap a {
+  flex: 0 0 auto;
+  color: var(--signal);
+  text-decoration: none;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.cap a:hover {
+  text-decoration: underline;
+}
+
+.cap a:focus-visible,
+.pre:focus-visible {
+  outline-color: var(--signal);
+}
+
+.pre {
+  padding: 14px 16px 16px;
+  overflow-x: auto;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: #d7e0e8;
+  tab-size: 4;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.pre:focus-visible {
+  outline-offset: -3px;
+}

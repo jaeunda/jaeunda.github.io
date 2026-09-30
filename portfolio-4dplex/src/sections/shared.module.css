@@ -1,0 +1,257 @@
+/* Patterns more than one section uses. */
+
+/* Three facts a reader needs before anything else. */
+.trio {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 32px;
+}
+
+.trio > li {
+  padding: 0 28px;
+  border-left: 1px solid var(--line-2);
+}
+
+.trio > li:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.trioK {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.trioV {
+  margin-top: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.trioD {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* Ruled cards in a row. */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+  gap: 16px;
+}
+
+.card {
+  padding: 18px 20px 20px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  background: var(--surface);
+}
+
+.card[data-tone="paper"] {
+  background: var(--paper);
+}
+
+.cardK {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.cardT {
+  margin-top: 6px;
+  font-size: 16.5px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.cardD {
+  margin-top: 6px;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--ink-2);
+}
+
+.cardD code,
+.list code,
+.rows code {
+  font-size: 0.88em;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: #eceff1;
+  color: var(--ink);
+}
+
+.cardL {
+  margin-top: 10px;
+  font-size: 13.5px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+
+/* A plain ruled list. */
+.list {
+  display: grid;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.list li {
+  position: relative;
+  padding-left: 16px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.list li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.68em;
+  width: 6px;
+  height: 1.5px;
+  background: var(--accent);
+}
+
+/* Key / value rows. */
+.rows {
+  border-top: 1px solid var(--line-2);
+}
+
+.rows > li {
+  display: grid;
+  grid-template-columns: 200px 170px minmax(0, 1fr);
+  gap: 20px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+
+.rows b {
+  font-weight: 650;
+}
+
+.rows span {
+  color: var(--ink-2);
+}
+
+.rows i {
+  font-style: normal;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+/* Native disclosure, styled. */
+.more {
+  margin-top: 20px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  background: var(--surface);
+}
+
+.more > summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.more > summary::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  margin-left: 2px;
+  border-right: 1.5px solid var(--accent);
+  border-bottom: 1.5px solid var(--accent);
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+}
+
+.more[open] > summary::before {
+  transform: rotate(45deg);
+}
+
+.more > summary span {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.more > summary em {
+  margin-left: auto;
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.moreB {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr));
+  gap: 16px;
+  padding: 4px 18px 18px;
+}
+
+.moreP {
+  grid-column: 1 / -1;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--ink-2);
+}
+
+@media (max-width: 900px) {
+  .trio {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .trio > li {
+    padding: 0 0 0 16px;
+    border-left: 2px solid var(--accent);
+  }
+
+  .trio > li:first-child {
+    padding-left: 16px;
+    border-left: 2px solid var(--accent);
+  }
+
+  .cards,
+  .moreB {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rows > li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+
+  .more > summary em {
+    display: none;
+  }
+}

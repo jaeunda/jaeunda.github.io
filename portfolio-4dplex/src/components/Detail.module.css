@@ -1,0 +1,93 @@
+/* The box is the query container; a container cannot restyle itself. */
+.box {
+  container-type: inline-size;
+}
+
+.root {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+}
+
+.lead {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.points {
+  margin-top: 10px;
+  display: grid;
+  gap: 6px;
+}
+
+.points li {
+  position: relative;
+  padding-left: 16px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.points li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.68em;
+  width: 6px;
+  height: 1.5px;
+  background: var(--accent);
+}
+
+.points code,
+.lead code,
+.facts code {
+  font-size: 0.88em;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: #eceff1;
+  color: var(--ink);
+  word-break: break-all;
+}
+
+.facts {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+
+.facts > div {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.facts dt {
+  padding-top: 2px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.facts dd {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+@container (min-width: 760px) {
+  .root[data-facts="true"] {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: 40px;
+  }
+
+  .facts {
+    align-self: start;
+  }
+}

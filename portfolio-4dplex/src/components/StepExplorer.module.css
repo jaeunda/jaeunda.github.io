@@ -1,0 +1,366 @@
+.root {
+  --gap: 28px;
+  --arrow: var(--line-2);
+}
+
+.steps {
+  display: grid;
+  gap: var(--gap);
+}
+
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.node {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  padding: 14px 16px 15px;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.node:hover {
+  border-color: var(--ink-2);
+}
+
+.node[aria-pressed="true"] {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+  background: var(--accent-soft);
+}
+
+.nodeTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 18px;
+}
+
+.num {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.mine {
+  margin-left: auto;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.title {
+  font-size: 15.5px;
+  font-weight: 650;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.sub {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.tags span {
+  padding: 1px 6px;
+  border: 1px solid var(--line-2);
+  border-radius: 3px;
+  background: var(--surface);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-2);
+}
+
+/* Connectors. `::before` is the line, `::after` the head. */
+.step::before,
+.step::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.inline {
+  display: none;
+}
+
+.panel {
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  background: var(--surface);
+  padding: 20px 24px 22px;
+}
+
+.panelK {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.panelK span {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* ── Wide: the diagrams ─────────────────────────────────────────────── */
+@media (min-width: 901px) {
+  /* → */
+  [data-layout="loop"] .step:nth-child(-n + 3)::before,
+  [data-layout="row"] .step:not([data-last="true"])::before {
+    top: 50%;
+    left: 100%;
+    width: calc(var(--gap) - 5px);
+    height: 1.5px;
+    margin-left: 2px;
+    background: var(--arrow);
+  }
+
+  [data-layout="loop"] .step:nth-child(-n + 3)::after,
+  [data-layout="row"] .step:not([data-last="true"])::after {
+    top: 50%;
+    left: calc(100% + var(--gap) - 11px);
+    width: 7px;
+    height: 7px;
+    margin-top: -3px;
+    border-top: 1.5px solid var(--arrow);
+    border-right: 1.5px solid var(--arrow);
+    transform: rotate(45deg);
+  }
+
+  /* loop: 1 2 3 4 across, then 5 6 7 back underneath, right to left */
+  [data-layout="loop"] .steps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-bottom: 20px;
+  }
+
+  [data-layout="loop"] .step:nth-child(5) {
+    grid-area: 2 / 4;
+  }
+
+  [data-layout="loop"] .step:nth-child(6) {
+    grid-area: 2 / 3;
+  }
+
+  [data-layout="loop"] .step:nth-child(7) {
+    grid-area: 2 / 2;
+  }
+
+  [data-layout="loop"] .legend {
+    grid-area: 2 / 1;
+  }
+
+  /* ↓ from 4 to 5 */
+  [data-layout="loop"] .step:nth-child(4)::before {
+    left: 50%;
+    top: 100%;
+    width: 1.5px;
+    height: calc(var(--gap) - 5px);
+    margin-top: 2px;
+    background: var(--arrow);
+  }
+
+  [data-layout="loop"] .step:nth-child(4)::after {
+    left: 50%;
+    top: calc(100% + var(--gap) - 11px);
+    width: 7px;
+    height: 7px;
+    margin-left: -3px;
+    border-right: 1.5px solid var(--arrow);
+    border-bottom: 1.5px solid var(--arrow);
+    transform: rotate(45deg);
+  }
+
+  /* ← from 5 to 6, 6 to 7 */
+  [data-layout="loop"] .step:nth-child(5)::before,
+  [data-layout="loop"] .step:nth-child(6)::before {
+    top: 50%;
+    right: 100%;
+    width: calc(var(--gap) - 5px);
+    height: 1.5px;
+    margin-right: 2px;
+    background: var(--arrow);
+  }
+
+  [data-layout="loop"] .step:nth-child(5)::after,
+  [data-layout="loop"] .step:nth-child(6)::after {
+    top: 50%;
+    right: calc(100% + var(--gap) - 11px);
+    width: 7px;
+    height: 7px;
+    margin-top: -3px;
+    border-left: 1.5px solid var(--arrow);
+    border-bottom: 1.5px solid var(--arrow);
+    transform: rotate(45deg);
+  }
+
+  /* row: one line of steps, detail beneath */
+  [data-layout="row"] {
+    --gap: 22px;
+  }
+
+  [data-layout="row"] .steps {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    margin-bottom: 20px;
+  }
+
+  [data-layout="row"] .node {
+    padding: 12px 12px 13px;
+  }
+
+  [data-layout="row"] .nodeTop {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  [data-layout="row"] .title {
+    font-size: 14px;
+  }
+
+  /* rail: steps down the left, detail held beside them */
+  [data-layout="rail"] {
+    --gap: 18px;
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 32px;
+    align-items: start;
+  }
+
+  [data-layout="rail"] .node {
+    padding: 11px 16px 12px;
+  }
+
+  [data-layout="rail"] .sub {
+    display: none;
+  }
+
+  [data-layout="rail"] .step:not([data-last="true"])::before {
+    left: 27px;
+    top: 100%;
+    width: 1.5px;
+    height: calc(var(--gap) - 5px);
+    margin-top: 2px;
+    background: var(--arrow);
+  }
+
+  [data-layout="rail"] .step:not([data-last="true"])::after {
+    left: 27px;
+    top: calc(100% + var(--gap) - 11px);
+    width: 7px;
+    height: 7px;
+    margin-left: -3px;
+    border-right: 1.5px solid var(--arrow);
+    border-bottom: 1.5px solid var(--arrow);
+    transform: rotate(45deg);
+  }
+
+  [data-layout="rail"] .panel {
+    position: sticky;
+    top: calc(var(--nav-h) + 20px);
+  }
+}
+
+/* ── Narrow: one column, detail under the selected step ─────────────── */
+@media (max-width: 900px) {
+  .root {
+    --gap: 18px;
+  }
+
+  .panel,
+  .legend {
+    display: none;
+  }
+
+  .step:not([data-last="true"])::before {
+    left: 27px;
+    top: 100%;
+    width: 1.5px;
+    height: calc(var(--gap) - 5px);
+    margin-top: 2px;
+    background: var(--arrow);
+  }
+
+  .step:not([data-last="true"])::after {
+    left: 27px;
+    top: calc(100% + var(--gap) - 11px);
+    width: 7px;
+    height: 7px;
+    margin-left: -3px;
+    border-right: 1.5px solid var(--arrow);
+    border-bottom: 1.5px solid var(--arrow);
+    transform: rotate(45deg);
+  }
+
+  .step[data-selected="true"] .node {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .inline {
+    display: block;
+    padding: 16px 16px 18px;
+    border: 1px solid var(--accent);
+    border-top: 0;
+    border-radius: 0 0 var(--r) var(--r);
+    box-shadow: inset 0 0 0 1px var(--accent);
+    background: var(--surface);
+    clip-path: inset(0 0 0 0);
+  }
+}
