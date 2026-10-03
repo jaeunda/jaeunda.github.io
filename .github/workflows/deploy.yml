@@ -39,6 +39,16 @@ jobs:
         run: |
           mkdir -p public/portfolio-4dplex
           cp -R portfolio-4dplex/dist/. public/portfolio-4dplex/
+      # The DB Inc. portfolio is a second standalone Vite app, built the same way.
+      - name: Build portfolio-dbinc
+        working-directory: portfolio-dbinc
+        run: |
+          npm ci
+          npm run build
+      - name: Add portfolio-dbinc to the site
+        run: |
+          mkdir -p public/portfolio-dbinc
+          cp -R portfolio-dbinc/dist/. public/portfolio-dbinc/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:

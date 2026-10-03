@@ -1,0 +1,58 @@
+.footer {
+  background: var(--night);
+  color: var(--on-night);
+  border-top: 1px solid var(--night-line);
+}
+
+.inner {
+  max-width: var(--frame);
+  margin: 0 auto;
+  padding: 48px var(--gutter) 56px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: end;
+}
+
+.line {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.5;
+  max-width: 30em;
+}
+
+.contact {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--on-night-2);
+}
+
+.contact a {
+  color: var(--on-night);
+  text-underline-offset: 3px;
+  text-decoration-color: var(--night-line-2);
+}
+
+.contact a:hover {
+  text-decoration-color: var(--signal);
+}
+
+.contact a:focus-visible {
+  outline-color: var(--signal);
+}
+
+.label {
+  display: inline-block;
+  width: 64px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 760px) {
+  .inner {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,493 @@
+/* The GPU page speaks in time and bottlenecks: conditions, a correctness
+   gate, a breakdown on one linear axis, and the structure before/after. */
+
+.workload {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 32px;
+  align-items: start;
+}
+
+.conditions {
+  display: grid;
+  border-top: 2px solid var(--navy);
+}
+
+.conditions > div {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.conditions dt {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-top: 2px;
+}
+
+.conditions dd {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.pipeline {
+  display: grid;
+  gap: 14px;
+}
+
+.pipeline li {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  padding: 12px 16px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  background: var(--surface);
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.pipeline li + li::before {
+  content: "↓";
+  position: absolute;
+  top: -15px;
+  left: 20px;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--muted);
+}
+
+.pipeline strong {
+  font-family: var(--display);
+  font-size: 15.5px;
+  color: var(--navy);
+}
+
+.pipeline li:last-child {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* Correctness */
+
+.correct {
+  display: grid;
+  grid-template-columns: minmax(0, 240px) minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+
+.gateFlow {
+  display: grid;
+  gap: 14px;
+}
+
+.gateFlow li {
+  position: relative;
+  padding: 12px 14px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  background: var(--day);
+  font-family: var(--display);
+  font-weight: 600;
+  color: var(--navy);
+  text-align: center;
+}
+
+.gateFlow li + li::before {
+  content: "↓";
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  line-height: 1;
+  color: var(--muted);
+}
+
+.gateFlow li[data-pair]::before {
+  content: "↕";
+}
+
+.gateFlow li[data-last] {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+}
+
+.gateTableWrap,
+.tableWrap {
+  position: relative;
+  overflow-x: auto;
+}
+
+.gate,
+.table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.gate th,
+.gate td,
+.table th,
+.table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.gate thead th,
+.table thead th {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  border-bottom: 1.5px solid var(--line-2);
+}
+
+.gate tbody th {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.gate td {
+  color: var(--ink-2);
+}
+
+.gate td:nth-child(2) {
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
+
+.verdict {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.verdict[data-result="PASS"] {
+  background: var(--pass-soft);
+  color: var(--pass);
+}
+
+.verdict[data-result="FAIL"] {
+  background: var(--fail-soft);
+  color: var(--fail);
+}
+
+/* Bars */
+
+.chart {
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+}
+
+.chart + .chart,
+.big + .chart {
+  margin-top: 20px;
+}
+
+.chartCaption {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 16px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.chartCaption span {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.bars {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.barRow {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+}
+
+.barLabel {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.barRow[data-emphasis] .barLabel {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.barTrack {
+  position: relative;
+  display: block;
+  /* The plot area leaves room for the label after the longest bar. */
+  width: calc(100% - 150px);
+  min-height: 26px;
+  border-left: 1px solid var(--line-2);
+}
+
+.bar {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  height: 18px;
+  background: #7489a6;
+  border-radius: 0 4px 4px 0;
+}
+
+.barRow[data-emphasis] .bar {
+  background: var(--accent);
+}
+
+.barValue {
+  position: absolute;
+  top: 3px;
+  margin-left: 10px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.barNote {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.reading {
+  margin-top: 20px;
+  max-width: var(--text);
+  color: var(--ink-2);
+}
+
+.table {
+  margin-top: 12px;
+}
+
+.table summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.table td {
+  font-family: var(--mono);
+  font-size: 13px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.table thead th:not(:first-child) {
+  text-align: right;
+}
+
+.totalRow th,
+.totalRow td {
+  font-weight: 700;
+  border-top: 1.5px solid var(--line-2);
+}
+
+.tableNote {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Before / after structure */
+
+.structures {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.structure {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--day);
+}
+
+.structure[data-after] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.structure h3 {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.structure[data-after] h3 {
+  color: var(--accent);
+}
+
+.structure ol {
+  margin-top: 12px;
+  display: grid;
+  gap: 12px;
+}
+
+.structure li {
+  position: relative;
+  padding: 9px 12px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  background: var(--surface);
+  font-family: var(--display);
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.structure li + li::before {
+  content: "↓";
+  position: absolute;
+  top: -13px;
+  left: 16px;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--muted);
+}
+
+.structure li[data-heavy] {
+  border-color: var(--fail);
+  border-style: dashed;
+}
+
+.structureTotal {
+  margin-top: auto;
+  padding-top: 14px;
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.structureArrow {
+  align-self: center;
+  font-size: 26px;
+  color: var(--navy);
+}
+
+.big {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr;
+  gap: 12px;
+}
+
+.big li {
+  display: grid;
+  gap: 4px;
+  padding: 18px 20px;
+  border-top: 2px solid var(--navy);
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.bigValue {
+  font-family: var(--display);
+  font-size: clamp(24px, 2.6vw, 32px);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.env {
+  margin-top: 24px;
+  display: grid;
+  gap: 6px;
+  font-size: 13.5px;
+}
+
+.env > div {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: 12px;
+}
+
+.env dt {
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.env dd {
+  color: var(--ink-2);
+}
+
+@media (max-width: 900px) {
+  .workload,
+  .correct {
+    grid-template-columns: 1fr;
+  }
+
+  .structures {
+    grid-template-columns: 1fr;
+  }
+
+  .structureArrow {
+    justify-self: center;
+    transform: rotate(90deg);
+  }
+
+  .big {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .barRow {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .chart {
+    padding: 18px 16px;
+  }
+
+  .env > div,
+  .conditions > div {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}

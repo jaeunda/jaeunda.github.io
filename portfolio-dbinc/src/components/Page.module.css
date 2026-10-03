@@ -1,0 +1,256 @@
+.frame {
+  max-width: var(--frame);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* Header */
+
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  padding: 56px 0 48px;
+}
+
+.capability,
+.kicker {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.title {
+  margin-top: 14px;
+  max-width: 22em;
+  font-size: clamp(28px, 3.6vw, 40px);
+  line-height: 1.32;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--navy);
+}
+
+.identifier {
+  margin-top: 12px;
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.message {
+  margin-top: 22px;
+  max-width: 40em;
+  font-size: 18px;
+  line-height: 1.65;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.meta {
+  margin-top: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.meta dt {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.meta dd {
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+
+.meta a {
+  color: var(--accent);
+  text-underline-offset: 3px;
+}
+
+.metrics {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.metrics li {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line-2);
+  border-radius: var(--r);
+  background: var(--day);
+}
+
+.metrics li[data-tone="fail"] {
+  border-left-color: var(--fail);
+}
+
+.metrics li[data-tone="pass"] {
+  border-left-color: var(--pass);
+}
+
+.metrics li[data-tone="plain"] {
+  border-left-color: var(--accent);
+}
+
+.metricValue {
+  display: block;
+  font-family: var(--display);
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.metricLabel {
+  display: block;
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+/* Blocks */
+
+.block {
+  padding: 64px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.block[data-tone="surface"] {
+  background: var(--surface);
+}
+
+.num {
+  display: inline-block;
+  margin-right: 10px;
+  padding: 1px 6px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+}
+
+.blockTitle {
+  margin-top: 14px;
+  max-width: 26em;
+  font-size: clamp(22px, 2.4vw, 28px);
+  line-height: 1.4;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--navy);
+}
+
+.lead {
+  margin-top: 14px;
+  max-width: var(--text);
+  font-size: 16.5px;
+  color: var(--ink-2);
+}
+
+.body {
+  margin-top: 32px;
+}
+
+.takeaway {
+  margin-top: 28px;
+  max-width: var(--text);
+  padding: 14px 18px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  font-weight: 600;
+  color: var(--navy);
+  border-radius: 0 var(--r) var(--r) 0;
+}
+
+/* Pager */
+
+.pager {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.pagerInner {
+  max-width: var(--frame);
+  margin: 0 auto;
+  padding: 32px var(--gutter);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+}
+
+.pagerLink {
+  display: grid;
+  gap: 2px;
+  padding: 14px 18px;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.pagerLink:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.pagerNext {
+  text-align: right;
+}
+
+.pagerDir {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.pagerName {
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.pagerHome {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  font-family: var(--display);
+  font-size: 14px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.pagerHome:hover {
+  color: var(--accent);
+}
+
+@media (max-width: 640px) {
+  .header {
+    padding: 40px 0 36px;
+  }
+
+  .block {
+    padding: 48px 0;
+  }
+
+  .pagerInner {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .pagerHome {
+    display: none;
+  }
+}

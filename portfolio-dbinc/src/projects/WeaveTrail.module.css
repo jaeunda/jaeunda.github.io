@@ -1,0 +1,516 @@
+/* WeaveTrail speaks in information and evidence: which actor produced each
+   step (lanes), what a result means (grades), and where it leads (trail). */
+
+.hops {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.hops li {
+  display: grid;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.hopTab {
+  padding: 7px 12px;
+  font-size: 12.5px;
+  color: var(--muted);
+  background: var(--day);
+  border-bottom: 1px solid var(--line);
+}
+
+.hopTab::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: var(--line-2);
+  vertical-align: 1px;
+}
+
+.hopAct {
+  padding: 14px 12px;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.hopNum {
+  margin-right: 8px;
+  font-family: var(--display);
+  font-size: 13px;
+  color: var(--accent);
+}
+
+/* Swimlanes */
+
+.swim {
+  --lanes: 4;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  overflow: hidden;
+  background:
+    linear-gradient(
+        90deg,
+        transparent calc(25% - 0.5px),
+        var(--line) 0 calc(25% + 0.5px),
+        transparent 0
+      )
+      0 0 / 100% 100%,
+    linear-gradient(
+        90deg,
+        transparent calc(50% - 0.5px),
+        var(--line) 0 calc(50% + 0.5px),
+        transparent 0
+      )
+      0 0 / 100% 100%,
+    linear-gradient(
+        90deg,
+        transparent calc(75% - 0.5px),
+        var(--line) 0 calc(75% + 0.5px),
+        transparent 0
+      )
+      0 0 / 100% 100%,
+    var(--day);
+}
+
+.swimHead {
+  display: grid;
+  grid-template-columns: repeat(var(--lanes), minmax(0, 1fr));
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.swimHead span {
+  padding: 10px 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.swimRows {
+  padding: 12px 0;
+}
+
+.swimRow {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--lanes), minmax(0, 1fr));
+  padding: 5px 10px;
+}
+
+.swimNode {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: var(--r);
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-left-width: 3px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.swimNode strong {
+  font-size: 14.5px;
+  color: var(--ink);
+}
+
+.swimIndex {
+  font-family: var(--display);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+[data-actor="user"] {
+  --actor: var(--muted);
+}
+
+[data-actor="ai"] {
+  --actor: var(--interp);
+}
+
+[data-actor="code"] {
+  --actor: var(--accent);
+}
+
+[data-actor="source"] {
+  --actor: var(--pass);
+}
+
+.swimHead span {
+  color: var(--actor);
+}
+
+.swimNode {
+  border-left-color: var(--actor);
+}
+
+.subhead {
+  margin-top: 36px;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+/* Grades */
+
+[data-grade="confirmed"] {
+  --grade: var(--pass);
+  --grade-soft: var(--pass-soft);
+}
+
+[data-grade="mismatch"] {
+  --grade: var(--fail);
+  --grade-soft: var(--fail-soft);
+}
+
+[data-grade="unverifiable"] {
+  --grade: var(--hold);
+  --grade-soft: var(--hold-soft);
+}
+
+[data-grade="interpretation"] {
+  --grade: var(--interp);
+  --grade-soft: var(--interp-soft);
+}
+
+.grades {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.grades li {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--grade);
+  border-radius: var(--r);
+  background: var(--surface);
+}
+
+.gradeName {
+  justify-self: start;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--grade-soft);
+  color: var(--grade);
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.gradeMeaning {
+  font-size: 14.5px;
+  color: var(--ink);
+}
+
+.gradeBy {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* AI / code */
+
+.roles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.role {
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--actor);
+  border-radius: var(--r);
+  background: var(--surface);
+}
+
+.role h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--actor);
+}
+
+.role ul {
+  margin-top: 12px;
+  display: grid;
+  gap: 6px;
+}
+
+.role li {
+  padding-left: 16px;
+  position: relative;
+  color: var(--ink);
+}
+
+.role li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0.72em;
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: var(--actor);
+}
+
+.roleLimit {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* Evidence trail */
+
+.trail {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--day);
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.badge {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1.5px solid var(--grade);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--grade);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.badge[aria-pressed="true"] {
+  background: var(--grade);
+  color: #fff;
+}
+
+.trailSteps {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.trailSteps li {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  background: var(--surface);
+  min-height: 120px;
+}
+
+.trailSteps li[data-step="result"] {
+  border-color: var(--grade);
+  background: var(--grade-soft);
+}
+
+.trailSteps li + li::before {
+  content: "→";
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.trailKey {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+.trailValue {
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.trailNote {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.case {
+  margin-top: 20px;
+  padding: 20px 24px;
+  border-left: 3px solid var(--pass);
+  background: var(--day);
+  border-radius: 0 var(--r) var(--r) 0;
+}
+
+.caseTag {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pass);
+}
+
+.caseBody {
+  margin-top: 8px;
+  max-width: var(--text);
+  font-size: 15px;
+  color: var(--ink-2);
+}
+
+.case a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* Direction: built vs next, drawn differently on purpose. */
+
+.direction {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.now,
+.later {
+  padding: 22px 24px;
+  border-radius: var(--r);
+}
+
+.now {
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+}
+
+.later {
+  border: 1.5px dashed var(--line-2);
+}
+
+.now h3,
+.later h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.later h3::after {
+  content: "향후 방향";
+  margin-left: 10px;
+  padding: 2px 8px;
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--accent);
+  vertical-align: 2px;
+}
+
+.now ul,
+.later ul {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.now li {
+  display: grid;
+  gap: 2px;
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+
+.now strong {
+  color: var(--ink);
+}
+
+.later li {
+  font-size: 15px;
+  color: var(--ink-2);
+}
+
+.later li::before {
+  content: "○ ";
+  color: var(--accent);
+}
+
+@media (max-width: 960px) {
+  .hops {
+    grid-template-columns: 1fr;
+  }
+
+  .grades {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .trailSteps {
+    grid-template-columns: 1fr;
+  }
+
+  .trailSteps li {
+    min-height: 0;
+  }
+
+  .trailSteps li + li::before {
+    content: "↓";
+    left: 50%;
+    top: -10px;
+  }
+}
+
+@media (max-width: 720px) {
+  /* Lanes collapse to a single column; the actor stays as a label. */
+  .swim {
+    background: var(--day);
+  }
+
+  .swimHead {
+    display: none;
+  }
+
+  .swimRow {
+    grid-template-columns: 1fr;
+  }
+
+  .swimNode {
+    grid-column: 1 / -1 !important;
+  }
+
+  .swimIndex :global(.sr-only) {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    clip: auto;
+    overflow: visible;
+  }
+
+  .roles,
+  .direction,
+  .grades {
+    grid-template-columns: 1fr;
+  }
+}

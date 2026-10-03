@@ -1499,6 +1499,53 @@ and deploy steps.
 - The root `tsconfig.json` and `.prettierignore` exclude the directory, because
   it has its own React JSX settings and build output.
 
+### DB Inc. Portfolio
+
+`portfolio-dbinc/` is the fourth portfolio and the second standalone Vite +
+React + TypeScript app. It is built to `portfolio-dbinc/dist` and copied into
+`public/portfolio-dbinc/` by `.github/workflows/deploy.yml` after the Quartz
+build, so it is served at `/portfolio-dbinc/`. Its README holds the run, build
+and deploy steps and the source of every figure on the page.
+
+- It reuses the 4DPLEX app's structure only (History API router, prerender,
+  font-subset check, previous/next pager). Copy, layout and visual language are
+  its own.
+- The home page (`/portfolio-dbinc/`) is one screen that states the case on a
+  light ground: a one-column hero (eyebrow, headline, one line of sub copy), then **one lead card** (weavegate) on its own row and the
+  other three projects in a row below it. Everything fits a desktop window
+  800px tall. The lead card is the only one with a navy frame and a figure
+  column (20/20 → 20/20); the three below are plain white cards. Cards are
+  whole-card links (a stretched title link): capability keywords beside the
+  number, problem title, project name, summary, a figure only where a number
+  carries the point, then one stack line. The small cards end in an arrow;
+  only the lead spells out `Explore Verification →`.
+- Each project is one complete page: capability → problem-first title →
+  identifier → one message → period · role · stack · GitHub → numbered blocks
+  → pager. The top bar on a project page shows `← Overview` and `0n / 04`
+  instead of the name and site links. The last project's "Next" is the
+  profile.
+- Every project page has its own diagram language, chosen by its problem:
+  weavegate is time and order (a schedule on a time axis with a
+  vulnerable/fixed toggle), WeaveTrail is evidence flow (actor swimlanes,
+  grade cards, a result → claim → source → data → rule trail), TeamPo is
+  business state (a state row lit as from → to per request, a transaction drawn
+  as its steps), and the GPU page is time and bottleneck (a correctness gate,
+  then bars on one linear axis).
+- Tokens live in `portfolio-dbinc/src/styles/global.css`: the overview and
+  the top bar are white (`--surface`), the night plane (`--night` `#0b1626`)
+  is kept for the footer only, and the day plane (`--day` `#f5f6f8`, `--ink` `#0f1722`, `--navy` `#13294b`,
+  `--accent` `#1d5fc4`) for the profile and project pages, and result-state
+  colours (`--pass`, `--fail`, `--hold`, `--interp`) used only for verification
+  outcomes and WeaveTrail's evidence grades.
+- Type is the portfolio set (Pretendard, Space Grotesk, IBM Plex Mono). Mono
+  carries English labels, code and identifiers only; Korean result lines use
+  the display face. The Pretendard subset is cut from
+  `portfolio-dbinc/scripts/font-chars.txt`.
+- Future work is drawn differently from built work: a dashed outline and a
+  `향후 방향` / `NEXT` tag, so a direction never reads as a finished project.
+- Like the other portfolios it is unlinked from the blog. The root
+  `tsconfig.json` and `.prettierignore` exclude its build output.
+
 ## Design Decisions Log
 
 ### 2026-05-27
@@ -3087,3 +3134,44 @@ on the page points outside the page.
   role note moved to the end of each page, a contents row and block numbers
   were added, results moved above implementation detail on the weavegate and
   CUDA pages, and the Ongi design notes were folded.
+
+### 2026-10-03 (a portfolio for DB Inc., built on the 4DPLEX structure)
+
+- Added `portfolio-dbinc/` for the DB Inc. S/W Engineer (financial affiliates)
+  application, served at `/portfolio-dbinc/`. The submitted cover letter sets
+  one message, reproducing operational faults and verifying the effect of a
+  change, so the home page shows that message and all four projects on the
+  first screen and leaves the profile to the scroll.
+- Kept the 4DPLEX router, prerender and pager because they were already proven
+  on GitHub Pages for direct visits, reloads and back/forward. Everything
+  visible was redesigned so the two applications do not read as the same page
+  with new words.
+- A navy-and-blue palette instead of 4DPLEX's cyan, closer to financial IT
+  documents while staying an independent technical portfolio.
+- Each project page draws its problem rather than sharing one diagram type, so
+  the four pages look different for a reason: order, evidence, state, time.
+- WeaveTrail's built and in-development parts, and the profile's future
+  direction, are visually separated (solid vs dashed) so nothing planned is
+  read as shipped.
+- See **DB Inc. Portfolio**.
+
+### 2026-10-03 (DB Inc. portfolio: light first screen, one lead project)
+
+- The dark overview read poorly, so the first screen and the top bar moved to
+  white with navy type. Only the footer keeps the night plane.
+- A 2 × 2 grid gave four cards equal weight and split attention. weavegate
+  carries the cover letter's message, so it now leads on its own row with the
+  only figure column; the other three sit in one row below it.
+- Card bodies lost their keyword lines (e.g. "공식 자료 + 시장 데이터 + 코드
+  재계산", "Java · Spring Boot · MySQL", "4인 팀 팀장"). Keywords live only
+  beside the number and in the stack line; the body keeps figures that carry
+  the point (20/20, 2,360.3 → 37.9 ms).
+- The GPU project is named by its domain (`거래 시계열 GPU 스캔`, capability
+  `TRADING DATA · PERFORMANCE`, a title that starts with "60만 건 거래
+  시계열") so it reads as financial data work.
+- In the profile, TOEIC Speaking (AL · 160) is the language headline and
+  TOEIC 855 the secondary line.
+- The name (`장다은 JANG DAEUN`) and school (`숭실대학교 컴퓨터학부 · 2027.02
+졸업예정`) moved from the hero into the home top bar, so the hero is only the
+  message. Below 760px the school line is dropped from the bar (it does not
+  fit beside the links) and stays in the profile's Education entry.

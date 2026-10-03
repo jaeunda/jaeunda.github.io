@@ -1,0 +1,352 @@
+/* The first screen: who, the development direction, and all four projects.
+   Light ground for reading. One lead project on its own row, three below it,
+   so the eye moves headline → lead → the rest. On a desktop window 800px
+   tall everything fits above the fold; on a phone it stacks. */
+.overview {
+  background: var(--surface);
+  color: var(--ink);
+  border-bottom: 1px solid var(--line);
+}
+
+.frame {
+  max-width: var(--frame);
+  margin: 0 auto;
+  padding: 20px var(--gutter) 12px;
+}
+
+/* Hero */
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.headline {
+  margin-top: 8px;
+  font-size: clamp(30px, 3vw, 37px);
+  line-height: 1.22;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--navy);
+}
+
+.sub {
+  margin-top: 10px;
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--ink-2);
+}
+
+/* Projects: one lead row, then three. */
+
+.projects {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 20px 11px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.card:hover {
+  border-color: var(--accent);
+  background: #fafcff;
+}
+
+.card:focus-within {
+  border-color: var(--accent);
+}
+
+.lead {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 270px;
+  gap: 32px;
+  padding: 16px 26px 14px;
+  border: 1.5px solid var(--navy);
+  background: var(--day);
+  box-shadow: inset 4px 0 0 var(--navy);
+}
+
+.lead:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.leadSide {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  padding-left: 28px;
+  border-left: 1px solid var(--line-2);
+}
+
+.leadSide .cta {
+  align-self: flex-end;
+}
+
+.leadStack {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.leadMain {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+}
+
+.cardNum {
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.cardCap {
+  color: var(--muted);
+}
+
+.leadTitle {
+  margin-top: 6px;
+  font-size: 23px;
+  line-height: 1.38;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--navy);
+}
+
+.cardTitle {
+  margin-top: 6px;
+  font-size: 17px;
+  line-height: 1.42;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--navy);
+}
+
+.cardLink {
+  text-decoration: none;
+}
+
+/* The whole card is the link target; the title carries its name. */
+.cardLink::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r);
+}
+
+.cardLink:focus-visible {
+  outline: none;
+}
+
+.cardLink:focus-visible::after {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.cardName {
+  margin-top: 3px;
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.cardSummary {
+  margin-top: 8px;
+  font-size: 14.5px;
+  line-height: 1.62;
+  color: var(--ink-2);
+}
+
+/* Figures: only where a number carries the point. */
+
+.leadFigure {
+  display: grid;
+  gap: 2px;
+}
+
+.figureRow {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.figureValue {
+  font-family: var(--display);
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.figureValue[data-tone="fail"] {
+  color: var(--fail);
+}
+
+.figureValue[data-tone="pass"] {
+  color: var(--pass);
+}
+
+.figureLabel {
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.figureArrow {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.cardFigure {
+  margin-top: 10px;
+}
+
+.figureInline {
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.figureInline span {
+  margin-left: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.cardFoot {
+  margin-top: auto;
+  padding-top: 8px;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+  font-size: 12px;
+}
+
+.cardFoot {
+  border-top: 1px solid var(--line);
+  margin-top: auto;
+}
+
+.stack {
+  flex: 1 1 auto;
+  padding-top: 0;
+  font-family: var(--mono);
+  color: var(--muted);
+}
+
+.cardFoot .cta {
+  font-size: 16px;
+}
+
+/* Decoration only: the hover transform would otherwise lift it above the
+   card's link layer and swallow clicks. */
+.cta {
+  pointer-events: none;
+  flex: none;
+  font-family: var(--display);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.ctaArrow {
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+
+.card:hover .ctaArrow,
+.card:focus-within .ctaArrow {
+  transform: translateX(4px);
+}
+
+/* Hand-off to the profile */
+
+.next {
+  margin-top: 6px;
+  text-align: center;
+}
+
+.nextLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 12px;
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.nextLink:hover {
+  color: var(--accent);
+}
+
+@media (max-width: 960px) {
+  .projects {
+    grid-template-columns: 1fr;
+  }
+
+  .lead {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .leadSide {
+    padding: 12px 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+}
+
+@media (max-width: 560px) {
+  .leadTitle {
+    font-size: 20px;
+  }
+
+  .figureValue {
+    font-size: 28px;
+  }
+
+  .frame {
+    padding-top: 28px;
+  }
+}

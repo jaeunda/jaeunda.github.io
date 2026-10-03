@@ -1,0 +1,405 @@
+.profile {
+  background: var(--day);
+  border-top: 1px solid var(--line);
+}
+
+.frame {
+  max-width: var(--frame);
+  margin: 0 auto;
+  padding: 80px var(--gutter) 88px;
+}
+
+.kicker {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.title {
+  margin-top: 10px;
+  font-family: var(--display);
+  font-size: clamp(30px, 3.4vw, 40px);
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--navy);
+}
+
+.lead {
+  margin-top: 12px;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+/* Education · qualification · language */
+
+.facts {
+  margin-top: 36px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  border-top: 2px solid var(--navy);
+  border-bottom: 1px solid var(--line);
+}
+
+.fact {
+  padding: 18px 20px 18px 0;
+}
+
+.fact + .fact {
+  padding-left: 20px;
+  border-left: 1px solid var(--line);
+}
+
+.fact dt {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.factMain {
+  display: block;
+  margin-top: 6px;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.factSub {
+  display: block;
+  font-size: 14px;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Parts */
+
+.part {
+  margin-top: 64px;
+}
+
+.partTitle {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--navy);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+/* Technology by use */
+
+.stack {
+  margin-top: 8px;
+}
+
+.stackGroup {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 24px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.groupName {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  padding-top: 3px;
+}
+
+.stackList {
+  display: grid;
+  gap: 10px;
+}
+
+.stackList > div {
+  display: grid;
+  grid-template-columns: minmax(0, 300px) 1fr;
+  gap: 16px;
+}
+
+.stackList dt {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.stackList dd {
+  color: var(--ink-2);
+}
+
+/* Beyond main projects */
+
+.beyond {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 40px;
+  padding: 28px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+}
+
+.beyondKind {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.beyondName {
+  margin-top: 8px;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--navy);
+}
+
+.beyondMeta {
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.beyondBody {
+  margin-top: 14px;
+  font-size: 15px;
+  color: var(--ink-2);
+}
+
+.tags {
+  margin-top: 14px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.loop {
+  align-self: center;
+  display: grid;
+  gap: 0;
+  counter-reset: step;
+}
+
+.loop li {
+  position: relative;
+  padding: 10px 14px 10px 44px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--day);
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+
+.loop li + li {
+  margin-top: 18px;
+}
+
+.loop li + li::before {
+  content: "";
+  position: absolute;
+  left: 24px;
+  top: -19px;
+  height: 18px;
+  border-left: 1.5px solid var(--line-2);
+}
+
+.loop li::after {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  font-family: var(--display);
+  font-size: 12px;
+}
+
+.loop span {
+  display: inline-block;
+  min-width: 64px;
+  margin-right: 8px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* Training */
+
+.training {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.course {
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+}
+
+.courseName {
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.courseOrg {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.coursePoint {
+  margin-top: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.courseFlow {
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--accent);
+}
+
+.courseNote {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+/* Direction: future work, set apart from what was built. */
+
+.direction {
+  margin-top: 72px;
+  padding: 32px;
+  border: 1.5px dashed var(--line-2);
+  border-radius: var(--r);
+}
+
+.directionTag {
+  display: inline-block;
+  padding: 3px 8px;
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.directionTitle {
+  margin-top: 14px;
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.directionLead {
+  margin-top: 10px;
+  max-width: var(--text);
+  font-size: 16.5px;
+  color: var(--ink);
+}
+
+.nextList {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.nextList li {
+  display: grid;
+  gap: 4px;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+
+.nextName {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.directionClose {
+  margin-top: 22px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+@media (max-width: 900px) {
+  .facts {
+    grid-template-columns: 1fr;
+  }
+
+  .fact + .fact {
+    padding-left: 0;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .stackGroup {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .beyond {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 22px;
+  }
+
+  .training,
+  .nextList {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .frame {
+    padding-top: 56px;
+    padding-bottom: 64px;
+  }
+
+  .stackList > div {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .direction {
+    padding: 22px;
+  }
+}

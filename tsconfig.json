@@ -19,5 +19,5 @@
     "jsxImportSource": "preact"
   },
   "include": ["**/*.ts", "**/*.tsx", "./package.json"],
-  "exclude": ["build/**/*.d.ts", "portfolio-4dplex"]
+  "exclude": ["build/**/*.d.ts", "portfolio-4dplex", "portfolio-dbinc"]
 }

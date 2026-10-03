@@ -4,3 +4,6 @@ node_modules
 portfolio-4dplex/dist
 portfolio-4dplex/dist-ssr
 portfolio-4dplex/scripts/font-chars.txt
+portfolio-dbinc/dist
+portfolio-dbinc/dist-ssr
+portfolio-dbinc/scripts/font-chars.txt
