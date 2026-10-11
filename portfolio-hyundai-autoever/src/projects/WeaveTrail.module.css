@@ -1,0 +1,748 @@
+/* ---------- examples table ---------- */
+
+.examples {
+  display: grid;
+}
+
+.exHead,
+.exRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 1.3fr);
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  align-items: start;
+}
+
+.exHead {
+  padding-top: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.exCol,
+.exVerdict {
+  display: flex;
+  flex-direction: column;
+}
+
+.exCol code {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.exCol small,
+.exVerdict small {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.exCol small {
+  font-family: var(--mono);
+}
+
+.exProposal code {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px dashed var(--plan);
+  border-radius: 5px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+
+.exVerdict b {
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.exRow[data-tone="pass"] .exVerdict b {
+  color: var(--pass);
+}
+
+.exRow[data-tone="hold"] .exVerdict b {
+  color: var(--hold);
+}
+
+.exRow[data-tone="fail"] .exVerdict b {
+  color: var(--fail);
+}
+
+/* ---------- pipeline ---------- */
+
+.pipeline {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.stage {
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 10px;
+}
+
+/* Arrow to the next stage. */
+.stage + .stage::before {
+  content: "→";
+  position: absolute;
+  left: -11px;
+  top: 40px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.stageCard {
+  display: flex;
+  flex-direction: column;
+  padding: 14px 14px 12px;
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+}
+
+.stage[data-kind="model"] .stageCard {
+  background: var(--surface);
+  border: 1.5px dashed var(--plan);
+}
+
+.stage[data-kind="person"] .stageCard {
+  border-color: var(--ink-2);
+}
+
+.stage[data-kind="code"] .stageCard {
+  background: var(--accent-soft);
+  border-color: rgba(61, 79, 214, 0.45);
+}
+
+.stageTop {
+  display: flex;
+  flex-direction: column;
+}
+
+.stageNum {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.stageKind {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.stageTitle {
+  margin-top: 4px;
+  font-size: 15.5px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.stageDoes {
+  margin-top: 6px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.stageNever {
+  margin-top: 8px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.stageNever span {
+  margin-right: 6px;
+  font-weight: 700;
+  color: var(--fail);
+}
+
+.stageRecord {
+  margin-top: auto;
+  padding-top: 10px;
+  font-size: 11.5px;
+  color: var(--accent-ink);
+  word-break: break-word;
+}
+
+.stageFail {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  background: var(--hold-soft);
+  border: 1px solid rgba(143, 83, 0, 0.35);
+  border-radius: 8px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.stageFail b {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--hold);
+}
+
+.failArrow {
+  position: absolute;
+  left: 50%;
+  top: -11px;
+  height: 10px;
+  border-left: 1.5px solid var(--hold);
+}
+
+.stageFailEmpty {
+  min-height: 0;
+}
+
+.pipelineNote {
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.pipelineNote code {
+  font-size: 12.5px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--sunk);
+}
+
+/* ---------- validator gates ---------- */
+
+.gates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.gates > li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px 16px;
+}
+
+.gates > li:not(:nth-child(3n + 1)) {
+  border-left: 1px solid var(--line);
+}
+
+.gates > li:nth-child(n + 4) {
+  border-top: 1px solid var(--line);
+}
+
+.gateNum {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.gateName {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.gateCodes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  margin-top: 2px;
+}
+
+.gateCodes code {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--sunk);
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.gateFoot {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.gateFoot p {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.gateFoot b {
+  margin-right: 8px;
+  color: var(--ink);
+}
+
+.gateFoot code {
+  font-size: 12.5px;
+}
+
+/* ---------- convergence ---------- */
+
+.converge {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) auto minmax(0, 1fr) auto minmax(0, 1.1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.inputs {
+  display: grid;
+  gap: 8px;
+}
+
+.file {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+}
+
+.file code {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.file small {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.variants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.variants li {
+  padding: 1px 7px;
+  border-radius: 4px;
+  background: var(--sunk);
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.arrowCol {
+  font-size: 18px;
+  color: var(--ink-2);
+}
+
+.core {
+  padding: 12px 14px;
+  background: var(--accent-soft);
+  border: 1px solid rgba(61, 79, 214, 0.45);
+  border-radius: 8px;
+}
+
+.coreLabel {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--accent-ink);
+}
+
+.core ul {
+  margin-top: 6px;
+  display: grid;
+  gap: 2px;
+}
+
+.core li {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.hashes {
+  display: grid;
+  gap: 8px;
+}
+
+.hash {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.hash small {
+  font-family: var(--mono);
+  font-size: 11.5px;
+}
+
+.hash b {
+  font-size: 14px;
+}
+
+.hash[data-tone="pass"] {
+  background: var(--pass-soft);
+  color: var(--pass);
+}
+
+.hash[data-tone="fail"] {
+  background: var(--fail-soft);
+  color: var(--fail);
+}
+
+.hash[data-tone="fail"] small {
+  font-family: var(--sans);
+}
+
+.trace {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 22px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
+.trace li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding-left: 14px;
+}
+
+.trace li + li::before {
+  content: "→";
+  position: absolute;
+  left: -8px;
+  top: 10px;
+  color: var(--pass);
+}
+
+.trace small {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.trace code {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--pass);
+}
+
+.decisionsWrap {
+  margin-top: 20px;
+}
+
+/* ---------- evaluation ---------- */
+
+.eval {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+  gap: 16px;
+}
+
+.rules,
+.chart {
+  padding: 18px 22px 20px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.evalTitle {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.evalTitle span {
+  margin-left: 6px;
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.rules dl {
+  margin-top: 10px;
+}
+
+.rules dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.rules dd {
+  font-family: var(--mono);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.rulesNote {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.candidates {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.candidates li {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr) 46px;
+  gap: 4px 12px;
+  align-items: center;
+}
+
+.candId {
+  font-size: 12.5px;
+}
+
+.candTrack {
+  position: relative;
+  height: 12px;
+  background: var(--sunk);
+  border-radius: 3px;
+}
+
+.candFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--ink-2);
+  border-radius: 3px;
+}
+
+/* The 95% threshold. */
+.candLine {
+  position: absolute;
+  left: 95%;
+  top: -4px;
+  bottom: -4px;
+  border-left: 1.5px dashed var(--pass);
+}
+
+.candValue {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.candMeta {
+  grid-column: 2 / -1;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.decision {
+  margin-top: 16px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--hold-soft);
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+.decision b {
+  margin-right: 8px;
+  font-family: var(--mono);
+  color: var(--hold);
+}
+
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.timeline li {
+  padding: 12px 14px 14px;
+  border-top: 2px solid var(--ink-2);
+  background: var(--surface);
+  border-radius: 0 0 6px 6px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.timeline li[data-tone="plan"] {
+  border-top-style: dashed;
+  border-top-color: var(--plan);
+}
+
+.timeline b {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.scopeWrap {
+  margin-top: 24px;
+}
+
+.docs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.docs a {
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+@media (max-width: 1100px) {
+  .pipeline {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: 20px;
+  }
+
+  .stage:nth-child(4)::before {
+    display: none;
+  }
+}
+
+@media (max-width: 1000px) {
+  .converge {
+    grid-template-columns: 1fr;
+  }
+
+  .arrowCol {
+    transform: rotate(90deg);
+    justify-self: center;
+  }
+
+  .eval {
+    grid-template-columns: 1fr;
+  }
+
+  .timeline {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .exHead {
+    display: none;
+  }
+
+  .exRow {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .pipeline {
+    grid-template-columns: 1fr;
+  }
+
+  .stage::before {
+    display: none;
+  }
+
+  .stage + .stage {
+    padding-top: 6px;
+  }
+
+  .stage + .stage::after {
+    content: "↓";
+    position: absolute;
+    top: -16px;
+    left: 18px;
+    color: var(--ink-2);
+  }
+
+  .stageFailEmpty {
+    display: none;
+  }
+
+  .stage {
+    grid-template-rows: auto;
+  }
+
+  .stageFail {
+    margin-left: 20px;
+  }
+
+  .failArrow {
+    left: 18px;
+  }
+
+  .gates {
+    grid-template-columns: 1fr;
+  }
+
+  .gates > li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 10px;
+    border-left: 0 !important;
+    border-top: 1px solid var(--line);
+  }
+
+  .gates > li:first-child {
+    border-top: 0;
+  }
+
+  .gateCodes {
+    grid-column: 2;
+  }
+
+  .gateFoot,
+  .timeline,
+  .trace {
+    grid-template-columns: 1fr;
+  }
+
+  .trace {
+    gap: 18px;
+  }
+
+  .trace li + li::before {
+    content: "↓";
+    left: -2px;
+    top: -14px;
+  }
+
+  .trace li {
+    padding-left: 10px;
+  }
+
+  .candidates li {
+    grid-template-columns: minmax(0, 1fr) 46px;
+  }
+
+  .candId {
+    grid-column: 1 / -1;
+  }
+
+  .candTrack {
+    grid-column: 1;
+  }
+
+  .candMeta {
+    grid-column: 1 / -1;
+  }
+}

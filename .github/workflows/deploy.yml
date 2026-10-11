@@ -49,6 +49,16 @@ jobs:
         run: |
           mkdir -p public/portfolio-dbinc
           cp -R portfolio-dbinc/dist/. public/portfolio-dbinc/
+      # A third standalone Vite app: three project case studies and a profile.
+      - name: Build portfolio-hyundai-autoever
+        working-directory: portfolio-hyundai-autoever
+        run: |
+          npm ci
+          npm run build
+      - name: Add portfolio-hyundai-autoever to the site
+        run: |
+          mkdir -p public/portfolio-hyundai-autoever
+          cp -R portfolio-hyundai-autoever/dist/. public/portfolio-hyundai-autoever/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:

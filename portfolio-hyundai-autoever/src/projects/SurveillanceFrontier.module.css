@@ -1,0 +1,518 @@
+.svgWide,
+.svgNarrow {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Below 640px the narrow drawing replaces the wide one, so its text keeps
+   its size instead of shrinking with the viewport. */
+.svgNarrow {
+  display: none;
+  max-width: 420px;
+}
+
+.svgWide {
+  max-width: 780px;
+}
+
+/* ---------- cost bars ---------- */
+
+.cost {
+  margin-top: 20px;
+  padding: 18px 22px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+}
+
+.costHead {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.costRow {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) 250px;
+  gap: 14px;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+
+.costLabel {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.costTrack {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 22px;
+}
+
+.costFill {
+  display: block;
+  height: 14px;
+  border-radius: 3px;
+  background: var(--ink-2);
+}
+
+.costRow[data-method="tail"] .costFill {
+  background: var(--muted);
+}
+
+.costRow[data-method="incremental"] .costFill {
+  background: var(--accent);
+}
+
+.costValue {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.costRow[data-method="incremental"] .costValue {
+  color: var(--accent-ink);
+}
+
+.costNote {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---------- time to solution (log axis) ---------- */
+
+.tts {
+  min-width: 0;
+}
+
+.ttsAxis,
+.ttsRow {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+  gap: 18px;
+}
+
+.ttsScale {
+  position: relative;
+  height: 20px;
+  border-bottom: 1px solid var(--line-2);
+}
+
+.ttsScale span {
+  position: absolute;
+  bottom: 4px;
+  transform: translateX(-50%);
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.ttsScale span[data-hour] {
+  color: var(--fail);
+  font-weight: 600;
+}
+
+.ttsRow {
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+}
+
+.ttsTask {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ttsTask small {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.ttsTrack {
+  position: relative;
+  height: 64px;
+}
+
+.ttsTrack::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  border-top: 1px solid var(--line);
+}
+
+.ttsHour {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1.5px dashed var(--fail);
+}
+
+.ttsDot {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--ink-2);
+}
+
+.ttsDot[data-method="shared"] {
+  border-color: var(--muted);
+}
+
+.ttsDot[data-method="tail"] {
+  border-color: var(--muted);
+  background: var(--sunk);
+}
+
+.ttsDot[data-method="inc"] {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.ttsDot[data-method="full"] {
+  background: var(--ink-2);
+}
+
+/* Labels alternate above and below the line so neighbours do not collide. */
+.ttsLabel {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  padding: 0 4px;
+  background: var(--paper);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--ink-2);
+}
+
+.ttsDot[data-method="full"] .ttsLabel,
+.ttsDot[data-method="tail"] .ttsLabel {
+  bottom: 13px;
+}
+
+.ttsDot[data-method="shared"] .ttsLabel,
+.ttsDot[data-method="inc"] .ttsLabel {
+  top: 13px;
+}
+
+.ttsDot[data-method="inc"] .ttsLabel {
+  color: var(--accent-ink);
+  font-weight: 600;
+  left: 0;
+  transform: none;
+}
+
+.ttsDot[data-method="full"] .ttsLabel {
+  left: auto;
+  right: -4px;
+  transform: none;
+}
+
+.ttsList {
+  display: none;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin-top: 14px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+
+.legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend li::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--ink-2);
+}
+
+.legend li[data-method="full"]::before {
+  background: var(--ink-2);
+}
+
+.legend li[data-method="shared"]::before {
+  border-color: var(--muted);
+}
+
+.legend li[data-method="tail"]::before {
+  border-color: var(--muted);
+  background: var(--sunk);
+}
+
+.legend li[data-method="inc"]::before {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.legend li[data-method="hour"]::before {
+  width: 0;
+  height: 12px;
+  border-radius: 0;
+  border: 0;
+  border-left: 1.5px dashed var(--fail);
+}
+
+/* ---------- findings ---------- */
+
+.findings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.finding {
+  padding: 18px 22px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+}
+
+.finding:first-child {
+  border-left: 3px solid var(--hold);
+}
+
+.finding h3 {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.finding p {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--ink-2);
+}
+
+/* ---------- GPU ---------- */
+
+.gpu {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 16px;
+}
+
+.gpuBuilt,
+.gpuOpen {
+  padding: 18px 22px 20px;
+  border-radius: 8px;
+}
+
+.gpuBuilt {
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.gpuOpen {
+  border: 1.5px dashed var(--line-2);
+}
+
+.gpuTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.gpuTitle span {
+  padding: 1px 8px;
+  border: 1px dashed var(--plan);
+  border-radius: 5px;
+  font-size: 12px;
+  color: var(--plan);
+}
+
+.gpuBuilt ul {
+  margin-top: 10px;
+  display: grid;
+  gap: 6px;
+}
+
+.gpuBuilt li {
+  position: relative;
+  padding-left: 14px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.gpuBuilt li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.7em;
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: var(--ink-2);
+}
+
+.gpuOpen p {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--ink-2);
+}
+
+.gpuQ {
+  color: var(--muted) !important;
+}
+
+.plan {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.plan li {
+  padding: 14px 16px 16px;
+  border: 1px dashed var(--line-2);
+  border-radius: 8px;
+}
+
+.planStep {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--plan);
+}
+
+.planTitle {
+  margin-top: 2px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.planBody {
+  margin-top: 6px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.scopeWrap {
+  margin-top: 24px;
+}
+
+.docs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.docs a {
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+@media (max-width: 1000px) {
+  .costRow {
+    grid-template-columns: 100px minmax(0, 1fr);
+  }
+
+  .costNote {
+    grid-column: 2;
+    margin-top: -6px;
+  }
+
+  .findings,
+  .gpu {
+    grid-template-columns: 1fr;
+  }
+
+  .plan {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .svgWide {
+    display: none;
+  }
+
+  .svgNarrow {
+    display: block;
+  }
+
+  .ttsAxis,
+  .ttsRow {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .ttsAxis > span:first-child {
+    display: none;
+  }
+
+  .ttsTask {
+    padding-bottom: 0;
+  }
+
+  .ttsTrack {
+    height: 52px;
+  }
+
+  .ttsTrack::before,
+  .ttsHour,
+  .ttsDot {
+    top: 14px;
+  }
+
+  .ttsHour {
+    top: 4px;
+    bottom: auto;
+    height: 20px;
+  }
+
+  .ttsLabel {
+    display: none;
+  }
+
+  .ttsList {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 26px;
+    font-size: 12px;
+    color: var(--ink-2);
+  }
+
+  .ttsScale span {
+    font-size: 10px;
+  }
+
+  .plan {
+    grid-template-columns: 1fr;
+  }
+}

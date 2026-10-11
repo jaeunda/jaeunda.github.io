@@ -1,0 +1,48 @@
+.footer {
+  border-top: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.inner {
+  max-width: var(--frame);
+  margin: 0 auto;
+  padding: 28px var(--gutter) 36px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+
+.name {
+  font-weight: 700;
+}
+
+.name span {
+  margin-left: 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+}
+
+.links a {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink-2);
+  text-decoration: none;
+  padding: 6px 0;
+  display: inline-block;
+}
+
+.links a:hover {
+  color: var(--accent-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

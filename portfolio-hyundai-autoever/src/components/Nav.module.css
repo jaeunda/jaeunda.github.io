@@ -1,0 +1,170 @@
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(246, 246, 243, 0.92);
+  backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+
+.inner {
+  max-width: var(--frame);
+  height: var(--nav-h);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.name {
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+}
+
+.latin {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.links {
+  display: flex;
+  gap: 4px;
+}
+
+.links a {
+  display: inline-block;
+  padding: 8px 12px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink-2);
+  text-decoration: none;
+  border-radius: 6px;
+}
+
+.links a:hover {
+  color: var(--ink);
+  background: var(--sunk);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-2);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.back:hover {
+  color: var(--accent-ink);
+}
+
+.switcher {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--sunk);
+  border-radius: 9px;
+  min-width: 0;
+}
+
+.tab {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 7px;
+  text-decoration: none;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--ink);
+}
+
+.tab[aria-current="page"] {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.tabNum {
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.tab[aria-current="page"] .tabNum {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.tabName {
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* On a narrow screen only the current project keeps its name; the other two
+   stay as numbered targets of the same size. */
+@media (max-width: 760px) {
+  .tab:not([aria-current="page"]) .tabName {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .tab {
+    padding: 6px 10px;
+    min-height: 36px;
+    align-items: center;
+  }
+
+  .tabName {
+    max-width: 38vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .latin {
+    display: none;
+  }
+
+  .links a {
+    padding: 8px 8px;
+  }
+}
+
+@media (max-width: 400px) {
+  .back {
+    font-size: 0;
+    gap: 0;
+  }
+
+  .back span {
+    font-size: 18px;
+  }
+
+  .back::after {
+    content: "전체";
+    font-size: 14px;
+    margin-left: 6px;
+  }
+}

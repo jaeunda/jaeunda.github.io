@@ -1546,6 +1546,53 @@ and deploy steps and the source of every figure on the page.
 - Like the other portfolios it is unlinked from the blog. The root
   `tsconfig.json` and `.prettierignore` exclude its build output.
 
+### Third Standalone Portfolio (three case studies)
+
+`portfolio-hyundai-autoever/` is the fifth portfolio and the third standalone
+Vite + React + TypeScript app, served at `/portfolio-hyundai-autoever/` and
+built and copied by `.github/workflows/deploy.yml` after the Quartz build. Its
+README holds the run, build and deploy steps and the source of every figure.
+The copy on the site names no employer or role.
+
+- It reuses the DB Inc. app's router, prerender and font-subset check, and adds
+  scroll restoration on Back/Forward (`history.state.scrollY`, manual
+  restoration) and a fade only after an in-site navigation (`data-navigated`),
+  so the first paint never waits on an animation.
+- The home page is one sentence and **three equal cards** in one row; at
+  1280×800 all three end around 650px. Each card is a whole-card link with a
+  status chip, name, what it is, **a small SVG that draws its mechanism**
+  (interleaved requests judged by SQL; full vs. incremental recompute;
+  propose → validate → approve → process with a REVIEW_REQUIRED exit), the
+  problem, the approach, one result with its condition, and a stack line.
+  Below 760px a numbered three-row index sits above the cards.
+- A project page reads problem → process → decisions → results → meaning:
+  `ProjectHeader` (problem-first title, two-sentence lead, status chips, three
+  results each with the condition it was measured under, facts, links), then
+  numbered `Section`s, `Decisions` (A/B/C, each with its evidence line),
+  `Apply` (numbered steps showing how the project is put to work, plus where it applies) and a `Pager` whose next card
+  previews the next project's topic and one sentence. The top bar on a project
+  page is `← 전체 프로젝트` plus a three-tab project switcher with the current
+  tab raised; below 760px only the current tab keeps its name.
+- Each page draws its own problem: weavegate is order and verdict (paired
+  sequence lanes, a five-step flow, a detection-count matrix per environment),
+  surveillance-frontier is cost (a task grid, a recompute-scope grid, linear
+  per-trial bars, a log time axis with the one-hour decision line),
+  WeaveTrail is authority (six stages with a forbidden line and a failure exit
+  under each gate, validator gates, a convergence-to-hash figure, candidates
+  against the 95% line).
+- Tokens live in `portfolio-hyundai-autoever/src/styles/global.css`: one light
+  plane (`--paper` `#f6f6f3`, `--surface` `#ffffff`, `--ink` `#17191e`), one
+  indigo (`--accent` `#3d4fd6`) for what is current or actionable, and result
+  colours (`--pass`, `--fail`, `--hold`) only for what a check returned.
+  Planned or unmeasured work is grey and dashed (`--plan`), never filled.
+  SVG colours mirror the tokens in `src/diagrams/palette.ts`.
+- Type is the portfolio set (Pretendard, Space Grotesk, IBM Plex Mono). Mono
+  carries identifiers only; any code-styled run that contains Hangul gets
+  `data-ko` and is set in Pretendard.
+- Wide SVGs that would shrink below legible size on a phone have a narrow
+  drawing instead (`svgWide` / `svgNarrow` at 640px); tables become two-line
+  rows rather than scrolling sideways.
+
 ## Design Decisions Log
 
 ### 2026-05-27
@@ -3175,3 +3222,40 @@ on the page points outside the page.
 졸업예정`) moved from the hero into the home top bar, so the hero is only the
   message. Below 760px the school line is dropped from the bar (it does not
   fit beside the links) and stays in the profile's Education entry.
+
+### 2026-10-11 (a third standalone portfolio: three case studies, one light plane)
+
+- Added `portfolio-hyundai-autoever/`, served at
+  `/portfolio-hyundai-autoever/`. The brief asked that a visitor recognise the
+  three lead projects within five seconds, so the first screen is one sentence
+  and three equal cards with no hero image, photo or menu beyond three links;
+  the profile follows on scroll.
+- Cards carry a drawing of each project's mechanism rather than a stack list,
+  so the three read as different systems and not the same card with new
+  keywords.
+- A single light plane and one indigo, distinct from the DB Inc. navy and the
+  4DPLEX cyan, so the three applications do not read as one page re-skinned.
+  Result colours are kept for check outcomes; planned work (the GPU phase,
+  WeaveTrail routing) is dashed grey so nothing unmeasured reads as a result.
+- Every figure states its condition beside it (349× with N, K, threads and
+  machine; NO_MODEL with the session and grid), because the numbers are only
+  true under those conditions.
+- Back/Forward now restore scroll, and the page fade runs only after an
+  in-site navigation, after the first build showed both a lost position on
+  return to the home cards and a fade on first paint.
+- A review pass moved Korean out of the mono face (`data-ko`), split the
+  validator's reason codes into chips so they no longer break mid-identifier,
+  capped the width of the wide SVGs and added narrow drawings for phones.
+- See **Third Standalone Portfolio (three case studies)**.
+
+### 2026-10-11 (portfolio-hyundai-autoever: copy aligned to the roles, `Scope` → `Apply`)
+
+- Every project page now ends with an `Apply` block (how a team would put the
+  project to work, and where it applies) instead of `Scope`. The author asked
+  that the pages state what was built and not list what was not done, so the
+  dashed "not yet established" box, planned-work chips and the NO_MODEL
+  headline were removed; figures stay as they were.
+- Titles and copy were rewritten in plain Korean for data-processing and
+  verification work (정합성 검증 자동화, 대용량 데이터 처리, 데이터 표준화와 AI
+  출력 품질 검증), with internal terms (정본화, 계약, H3/H4) replaced by
+  descriptive ones.
