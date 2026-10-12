@@ -1,0 +1,277 @@
+/* Trial loop */
+
+.loop {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0;
+  counter-reset: none;
+}
+
+.loop li {
+  position: relative;
+  padding: 0 18px 0 0;
+  margin-right: 18px;
+  border-right: 1px solid var(--line);
+}
+
+.loop li:last-child {
+  border-right: none;
+  margin-right: 0;
+  padding-right: 0;
+}
+
+/* An arrow on the rule between two steps. */
+.loop li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 34px;
+  right: -5px;
+  width: 8px;
+  height: 8px;
+  border-top: 1.5px solid var(--line-2);
+  border-right: 1.5px solid var(--line-2);
+  background: inherit;
+  transform: rotate(45deg);
+}
+
+.stepNum {
+  display: block;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.glyph {
+  display: block;
+  width: 100%;
+  max-width: 132px;
+  height: auto;
+  margin-bottom: 12px;
+}
+
+.loop h3 {
+  font-size: 15.5px;
+  line-height: 1.35;
+  font-weight: 650;
+}
+
+.loop p {
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+@media (max-width: 900px) {
+  .loop {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .loop li,
+  .loop li:last-child {
+    display: grid;
+    grid-template-columns: 24px 96px minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    column-gap: 14px;
+    margin: 0;
+    padding: 16px 0;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .loop li:first-child {
+    padding-top: 0;
+  }
+
+  .loop li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .loop li::after {
+    display: none;
+  }
+
+  .stepNum {
+    grid-row: 1 / 3;
+    margin: 0;
+    padding-top: 2px;
+  }
+
+  .glyph {
+    grid-row: 1 / 3;
+    margin: 0;
+  }
+
+  .loop p {
+    margin-top: 4px;
+  }
+}
+
+@media (max-width: 420px) {
+  .loop li,
+  .loop li:last-child {
+    grid-template-columns: 18px 72px minmax(0, 1fr);
+    column-gap: 10px;
+  }
+}
+
+/* Stage bars */
+
+.stages {
+  display: grid;
+  gap: 18px;
+}
+
+.stageKey {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.stageKey li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.stageKey li::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--swatch);
+}
+
+[data-stage="scan"] {
+  --swatch: #c3c6cc;
+}
+
+[data-stage="rank"] {
+  --swatch: #5d626c;
+}
+
+[data-stage="select"] {
+  --swatch: #17191e;
+}
+
+.stageRow {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 16px;
+  row-gap: 4px;
+  align-items: center;
+}
+
+.stageName {
+  grid-row: 1 / 3;
+  align-self: start;
+  padding-top: 3px;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.stageRow[data-method="incremental"] .stageName {
+  color: var(--accent-ink);
+}
+
+.stageTrack {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.stageFill {
+  display: flex;
+  height: 22px;
+  border-radius: 3px;
+  overflow: hidden;
+  flex: none;
+  max-width: calc(100% - 108px);
+}
+
+.stageFill span {
+  flex-basis: 0;
+  min-width: 0;
+  background: var(--swatch);
+}
+
+.stageRow[data-method="incremental"] .stageFill {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.stageValue {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.stageRow[data-method="incremental"] .stageValue {
+  color: var(--accent-ink);
+}
+
+.stageNote {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+@media (max-width: 560px) {
+  .stageRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .stageName {
+    grid-row: auto;
+    padding: 0;
+  }
+}
+
+/* Method legend */
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  margin-top: 16px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+
+.legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend li::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--swatch);
+}
+
+.legend li[data-hour] {
+  color: var(--fail);
+}
+
+.legend li[data-hour]::before {
+  width: 0;
+  height: 14px;
+  border-radius: 0;
+  border-left: 2px dashed var(--fail);
+  background: none;
+}

@@ -1,0 +1,99 @@
+/* Parallel efficiency at 32 threads against the 0.7 criterion. */
+
+.scaling {
+  display: grid;
+  gap: 14px;
+}
+
+.axis,
+.row {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) 90px;
+  align-items: center;
+  gap: 14px;
+}
+
+.axis span:nth-child(2) {
+  position: relative;
+  height: 18px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.axis i {
+  position: absolute;
+  font-style: normal;
+  transform: translateX(-50%);
+}
+
+.name {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.row[data-m="incremental"] .name,
+.row[data-m="incremental"] .value {
+  color: var(--accent-ink);
+}
+
+.track {
+  position: relative;
+  height: 22px;
+  background: var(--sunk);
+  border-radius: 3px;
+}
+
+.bar {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  border-radius: 3px;
+  background: var(--ink-2);
+}
+
+.row[data-m="incremental"] .bar {
+  background: var(--accent);
+}
+
+.criterion {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  border-left: 2px dashed var(--fail);
+}
+
+.value {
+  font-family: var(--mono);
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.note {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--fail);
+}
+
+@media (max-width: 560px) {
+  .axis,
+  .row {
+    grid-template-columns: 92px minmax(0, 1fr) 72px;
+    gap: 8px;
+  }
+
+  .name,
+  .value {
+    font-size: 12.5px;
+  }
+}
+
+/* Controls: each rate cell shaded by its value. */
+
+.heat td[data-rate] {
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 14px;
+}

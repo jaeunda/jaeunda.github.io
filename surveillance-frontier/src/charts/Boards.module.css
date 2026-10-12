@@ -1,0 +1,274 @@
+/* Gate checks: hairline rows */
+
+.checks {
+  max-width: 820px;
+  border-top: 1px solid var(--line-2);
+}
+
+.checks li {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pass);
+  background: var(--pass-soft);
+}
+
+.checks li[data-kind="caught"] .mark {
+  color: var(--fail);
+  background: var(--fail-soft);
+}
+
+.checkLabel {
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+.checkResult {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--pass);
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .checks li {
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+
+  .checkResult {
+    grid-column: 2;
+  }
+}
+
+/* Hypothesis ledger */
+
+.ledgerWrap {
+  max-width: 960px;
+  overflow-x: auto;
+  border-top: 1px solid var(--line-2);
+}
+
+.ledger {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.ledger th,
+.ledger td {
+  padding: 10px 16px 10px 0;
+  text-align: left;
+  vertical-align: baseline;
+  border-bottom: 1px solid var(--line);
+}
+
+.ledger thead th {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.ledger tbody th {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.ledger td {
+  color: var(--ink-2);
+}
+
+.ledgerValue {
+  font-family: var(--mono);
+  font-size: 13.5px;
+  color: var(--ink) !important;
+  white-space: nowrap;
+}
+
+.scorePred {
+  color: var(--muted);
+}
+
+.ledger tr[data-tone="plan"] td,
+.ledger tr[data-tone="plan"] th {
+  color: var(--muted);
+}
+
+/* Cause → consequence, no boxes */
+
+.flow {
+  max-width: 960px;
+  border-top: 1px solid var(--line-2);
+}
+
+.flow li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 32px minmax(0, 1fr);
+  align-items: baseline;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.flowFrom {
+  color: var(--muted);
+}
+
+.flowTo {
+  color: var(--ink);
+}
+
+.flowArrow {
+  font-family: var(--mono);
+  color: var(--accent);
+  text-align: center;
+}
+
+.flow li[data-muted] .flowTo,
+.flow li[data-muted] .flowFrom {
+  color: var(--faint);
+}
+
+.flow li[data-muted] .flowArrow {
+  color: var(--line-2);
+}
+
+@media (max-width: 640px) {
+  .flow li {
+    grid-template-columns: 1fr;
+  }
+
+  .flowArrow {
+    text-align: left;
+  }
+}
+
+/* Plain lists with a top rule */
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+}
+
+.columns section {
+  padding-top: 12px;
+  border-top: 2px solid var(--pass);
+}
+
+.columns section[data-tone="plan"] {
+  border-top: 2px dashed var(--plan);
+}
+
+.columns section[data-tone="accent"] {
+  border-top-color: var(--accent);
+}
+
+.columns h3 {
+  font-size: 15.5px;
+  font-weight: 650;
+  margin-bottom: 10px;
+}
+
+.columns ul {
+  display: grid;
+  gap: 7px;
+  padding-left: 1.1em;
+  list-style: disc;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.columns li::marker {
+  color: var(--faint);
+}
+
+@media (max-width: 900px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Breathing room before the text that follows a block. */
+.checks,
+.ledgerWrap,
+.flow,
+.columns {
+  margin-bottom: 28px;
+}
+
+/* Phase links: three quiet columns */
+
+.phases {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+}
+
+.phases a {
+  display: block;
+  padding-top: 12px;
+  border-top: 2px solid var(--ink);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.phases li[data-plan] a {
+  border-top: 2px dashed var(--plan);
+  color: var(--muted);
+}
+
+.phaseTag {
+  display: block;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.phaseQ {
+  display: block;
+  margin-top: 6px;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.phaseMore {
+  display: block;
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent-ink);
+}
+
+.phases a:hover .phaseQ {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+  .phases {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}

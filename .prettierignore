@@ -10,3 +10,6 @@ portfolio-dbinc/scripts/font-chars.txt
 portfolio-hyundai-autoever/dist
 portfolio-hyundai-autoever/dist-ssr
 portfolio-hyundai-autoever/scripts/font-chars.txt
+surveillance-frontier/dist
+surveillance-frontier/dist-ssr
+surveillance-frontier/src/data/generated.ts

@@ -23,6 +23,7 @@
     "build/**/*.d.ts",
     "portfolio-4dplex",
     "portfolio-dbinc",
-    "portfolio-hyundai-autoever"
+    "portfolio-hyundai-autoever",
+    "surveillance-frontier"
   ]
 }

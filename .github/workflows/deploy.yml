@@ -59,6 +59,16 @@ jobs:
         run: |
           mkdir -p public/portfolio-hyundai-autoever
           cp -R portfolio-hyundai-autoever/dist/. public/portfolio-hyundai-autoever/
+      # The surveillance-frontier research site, a fourth standalone Vite app.
+      - name: Build surveillance-frontier
+        working-directory: surveillance-frontier
+        run: |
+          npm ci
+          npm run build
+      - name: Add surveillance-frontier to the site
+        run: |
+          mkdir -p public/surveillance-frontier
+          cp -R surveillance-frontier/dist/. public/surveillance-frontier/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:

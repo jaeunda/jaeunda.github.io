@@ -1593,6 +1593,56 @@ The copy on the site names no employer or role.
   drawing instead (`svgWide` / `svgNarrow` at 640px); tables become two-line
   rows rather than scrolling sideways.
 
+### Research Project Site (surveillance-frontier)
+
+`surveillance-frontier/` is a standalone Vite + React + TypeScript app served
+at `/surveillance-frontier/` and built and copied by
+`.github/workflows/deploy.yml` after the Quartz build. Unlike the portfolios it
+is not addressed to a role: it presents one research project as it is, in
+English, and is meant to be linked from the project repository and, later,
+from the blog home. Its README holds the run and build steps and the source of
+every figure.
+
+- Every page reads down one line: a mono breadcrumb, the title (40px), one
+  sentence (20px, 640px measure), then the page's one figure across the full
+  frame with no box, a caption and a single mono line of facts and links.
+  The overview's figure (`HeroArc` in `src/charts/Hero.tsx`) puts the whole
+  project on one wall-clock axis — Phase 0's minute, Phase 1's task times
+  against the one-hour line, Phase 2 as a dashed band — so progress and
+  direction read from solid versus dashed marks rather than from labels.
+  Phase 0 opens on the 10/30/60 s intervals, Phase 1 on the four-method
+  time-to-solution chart.
+- Sections follow one pattern: title, a two-to-four sentence lede at 640px,
+  then figures across the width (`Section text=…`). Narrow blocks take eight
+  columns with margin notes beside them (`aside`); two related figures sit
+  side by side in their narrow drawings (`Pair`). Figures, tables and lists
+  have no boxes: a hairline and a mono label above. Hypotheses are one ledger
+  table. One paper background throughout. Phase pages keep a 40px sticky
+  contents bar with one-to-two-word labels. No commit hashes appear.
+- Three pages in reading order: an overview of the results so far, then
+  Phase 0 and Phase 1. The bar carries the project name and three tabs (the
+  current one marked) plus a `Code ↗` link; each page ends with a previous /
+  next pager, and Phase 1's next card is the dashed, external Phase 2 protocol.
+- A page is a header (eyebrow, the page's question as the h1, a lead, a
+  metadata row, outbound buttons) and numbered sections whose h2 is the claim.
+  Phase pages put a sticky contents list beside the text above 1080px; below
+  that it is a plain list above the first section.
+- The lead figure is data, not decoration: the Phase 0 rarity map of the fake
+  SEC post, recomputed by `scripts/make-data.mjs` from the project's own series
+  files and drawn as a one-pixel-per-window PNG scaled with nearest-neighbour
+  under SVG axes. Other charts are SVG (log dots against the one-hour decision
+  line, interval bars per time budget, log–log cost curves, rate panels) or
+  HTML where they are mostly text (the trial loop, stage bars, phase cards).
+- Tokens follow the hyundai-autoever portfolio's light plane and indigo, with
+  verdict colours only for what a check returned and dashed grey for what is
+  not tested or not started. The trial methods read as a grey ramp from the
+  reference to the fastest, with indigo for incremental, the method the
+  results are read against.
+- Type is Space Grotesk for headings, IBM Plex Mono for labels, figures and
+  identifiers, and the system sans for prose, so no Korean subset is loaded.
+- Wide SVGs stop at 900px and have narrow twins at 640px; narrow drawings use
+  13–13.5 unit text so labels stay near 12px on a 390px phone.
+
 ## Design Decisions Log
 
 ### 2026-05-27
@@ -3259,3 +3309,78 @@ on the page points outside the page.
   verification work (정합성 검증 자동화, 대용량 데이터 처리, 데이터 표준화와 AI
   출력 품질 검증), with internal terms (정본화, 계약, H3/H4) replaced by
   descriptive ones.
+
+### 2026-10-12 (a research site for surveillance-frontier)
+
+- Added `surveillance-frontier/`, served at `/surveillance-frontier/`. The
+  author asked for one site that presents the project as it is rather than
+  for a role, explains the results so far in English with graphics on the
+  first page, and gives Phase 0 and Phase 1 their own pages.
+- The first page leads with the project's question and a recomputed rarity
+  map instead of a hero title or stat cards, because the map is the
+  detector's own output and shows in one picture what is being stress-tested.
+  Each numbered section states one finding as its heading and carries the one
+  figure that supports it, with the condition it was measured under.
+- Hypotheses that were not tested and the Phase 2 card are dashed grey, and
+  H2 reads `not supported`, so nothing unmeasured or unfavourable is styled
+  as a result.
+- The first build showed the narrow drawings rendering on desktop (a module
+  rule overrode `.narrow`), SVG text near 9px on phones, and contents links
+  jumping back to the top because `popstate` fires on fragment navigation.
+  The router now saves each entry's scroll position and lets in-page jumps
+  land on their section; wide drawings are capped and narrow text enlarged.
+- See **Research Project Site (surveillance-frontier)**.
+
+### 2026-10-12 (surveillance-frontier: graphics first, half the text)
+
+- The author found the first screen a large title over dense text that no
+  one would read, and asked that each section open with a graphic, that
+  question, issue and conclusion be visible at a glance, that the prose be
+  cut to about half without losing context, and that no commit hashes show.
+- The header shrank (34px title, one-sentence lead) and now carries a
+  three-card board — Question → The catch → Answer — each with a graphic
+  drawn for one message (interval narrowing with n, trials in 60 s, the
+  one-hour verdict; the rarity cone, the download share, the 60 s
+  intervals; the task grid, 349×, the verdict). Metadata and links moved
+  below the board.
+- Prose-only sections became visual blocks: gates as a check grid,
+  hypotheses as predicted → measured tiles, "what changed" as a
+  cause → consequence flow, the decision rule as two branches with the
+  untaken one dashed, parallel efficiency as bars against the 0.7 line, the
+  controls table shaded by rate, and the closing summary as three columns.
+
+### 2026-10-12 (surveillance-frontier: one message at the top)
+
+- The three-card board split attention: the author could not tell where to
+  look first. Each page now opens with a single statement and the single
+  figure that proves it, with one caption line; the question, the catch and
+  the other figures stay in the numbered sections below. The small board
+  graphics that only served the cards were removed.
+
+### 2026-10-12 (surveillance-frontier: two columns, no boxed hero)
+
+- Full-width figures made each screen hold little: a figure filled the width
+  and pushed its explanation below the fold. Sections now set heading and
+  text beside the figures on wide screens, and the contents list moved from
+  a 196px side column to a sticky bar so figures get that width.
+- The first screen lost its bordered card: text left, figure right, on the
+  page itself. The overview states the overall conclusion and the direction
+  (labelled lines and a dashed Phase 2 row in the figure); each phase page
+  states that phase's core result.
+
+### 2026-10-12 (surveillance-frontier: one reading line, after a design review)
+
+- The author found the information piled into the left column and asked for
+  a re-layout that follows the reader's gaze, with the overview conveying
+  the project's character and progress implicitly rather than in labelled
+  fragments ("Conclusion:", "Direction:").
+- A design review found left-heavy first screens with the figure floating
+  beside them, an L-shaped hole wherever a short text rail met a tall
+  figure, three competing section layouts, too many boxes, and an overview
+  hero that repeated Phase 1. The pages now read top to bottom on one line
+  (title → sentence → full-width figure), every section uses the same
+  title → lede → figure order, boxes became hairlines, the overview gained a
+  figure of its own (the project on one clock) and dropped sections that
+  repeated phase pages, Phase 0's budget section became its hero, and
+  Phase 1 moved Controls next to the definition and merged its time table
+  and hypotheses into one Verdicts section.
